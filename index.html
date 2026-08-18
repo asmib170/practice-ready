@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A UX research case study about finding suitable music practice rooms and reliable equipment information at TSM.">
-    <title>Finding Space to Practice — UX Case Study</title>
+    <meta name="description" content="A UX research case study about helping True School of Music students confirm that a suitable practice room, time slot and working equipment are ready before practice begins.">
+    <title>Practice Ready — UX Case Study</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <a class="skip-link" href="#main">Skip to main content</a>
 
     <header class="site-header">
-        <a class="brand" href="#top" aria-label="Return to top">Finding Space to Practice</a>
+        <a class="brand" href="#top" aria-label="Practice Ready — return to top">Practice Ready</a>
         <nav aria-label="Case study sections">
             <a href="#phase-1">Empathize</a>
             <a href="#phase-2">Ideate</a>
@@ -23,8 +23,8 @@
         <section class="hero" id="top">
             <div class="hero-copy">
                 <p class="eyebrow">HCI Mid-Term · Empathy to Execution</p>
-                <h1>Finding space<br>to <em>practice.</em></h1>
-                <p class="lede">A research-led product blueprint that helps TSM students find suitable music practice rooms and understand where the equipment they need is located and whether it is working.</p>
+                <h1>Practice<br><em>ready.</em></h1>
+                <p class="lede">A research-led product blueprint that helps True School of Music students find and reserve a suitable practice room, then confirm that the equipment they need is in place and working before practice begins.</p>
                 <div class="hero-meta" aria-label="Project details">
                     <span>Asmi B.</span>
                     <span>Primary user: Elizabeth John</span>
@@ -320,7 +320,7 @@
             </div>
 
             <figure class="artifact-image">
-                <img src="assets/empathy-map.png" alt="Empathy map for Elizabeth John showing what she says, thinks, does and feels while searching for the missing MPR 3 mixer and ultimately practising without the required equipment.">
+                <img src="assets/empathy-map.png" alt="Empathy map for Elizabeth John divided into Says, Thinks, Does and Feels. It records her searching MPRs 3, 5, 4 and 2 for a missing mixer, calling Leo for its location, learning that one mixer was moved and another is under repair, and feeling increasingly frustrated before practising without amplification.">
                 <figcaption>Empathy map based on Elizabeth’s interview account and the reconstructed observation log.</figcaption>
             </figure>
         </section>
@@ -335,7 +335,7 @@
             </div>
 
             <figure class="artifact-image">
-                <img src="assets/user-journey-map.png" alt="Elizabeth’s user journey map across planning, discovery, searching, enquiry, realization and compromise, with an emotion line falling from motivated to frustrated and powerless before ending disappointed and helpless.">
+                <img src="assets/user-journey-map.png" alt="Journey map of Elizabeth’s failed vocal-practice setup across six stages: Plan, Discovery, Search, Enquiry, Realization and Compromise. Her emotion moves from motivated at plus two, to confused at minus one, increasingly frustrated at minus two, briefly hopeful at minus one, then reaches its lowest point at minus three when neither mixer is available, before ending disappointed at minus two while practising without the equipment.">
                 <figcaption>Elizabeth’s emotion reaches its lowest point when she learns that neither mixer is available and that the mixer under repair has no confirmed return date.</figcaption>
             </figure>
         </section>
@@ -418,8 +418,11 @@
             <p class="wide-lede">Participants grouped the 17 cards, named their categories and described alternative choices, expected sequences, mandatory steps and conditional actions.</p>
 
             <figure class="card-sort-photo">
-                <img src="assets/card-sort-activity.png" alt="Photograph of handwritten pink feature cards arranged into groups during the physical open hierarchical card-sorting activity.">
-                <figcaption>A participant organizing the 17 feature cards into self-defined categories and documenting relationships between them.</figcaption>
+                <div class="card-sort-gallery">
+                    <img src="assets/card-sort-completed-arrangement.png" alt="Completed physical card sort showing 17 handwritten pink feature cards arranged across a table into participant-defined clusters for room discovery, reservations, equipment information, temporary relocation, repair, reporting and support. The complete arrangement is visible from the three room-finding cards at the top through the relocation and reporting cards along the bottom edge.">
+                    <img src="assets/card-sort-participant.png" alt="A participant leans over a table while examining and arranging 17 handwritten pink feature cards during the open hierarchical card-sorting activity.">
+                </div>
+                <figcaption>Physical card-sorting evidence showing both the sorting process and a completed participant-defined arrangement of the 17 feature cards.</figcaption>
             </figure>
 
             <div class="stat-grid compact-stats">
@@ -451,7 +454,7 @@
             <p class="wide-lede">The repeated card-sort patterns were translated into four top-level branches: Find a Room, Equipment, Reservations, and Reports &amp; Support. Each of the 17 tested cards was placed once in the hierarchy, while sequential relationships were documented separately rather than represented as menu nesting.</p>
 
             <figure class="artifact-image">
-                <img src="assets/v1-ia-tree.png" alt="V1 information architecture menu tree for the MPR Practice System, showing Find a Room, Equipment, Reservations, and Reports and Support as the four top-level categories containing the 17 tested features.">
+                <img src="assets/v1-ia-tree.png" alt="V1 menu hierarchy for the MPR Practice System. Four top-level categories—Find a Room, Equipment, Reservations, and Reports and Support—organize the 17 card-sorted features. Practice Type sits under Find a Room, while Reschedule and Cancel sit inside My Reservations under Reservations.">
                 <figcaption>V1 IA menu tree derived from the ten-participant card sort.</figcaption>
             </figure>
         </section>
@@ -503,7 +506,7 @@
                 <table>
                     <thead><tr><th>V2 validation task</th><th>Expected path</th></tr></thead>
                     <tbody>
-                        <tr><td>Check which MPRs are free tomorrow from 6:00–7:00 PM.</td><td>Reservations → Availability &amp; Daily Slots</td></tr>
+                        <tr><td>Check which MPRs are free tomorrow from 6:00–7:00 PM.</td><td>Book a Room → Availability &amp; Daily Slots</td></tr>
                         <tr><td>Find a room suitable for a band rehearsal.</td><td>Find a Room → Practice Type → Band Rehearsal</td></tr>
                         <tr><td>Check the current location of a temporarily relocated mixer.</td><td>Equipment → MPR Setups &amp; TSM Equipment Locations</td></tr>
                         <tr><td>Reschedule an existing reservation.</td><td>My Reservations → Upcoming → Reschedule</td></tr>
@@ -525,15 +528,15 @@
                 <p class="section-number">15</p>
                 <div>
                     <p class="eyebrow">Final structure</p>
-                    <h2 id="v2-title">Final V2 Information Architecture validated through tree testing.</h2>
+                    <h2 id="v2-title">Final V2 Information Architecture refined after validation.</h2>
                 </div>
             </div>
 
-            <p class="wide-lede">V2 contains five top-level branches and 19 features. The revised hierarchy achieved 35 direct successes across 35 task attempts during the five-participant validation round.</p>
+            <p class="wide-lede">V2 contains five top-level branches and 19 features. The revised hierarchy achieved 35 direct successes across 35 task attempts during the five-participant validation round. Following instructor feedback, the validated “Reservations” label was refined to “Book a Room” to distinguish creating a booking from managing one under “My Reservations”; the hierarchy itself was unchanged.</p>
 
             <figure class="artifact-image">
-                <img src="assets/final-v2-ia-tree.png" alt="Final V2 information architecture menu tree for the MPR Practice System, showing Find a Room, Equipment, Reservations, My Reservations, and Reports and Support as five top-level categories containing all 19 final features.">
-                <figcaption>Final V2 IA after revisions prompted by the two-participant pilot and validation with five additional participants.</figcaption>
+                <img src="assets/final-v2-ia-tree-book-a-room.png" alt="Final V2 menu hierarchy with five top-level categories: Find a Room, Equipment, Book a Room, My Reservations, and Reports and Support. Book a Room contains availability, reservation, session equipment logging and usage rules. My Reservations is divided into Upcoming for reschedule and cancel, Active for editing equipment-use and relocation records, and History for completed reservations and session records.">
+                <figcaption>Final V2 IA after the two-participant pilot, validation with five additional participants, and a post-presentation label refinement from “Reservations” to “Book a Room.”</figcaption>
             </figure>
         </section>
 
@@ -569,15 +572,15 @@
                 <article class="should">
                     <h3>Should-Have <span>9</span></h3>
                     <ul>
-                        <li><strong>3.</strong> Reschedule an MPR reservation</li>
-                        <li><strong>4.</strong> Cancel an MPR reservation</li>
+                        <li><strong>17.</strong> Log a temporary equipment relocation</li>
                         <li><strong>8.</strong> View equipment repair progress and expected return date</li>
                         <li><strong>9.</strong> Find rooms suitable for vocal practice</li>
+                        <li><strong>14.</strong> View room conditions and usage restrictions</li>
+                        <li><strong>3.</strong> Reschedule an MPR reservation</li>
+                        <li><strong>4.</strong> Cancel an MPR reservation</li>
                         <li><strong>10.</strong> Find rooms suitable for band rehearsals</li>
                         <li><strong>11.</strong> Find rooms suitable for individual instrument practice</li>
-                        <li><strong>14.</strong> View room conditions and usage restrictions</li>
                         <li><strong>15.</strong> View MPR booking and room/equipment usage rules</li>
-                        <li><strong>17.</strong> Log a temporary equipment relocation</li>
                     </ul>
                 </article>
                 <article class="could">
@@ -598,7 +601,7 @@
                 </article>
             </div>
 
-            <p class="note">Features 7 and 17 were the two candidates debated for the fourth and final Must-Have position. They were compared using the DFV Matrix in the next step.</p>
+            <p class="note">Items are ordered from highest to lowest relative importance within each MoSCoW category. Feature 17 appears first among the Should-Haves because it narrowly lost the fourth and final Must-Have position to Feature 7 in the DFV comparison below.</p>
         </section>
 
         <section class="section-shell" aria-labelledby="dfv-title">
@@ -649,7 +652,7 @@
     </main>
 
     <footer>
-        <p>Finding Space to Practice · HCI Mid-Term Project · Asmi B.</p>
+        <p>Practice Ready · HCI Mid-Term Project · Asmi B.</p>
     </footer>
 </body>
 </html>

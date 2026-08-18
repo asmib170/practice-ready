@@ -1,77 +1,50 @@
-# Finding Space to Practice
+# Practice Ready
 
-An HCI/UI-UX case study exploring how students at the **True School of Music (TSM)** find suitable Music Practice Rooms and determine whether the equipment they need is available, correctly located and functional.
+Practice Ready is an HCI/UI-UX case study about helping students at the True School of Music (TSM) find and reserve a suitable Music Practice Room (MPR), then confirm that the equipment they need is correctly located and working before practice begins.
 
-## Project Overview
+## Project focus
 
-The initial assumption was that room booking was the main difficulty. Primary research revealed a broader problem: an available room is not necessarily suitable when essential equipment is missing, relocated, damaged or under repair.
+The research showed that an empty room is not necessarily a usable room. Students lack reliable, up-to-date information about room suitability, equipment location and equipment condition, causing them to lose practice time and compromise their preparation.
 
-The project follows an end-to-end UX process from empathy and problem definition to Information Architecture testing and MVP prioritisation.
+## UX process
 
-## Research Process
+The case study documents three phases:
 
-* 3 semi-structured research interviews
-* 1 research-based primary persona
-* Empathy Map
-* User Journey Map with emotion line
-* 3 user stories
-* 17 feature cards tested through an open hierarchical card sort
-* 10 card-sort participants
-* V1 Information Architecture
-* 2-participant V1 tree-test pilot
-* V2 Information Architecture
-* 5-participant V2 validation
-* 35/35 direct V2 task successes
-* 19 final features
-* MoSCoW prioritisation with exactly 4 Must-Haves
-* DFV comparison between the final two Must-Have candidates
+1. **Empathy and Definition** — problem framing, a proto-persona, three interviews and observations, a research-based persona, an empathy map, a journey map, the validated pain point and user stories.
+2. **Ideation and Evaluation** — 17 card-sorted features, an open hierarchical card sort with 10 participants, a V1 information architecture, a two-participant tree-test pilot, revisions and validation with five additional participants.
+3. **Prioritisation** — a 19-feature MoSCoW analysis with exactly four Must-Haves and a DFV comparison between the two candidates for the final Must-Have position.
 
-## Primary User
+## Key outcome
 
-**Elizabeth John** is a third-year vocalist who frequently uses the MPRs for individual vocal practice and group rehearsals.
+The final information architecture contains five top-level categories: **Find a Room**, **Equipment**, **Book a Room**, **My Reservations**, and **Reports & Support**. The validated V2 hierarchy achieved 35 out of 35 direct task successes. Following instructor feedback, the category label “Reservations” was refined to “Book a Room” to distinguish creating a booking from managing existing reservations.
 
-> “An empty room is not enough if the equipment I need is missing or unusable.”
+## Built with
 
-## Validated Pain Point
+- Semantic HTML5
+- Responsive CSS3
+- No JavaScript
+- No frameworks or external UI libraries
 
-Elizabeth lacks reliable, up-to-date visibility into the location and availability of essential vocal equipment before beginning practice. This uncertainty frustrates her, wastes her limited practice time and forces her to compromise her preparation for live performance.
-
-## Final MVP
-
-The four Must-Have capabilities are:
-
-* View MPR availability and daily time slots
-* Reserve an MPR time slot
-* View MPR setups and TSM equipment locations
-* View equipment working condition
-
-## Technical Constraints
-
-The case study is presented as a single responsive scrolling webpage built with:
-
-* Semantic HTML5
-* CSS3
-* Accessible image elements and alt text
-* No JavaScript
-* No frameworks
-* No UI screen designs
-
-## Repository Structure
+## Repository structure
 
 ```text
-.
+practice-ready/
 ├── index.html
 ├── style.css
+├── README.md
 └── assets/
-    ├── card-sort-activity.png
+    ├── card-sort-completed-arrangement.png
+    ├── card-sort-participant.png
     ├── empathy-map.png
-    ├── final-v2-ia-tree.png
+    ├── final-v2-ia-tree-book-a-room.png
     ├── user-journey-map.png
     └── v1-ia-tree.png
 ```
 
+## Accessibility
+
+The webpage uses semantic structure, a skip link, labelled navigation, responsive layouts and descriptive alternative text for every research image and diagram.
+
 ## Author
 
-**Asmi B.**
-Human-Computer Interaction Mid-Term Project
-Vijaybhoomi University
+Asmi B. — HCI/UI-UX Mid-Term Project
