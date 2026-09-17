@@ -8,8 +8,6 @@ dist/
 # Cloudflare / Wrangler local files
 .wrangler/
 
-# Local ChatGPT/OpenAI project files
-.openai/
 
 # Local working folders
 .codex/
