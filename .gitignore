@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+
+# Build output
+.next/
+dist/
+
+# Cloudflare / Wrangler local files
+.wrangler/
+
+# Local ChatGPT/OpenAI project files
+.openai/
+
+# Local working folders
+.codex/
+outputs/
+work/
+
+# Environment variables / secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Practice Ready local runtime files
+.sites-runtime/
+.agents/
+
+# Next.js generated type file
+next-env.d.ts
