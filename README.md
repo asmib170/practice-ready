@@ -6,6 +6,11 @@ The project addresses a practical problem faced by students: before arriving for
 
 Practice Ready brings this information together so students can make a more informed room booking before beginning a practice session.
 
+## Live Links
+
+- **Current Interactive Prototype:** https://practice-ready.asmi-battoo.workers.dev
+- **HCI/UI-UX Case Study:** https://asmib170.github.io/practice-ready/
+
 ## Must-Have Features
 
 The prototype is built around four prioritized Must-Have features:
