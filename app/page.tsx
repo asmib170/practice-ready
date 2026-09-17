@@ -979,8 +979,8 @@ function Shell({
   return (
     <main className="min-h-screen bg-[#f3f5fb] text-[#151a31]">
       <div className="mx-auto min-h-screen w-full max-w-[760px] bg-[#f8f9fd] shadow-[0_0_60px_rgba(21,26,49,.08)]">
-        <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-[#f8f9fd]/95 px-5 pb-4 pt-4 backdrop-blur sm:px-8">
-          <div className="mb-4 flex items-center justify-between">
+        <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-[#f8f9fd]/95 px-5 pb-3 pt-3 backdrop-blur sm:px-8 sm:pb-4 sm:pt-4">
+          <div className="mb-2.5 flex items-center justify-between sm:mb-4">
             {back ? (
               <button
                 onClick={back}
@@ -1000,22 +1000,22 @@ function Shell({
               </button>
             )}
           </div>
-          <h1 className="text-[1.75rem] font-semibold leading-tight tracking-[-0.035em]">
+          <h1 className="text-[1.6rem] font-semibold leading-tight tracking-[-0.035em] sm:text-[1.75rem]">
             {title}
           </h1>
           {subtitle && (
-            <p className="mt-2 text-[15px] leading-6 text-slate-600">
+            <p className="mt-1.5 text-[15px] leading-5 text-slate-600 sm:mt-2 sm:leading-6">
               {subtitle}
             </p>
           )}
           {contextualScrollHint && (
-            <p className="mt-1 text-sm font-normal text-slate-500">
+            <p className="mt-0.5 text-sm font-normal leading-5 text-slate-500 sm:mt-1">
               {contextualScrollHint}
             </p>
           )}
           {headerExtra && <div className="mt-4">{headerExtra}</div>}
         </header>
-        <div className="px-5 pb-56 pt-5 sm:px-8">{children}</div>
+        <div className="px-5 pb-56 pt-3.5 sm:px-8 sm:pt-5">{children}</div>
       </div>
     </main>
   );
@@ -1052,7 +1052,7 @@ function Primary({
 }
 function ActionBar({ children }: { children: React.ReactNode }) {
   return (
-    <div className="fixed bottom-0 left-1/2 z-30 w-full max-w-[760px] -translate-x-1/2 border-t border-slate-200/80 bg-[#f8f9fd]/95 px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 shadow-[0_-10px_30px_rgba(21,26,49,.08)] backdrop-blur sm:px-8">
+    <div className="fixed bottom-0 left-1/2 z-30 w-full max-w-[760px] -translate-x-1/2 border-t border-slate-200/80 bg-[#f8f9fd]/95 px-5 pb-[max(.75rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-10px_30px_rgba(21,26,49,.08)] backdrop-blur sm:px-8 sm:pb-[max(1rem,env(safe-area-inset-bottom))] sm:pt-3">
       <div className="space-y-3">{children}</div>
     </div>
   );
@@ -1098,18 +1098,18 @@ function Summary({
   date: Date;
 }) {
   return (
-    <div className="grid grid-cols-3 gap-2 rounded-2xl bg-[#151a31] p-4 text-white">
+    <div className="grid grid-cols-3 gap-2 rounded-2xl bg-[#151a31] p-3 text-white sm:p-4">
       <div>
         <small className="text-slate-400">Date</small>
-        <p className="mt-1 text-sm font-semibold">{shortDate(date)}</p>
+        <p className="mt-0.5 text-sm font-semibold sm:mt-1">{shortDate(date)}</p>
       </div>
       <div>
         <small className="text-slate-400">Time</small>
-        <p className="mt-1 text-sm font-semibold">{time}</p>
+        <p className="mt-0.5 text-sm font-semibold sm:mt-1">{time}</p>
       </div>
       <div>
         <small className="text-slate-400">Room</small>
-        <p className="mt-1 text-sm font-semibold">{room}</p>
+        <p className="mt-0.5 text-sm font-semibold sm:mt-1">{room}</p>
       </div>
     </div>
   );
@@ -1129,17 +1129,17 @@ function ConfirmationDetails({
     { label: "Room", value: room, icon: <MapPin size={18} /> },
   ];
   return (
-    <section className="mt-5" aria-labelledby="reservation-details">
-      <h2 id="reservation-details" className="mb-3 text-base font-semibold">
+    <section className="mt-3.5 sm:mt-5" aria-labelledby="reservation-details">
+      <h2 id="reservation-details" className="mb-2 text-base font-semibold sm:mb-3">
         Reservation details
       </h2>
       <div className="grid rounded-2xl border border-slate-200 bg-white shadow-sm sm:grid-cols-3">
         {details.map((detail, index) => (
           <div
             key={detail.label}
-            className={`flex items-center gap-3 p-4 ${index > 0 ? "border-t border-slate-100 sm:border-l sm:border-t-0" : ""}`}
+            className={`flex items-center gap-2.5 px-3.5 py-3 ${index > 0 ? "border-t border-slate-100 sm:border-l sm:border-t-0" : ""} sm:gap-3 sm:p-4`}
           >
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-violet-50 text-violet-700">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-violet-50 text-violet-700 sm:h-10 sm:w-10">
               {detail.icon}
             </span>
             <div>
@@ -1779,7 +1779,7 @@ export default function Home() {
         home={home}
       >
         <Summary room={room} time={time} date={bookingDate} />
-        <h2 className="mb-3 mt-6 text-lg font-semibold">
+        <h2 className="mb-2.5 mt-4 text-lg font-semibold sm:mb-3 sm:mt-6">
           Available now{" "}
           <span className="text-emerald-600">
             {ready.length}/{data.length}
@@ -1794,13 +1794,13 @@ export default function Home() {
           {unavailable.length > 0 && (
             <button
               onClick={() => go(room === "MPR 5" ? "issues5" : "issues3")}
-              className="flex min-h-12 w-full items-center justify-between rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 text-left text-amber-950 transition hover:bg-amber-100"
+              className="flex min-h-11 w-full items-center justify-between rounded-2xl border border-amber-300 bg-amber-50 px-3.5 py-2 text-left text-amber-950 transition hover:bg-amber-100 sm:min-h-12 sm:px-4 sm:py-3"
             >
               <span>
                 <strong className="text-sm">
                   {unavailable.length} assigned items need attention
                 </strong>
-                <small className="mt-0.5 block text-xs text-amber-800">
+                <small className="block text-xs leading-4 text-amber-800 sm:mt-0.5">
                   View their status and your options.
                 </small>
               </span>
@@ -2048,9 +2048,9 @@ export default function Home() {
       >
         <Summary room={room} time={time} date={bookingDate} />
         <div
-          className={`mt-5 rounded-2xl border bg-white p-4 ${hasIssues ? "border-amber-200" : "border-slate-200"}`}
+          className={`mt-3.5 rounded-2xl border bg-white p-3.5 sm:mt-5 sm:p-4 ${hasIssues ? "border-amber-200" : "border-slate-200"}`}
         >
-          <div className="flex items-start gap-3">
+          <div className="flex items-start gap-2.5 sm:gap-3">
             {hasIssues ? (
               <TriangleAlert className="mt-0.5 shrink-0 text-amber-600" />
             ) : (
@@ -2064,7 +2064,7 @@ export default function Home() {
                     {unavailable.length} of {data.length} assigned items need
                     attention.
                   </p>
-                  <p className="mt-0.5 text-xs text-slate-500">
+                  <p className="text-xs leading-4 text-slate-500 sm:mt-0.5">
                     {data.length - unavailable.length} items are currently
                     available.
                   </p>
@@ -2079,7 +2079,7 @@ export default function Home() {
           {unavailable.map((x) => (
             <div
               key={x.id}
-              className="mt-3 flex items-center justify-between gap-3 border-t border-slate-100 pt-3 text-sm"
+              className="mt-2.5 flex items-center justify-between gap-3 border-t border-slate-100 pt-2.5 text-sm sm:mt-3 sm:pt-3"
             >
               <span>
                 {x.name} · {x.id}
@@ -2093,7 +2093,7 @@ export default function Home() {
           <Button
             variant="outline"
             onClick={home}
-            className="min-h-12 w-full rounded-2xl border-slate-300 bg-white font-semibold text-slate-700 shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:text-slate-900"
+            className="min-h-10 w-full rounded-2xl border-slate-300 bg-white py-2 text-sm font-semibold text-slate-700 shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:text-slate-900 sm:min-h-12 sm:py-0 sm:text-base"
           >
             Cancel and Return Home
           </Button>
@@ -2124,7 +2124,7 @@ export default function Home() {
       <Shell title="Reservation confirmed">
         <div
           role="status"
-          className="flex items-center gap-4 rounded-3xl border border-emerald-600 bg-emerald-600 p-5 text-white shadow-lg shadow-emerald-200/70"
+          className="flex items-center gap-3 rounded-3xl border border-emerald-600 bg-emerald-600 p-4 text-white shadow-lg shadow-emerald-200/70 sm:gap-4 sm:p-5"
         >
           <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-white/20">
             <Check size={27} />
@@ -2156,12 +2156,12 @@ export default function Home() {
         }
         subtitle="Your reservation was not created."
       >
-        <div className="rounded-3xl border border-rose-200 bg-rose-50 p-5">
+        <div className="rounded-3xl border border-rose-200 bg-rose-50 p-4 sm:p-5">
           <TriangleAlert className="text-rose-600" size={30} />
-          <h2 className="mt-4 text-xl font-semibold text-rose-950">
+          <h2 className="mt-3 text-xl font-semibold text-rose-950 sm:mt-4">
             {conflictSlot} was just booked by someone else.
           </h2>
-          <p className="mt-2 text-sm leading-6 text-rose-800">
+          <p className="mt-1.5 text-sm leading-5 text-rose-800 sm:mt-2 sm:leading-6">
             {selectedSlots.length > 1
               ? `This 30-minute interval is part of your selected ${time} booking in ${room} on ${longDate(bookingDate)}.`
               : `Another student reserved ${room} on ${longDate(bookingDate)} from ${time} before your booking was confirmed.`}
@@ -2524,9 +2524,9 @@ function HomeScreen({
             ))}
           </div>
         </section>
-        <section className="flex min-h-screen items-center px-5 py-8 sm:px-10 lg:px-20">
+        <section className="flex min-h-screen items-center px-5 py-5 sm:px-10 sm:py-8 lg:px-20">
           <div className="mx-auto w-full max-w-xl">
-            <div className="mb-10 flex items-center justify-between lg:hidden">
+            <div className="mb-6 flex items-center justify-between sm:mb-10 lg:hidden">
               <Brand />
               <span className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-slate-500 shadow-sm">
                 TSM
@@ -2541,7 +2541,7 @@ function HomeScreen({
             <p className="mt-3 text-base leading-7 text-slate-600">
               Book a room or check where equipment is and whether it works.
             </p>
-            <div className="mt-8 space-y-4">
+            <div className="mt-5 space-y-3 sm:mt-8 sm:space-y-4">
               <HomeCard
                 dark
                 icon={<CalendarDays />}
@@ -2584,10 +2584,10 @@ function HomeCard({
   return (
     <button
       onClick={onClick}
-      className={`group flex w-full items-center gap-4 rounded-[1.4rem] p-5 text-left shadow-sm transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-300 ${dark ? "bg-[#151a31] text-white hover:bg-[#1b213c]" : "border border-violet-200 bg-[#f7f5ff] text-[#151a31] shadow-violet-100/70 hover:border-violet-300 hover:bg-[#f1edff]"}`}
+      className={`group flex w-full items-center gap-3 rounded-[1.4rem] px-4 py-3.5 text-left shadow-sm transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-300 sm:gap-4 sm:p-5 ${dark ? "bg-[#151a31] text-white hover:bg-[#1b213c]" : "border border-violet-200 bg-[#f7f5ff] text-[#151a31] shadow-violet-100/70 hover:border-violet-300 hover:bg-[#f1edff]"}`}
     >
       <span
-        className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl ${dark ? "bg-violet-500" : "bg-violet-600 text-white"}`}
+        className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl sm:h-12 sm:w-12 sm:rounded-2xl ${dark ? "bg-violet-500" : "bg-violet-600 text-white"}`}
       >
         {icon}
       </span>
@@ -2694,7 +2694,7 @@ function Slots({
       back={back}
       headerExtra={
         selectedSlots.length > 0 ? (
-          <div className="flex items-center justify-between gap-3 rounded-xl border border-violet-200 bg-white px-4 py-3 text-sm shadow-sm">
+          <div className="flex items-center justify-between gap-2 rounded-xl border border-violet-200 bg-white px-3 py-2 text-sm shadow-sm sm:gap-3 sm:px-4 sm:py-3">
             <span className="font-medium text-slate-600">Selected time</span>
             <strong className="text-right text-violet-800">
               {selectedRange} · {durationLabel(selectedSlots.length)}
@@ -2703,8 +2703,8 @@ function Slots({
         ) : undefined
       }
     >
-      <div className="mb-5 flex items-center gap-3 rounded-2xl bg-white p-4 shadow-sm">
-        <MapPin className="text-violet-600" />
+      <div className="mb-3 flex items-center gap-2.5 rounded-2xl bg-white px-3.5 py-2.5 shadow-sm sm:mb-5 sm:gap-3 sm:p-4">
+        <MapPin className="text-violet-600" size={20} />
         <div>
           <small className="text-slate-500">Selected MPR</small>
           <p className="font-semibold">{room}</p>
@@ -2716,20 +2716,20 @@ function Slots({
           Change <ChevronDown size={15} />
         </button>
       </div>
-      <div className="mb-5 rounded-2xl border border-violet-200 bg-violet-50 px-4 py-4 text-violet-950">
+      <div className="mb-3 rounded-2xl border border-violet-200 bg-violet-50 px-3.5 py-2.5 text-violet-950 sm:mb-5 sm:px-4 sm:py-4">
         <p className="font-semibold">Select your practice time</p>
-        <p className="mt-1 text-sm leading-5 text-violet-800">
+        <p className="mt-0.5 text-sm leading-5 text-violet-800 sm:mt-1">
           Choose a start and end time in 30-minute increments. Maximum booking duration: 3 hours.
         </p>
       </div>
       {alternativeRoom && (
-        <p className="mb-5 rounded-xl border border-violet-200 bg-violet-50 px-4 py-3 text-sm text-violet-900">
+        <p className="mb-3 rounded-xl border border-violet-200 bg-violet-50 px-3.5 py-2.5 text-sm leading-5 text-violet-900 sm:mb-5 sm:px-4 sm:py-3">
           {originalSlots.some((slot) => booked.has(slot))
             ? `Your original ${originalTime} booking is not fully available in ${room}. Choose another available time.`
             : `Your original ${originalTime} booking is available in ${room}. Keep it selected or choose another available time.`}
         </p>
       )}
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {periods.map((p) => (
           <section key={p.name}>
             <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-slate-500">
