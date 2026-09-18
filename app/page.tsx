@@ -2006,9 +2006,9 @@ export default function Home() {
             Continue Booking Without {mixer ? "Mixer" : "Microphone Stand"}
           </Button>
           <Button
-            variant="ghost"
+            variant="outline"
             onClick={() => setScreen("setup3")}
-            className="min-h-12 w-full rounded-2xl font-semibold text-violet-700 hover:bg-violet-50 hover:text-violet-800"
+            className="min-h-12 w-full rounded-2xl border-slate-300 bg-white font-semibold text-slate-700 shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:text-slate-900"
           >
             Return to MPR 3 Setup
           </Button>
@@ -2716,17 +2716,14 @@ function Slots({
           Change <ChevronDown size={15} />
         </button>
       </div>
-      <div className="mb-3 rounded-2xl border border-violet-200 bg-violet-50 px-3.5 py-2.5 text-violet-950 sm:mb-5 sm:px-4 sm:py-4">
-        <p className="font-semibold">Select your practice time</p>
-        <p className="mt-0.5 text-sm leading-5 text-violet-800 sm:mt-1">
-          Choose a start and end time in 30-minute increments. Maximum booking duration: 3 hours.
-        </p>
+      <div className="mb-3 rounded-xl bg-violet-50/70 px-3.5 py-2.5 text-sm font-medium leading-5 text-violet-800 sm:mb-5 sm:px-4">
+        Select a start and end time · Max 3 hours
       </div>
       {alternativeRoom && (
         <p className="mb-3 rounded-xl border border-violet-200 bg-violet-50 px-3.5 py-2.5 text-sm leading-5 text-violet-900 sm:mb-5 sm:px-4 sm:py-3">
           {originalSlots.some((slot) => booked.has(slot))
-            ? `Your original ${originalTime} booking is not fully available in ${room}. Choose another available time.`
-            : `Your original ${originalTime} booking is available in ${room}. Keep it selected or choose another available time.`}
+            ? <>Your selected time isn&apos;t available in {room}. <span className="font-medium">Choose another available time below.</span></>
+            : <>Your selected time is available in {room}. <span className="font-medium">Keep it selected or choose another available time.</span></>}
         </p>
       )}
       <div className="space-y-4 sm:space-y-6">
