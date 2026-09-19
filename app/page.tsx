@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -8,6 +8,7 @@ import {
   Check,
   ChevronDown,
   Clock3,
+  Expand,
   Headphones,
   MapPin,
   Music2,
@@ -33,9 +34,11 @@ type Screen =
   | "issues3"
   | "mixer-search"
   | "stand-search"
+  | "alternative-search"
   | "slots5"
   | "setup5"
   | "issues5"
+  | "available-equipment"
   | "review"
   | "recheck"
   | "success"
@@ -809,6 +812,49 @@ const equipmentSearchTags = (item: Equipment) => {
   return normalizeEquipmentSearch(`${text} ${tags.join(" ")}`);
 };
 
+const equipmentType = (item: Equipment) => {
+  const name = normalizeEquipmentSearch(item.name);
+
+  // Specific accessory/microphone types must be classified before their
+  // broader drum terms so they cannot masquerade as drum alternatives.
+  if (/kick drum microphone|kick microphone/.test(name)) return "kick-drum-microphone";
+  if (/snare drum microphone|snare microphone/.test(name)) return "snare-drum-microphone";
+  if (/kick pedal/.test(name)) return "kick-pedal";
+  if (/floor tom/.test(name)) return "floor-tom";
+  if (/rack tom/.test(name)) return "rack-tom";
+  if (/snare drum/.test(name)) return "snare-drum";
+  if (/kick drum/.test(name)) return "kick-drum";
+  if (/instrument cable/.test(name)) return "instrument-cable";
+  if (/xlr/.test(name) && /cable/.test(name)) return "xlr-cable";
+  if (/microphone stand|mic stand/.test(name)) return "microphone-stand";
+  if (/monitor speaker/.test(name)) return "monitor-speaker";
+  if (/mixer/.test(name)) return "mixer";
+  if (/digital piano|grand piano|acoustic piano|keyboard/.test(name)) return "keyboard-piano";
+  return "";
+};
+
+const requestedAlternativeType = (value: string) => {
+  const query = normalizeEquipmentSearch(value);
+  if (query === "floor tom") return "floor-tom";
+  if (query === "rack tom") return "rack-tom";
+  if (query === "snare drum") return "snare-drum";
+  if (query === "kick drum") return "kick-drum";
+  if (query === "instrument cable") return "instrument-cable";
+  if (query === "microphone stand" || query === "mic stand") return "microphone-stand";
+  if (query === "mixer") return "mixer";
+  if (query === "monitor speaker" || query === "monitor") return "monitor-speaker";
+  if (query === "keyboard" || query === "digital piano" || query === "piano")
+    return "keyboard-piano";
+  return "";
+};
+
+const alternativeEquipmentMatches = (item: Equipment, value: string) => {
+  const requestedType = requestedAlternativeType(value);
+  return requestedType
+    ? equipmentType(item) === requestedType
+    : equipmentMatches(item, value);
+};
+
 const equipmentMatches = (item: Equipment, value: string) => {
   const normalized = normalizeEquipmentSearch(value);
   if (!normalized) return false;
@@ -950,6 +996,8 @@ function Shell({
   back,
   home,
   headerExtra,
+  stickyHeader = true,
+  headerRef,
 }: {
   children: React.ReactNode;
   title: string;
@@ -958,13 +1006,15 @@ function Shell({
   back?: () => void;
   home?: () => void;
   headerExtra?: React.ReactNode;
+  stickyHeader?: boolean;
+  headerRef?: React.RefObject<HTMLElement | null>;
 }) {
   const contextualScrollHint =
     scrollHint ??
     (title.startsWith("MPR ") && title.endsWith(" availability")
-      ? "Scroll to view availability throughout the day."
+      ? undefined
       : title.endsWith(" setup")
-        ? "Scroll to review all assigned equipment."
+        ? undefined
         : title === "Equipment availability issues"
           ? "Scroll to review all affected items and your options."
           : title.startsWith("Search for another")
@@ -977,10 +1027,10 @@ function Shell({
                   ? "Scroll to review all equipment in this location."
                   : undefined);
   return (
-    <main className="min-h-screen bg-[#f3f5fb] text-[#151a31]">
-      <div className="mx-auto min-h-screen w-full max-w-[760px] bg-[#f8f9fd] shadow-[0_0_60px_rgba(21,26,49,.08)]">
-        <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-[#f8f9fd]/95 px-5 pb-3 pt-3 backdrop-blur sm:px-8 sm:pb-4 sm:pt-4">
-          <div className="mb-2.5 flex items-center justify-between sm:mb-4">
+    <main className="min-h-screen w-full max-w-full overflow-x-clip bg-[#f3f5fb] text-[#151a31]">
+      <div className="mx-auto min-h-screen w-full min-w-0 max-w-[760px] overflow-x-clip bg-[#f8f9fd] shadow-[0_0_60px_rgba(21,26,49,.08)]">
+        <header ref={headerRef} className={`${stickyHeader ? "sticky top-0 z-20 backdrop-blur" : "relative z-10"} border-b border-slate-200/80 bg-[#f8f9fd]/95 px-5 pb-3 pt-3 sm:px-8 sm:pb-3 sm:pt-3`}>
+          <div className="mb-2.5 flex items-center justify-between sm:mb-2.5">
             {back ? (
               <button
                 onClick={back}
@@ -1000,11 +1050,11 @@ function Shell({
               </button>
             )}
           </div>
-          <h1 className="text-[1.6rem] font-semibold leading-tight tracking-[-0.035em] sm:text-[1.75rem]">
+          <h1 className="min-w-0 break-words text-[1.6rem] font-semibold leading-tight tracking-[-0.035em] sm:text-[1.65rem]">
             {title}
           </h1>
           {subtitle && (
-            <p className="mt-1.5 text-[15px] leading-5 text-slate-600 sm:mt-2 sm:leading-6">
+            <p className="min-w-0 break-words text-pretty mt-1.5 text-[15px] leading-5 text-slate-600 sm:mt-1 sm:leading-5">
               {subtitle}
             </p>
           )}
@@ -1013,9 +1063,9 @@ function Shell({
               {contextualScrollHint}
             </p>
           )}
-          {headerExtra && <div className="mt-4">{headerExtra}</div>}
+          {headerExtra && <div className="mt-4 sm:mt-3">{headerExtra}</div>}
         </header>
-        <div className="px-5 pb-56 pt-3.5 sm:px-8 sm:pt-5">{children}</div>
+        <div className="w-full min-w-0 max-w-full px-5 pb-36 pt-3.5 sm:px-8 sm:pb-40 sm:pt-5">{children}</div>
       </div>
     </main>
   );
@@ -1052,7 +1102,7 @@ function Primary({
 }
 function ActionBar({ children }: { children: React.ReactNode }) {
   return (
-    <div className="fixed bottom-0 left-1/2 z-30 w-full max-w-[760px] -translate-x-1/2 border-t border-slate-200/80 bg-[#f8f9fd]/95 px-5 pb-[max(.75rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-10px_30px_rgba(21,26,49,.08)] backdrop-blur sm:px-8 sm:pb-[max(1rem,env(safe-area-inset-bottom))] sm:pt-3">
+    <div className="fixed bottom-0 left-1/2 z-30 w-full min-w-0 max-w-[760px] -translate-x-1/2 overflow-x-hidden border-t border-slate-200/80 bg-[#f8f9fd]/95 px-5 pb-[max(.75rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-10px_30px_rgba(21,26,49,.08)] backdrop-blur sm:px-8 sm:pb-[max(1rem,env(safe-area-inset-bottom))] sm:pt-3">
       <div className="space-y-3">{children}</div>
     </div>
   );
@@ -1098,18 +1148,18 @@ function Summary({
   date: Date;
 }) {
   return (
-    <div className="grid grid-cols-3 gap-2 rounded-2xl bg-[#151a31] p-3 text-white sm:p-4">
-      <div>
+    <div className="grid min-w-0 grid-cols-[minmax(0,1.05fr)_minmax(0,1.2fr)_minmax(0,.58fr)] gap-2 rounded-2xl bg-[#151a31] p-4 text-white sm:grid-cols-3">
+      <div className="min-w-0">
         <small className="text-slate-400">Date</small>
-        <p className="mt-0.5 text-sm font-semibold sm:mt-1">{shortDate(date)}</p>
+        <p className="mt-1 whitespace-nowrap text-sm font-semibold">{shortDate(date)}</p>
       </div>
-      <div>
+      <div className="min-w-0">
         <small className="text-slate-400">Time</small>
-        <p className="mt-0.5 text-sm font-semibold sm:mt-1">{time}</p>
+        <p className="mt-1 whitespace-nowrap text-sm font-semibold">{time}</p>
       </div>
-      <div>
+      <div className="min-w-0">
         <small className="text-slate-400">Room</small>
-        <p className="mt-0.5 text-sm font-semibold sm:mt-1">{room}</p>
+        <p className="mt-1 whitespace-nowrap text-sm font-semibold">{room}</p>
       </div>
     </div>
   );
@@ -1255,11 +1305,17 @@ const equipmentImageUrl = (item: Equipment) => {
 function EquipmentRow({
   item,
   showDefault = false,
+  showStatus = true,
   action,
+  compactResult = false,
+  availableEquipmentLayout = false,
 }: {
   item: Equipment;
   showDefault?: boolean;
+  showStatus?: boolean;
   action?: React.ReactNode;
+  compactResult?: boolean;
+  availableEquipmentLayout?: boolean;
 }) {
   const [imageOpen, setImageOpen] = useState(false);
   const imageUrl = equipmentImageUrl(item);
@@ -1275,47 +1331,103 @@ function EquipmentRow({
 
   return (
     <>
-      <div className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex min-w-0 items-start gap-3">
-            <button
-              type="button"
-              onClick={() => setImageOpen(true)}
-              className="group relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2"
-              aria-label={`View larger reference image of ${item.name}`}
-              title="View larger image"
-            >
-              <img
-                src={imageUrl}
-                alt={`Reference image of ${item.name}`}
-                className="h-full w-full object-contain p-1.5 transition-transform group-hover:scale-105"
-                loading="lazy"
-              />
-            </button>
-            <div className="min-w-0">
-              <p className="font-semibold leading-snug">{item.name}</p>
-              <p className="mt-0.5 text-xs font-bold tracking-wide text-violet-600">
-                {item.id}
-              </p>
+      <div
+        className={
+          compactResult
+            ? "flex h-full min-w-0 flex-col bg-transparent px-1 py-3 sm:px-4 sm:py-4"
+            : "flex h-full flex-col bg-transparent py-4 sm:py-5"
+        }
+      >
+        <div className="flex items-start gap-3 sm:gap-4">
+          <div className="shrink-0">
+            <div className="shrink-0">
+              <button
+                type="button"
+                onClick={() => setImageOpen(true)}
+                className="group relative h-16 w-16 cursor-zoom-in overflow-hidden rounded-xl border border-slate-200 bg-white transition-colors hover:border-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 sm:h-[72px] sm:w-[72px]"
+                aria-label={`View larger image of ${item.name}`}
+              >
+                <img
+                  src={imageUrl}
+                  alt={`Reference image of ${item.name}`}
+                  className="h-full w-full object-contain p-1.5 transition-transform group-hover:scale-105"
+                  loading="lazy"
+                />
+                <span
+                  aria-hidden="true"
+                  className="absolute bottom-1 right-1 grid h-5 w-5 place-items-center rounded-full bg-white/90 text-slate-600 shadow-sm ring-1 ring-slate-200/90 transition-colors group-hover:bg-white group-hover:text-slate-900"
+                >
+                  <Expand size={11} />
+                </span>
+              </button>
             </div>
           </div>
-          <StatusPill status={item.status} condition={item.condition} />
+          <div className="min-w-0 flex-1">
+            <div className="flex min-w-0 items-start gap-3">
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold leading-snug">{item.name}</p>
+                <p className="mt-0.5 min-w-0 text-xs font-bold tracking-wide text-violet-600">
+                  {item.id}
+                </p>
+              </div>
+              {showStatus && (
+                <div className="ml-auto shrink-0 pt-0.5">
+                  <StatusPill status={item.status} condition={item.status === "missing" ? "Unknown" : item.condition} />
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-        <dl className="mt-3 grid grid-cols-2 gap-3 border-t border-slate-100 pt-3 text-sm">
+        <dl
+          className={
+            compactResult
+              ? "mt-2.5 grid grid-cols-2 gap-x-4 gap-y-2 border-t border-slate-200 pt-2.5 text-sm"
+              : "mt-3 grid grid-cols-2 gap-4 border-t border-slate-200 pt-3 text-sm"
+          }
+        >
           {showDefault && (
             <div>
-              <dt className="text-xs text-slate-500">Default location</dt>
-              <dd className="mt-1 font-medium">{item.defaultLocation}</dd>
+              <dt className="whitespace-nowrap text-xs text-slate-500">Default location</dt>
+              <dd className={compactResult ? "mt-0.5 font-medium" : "mt-1 font-medium"}>
+                {item.defaultLocation}
+              </dd>
             </div>
           )}
-          <div>
-            <dt className="text-xs text-slate-500">Current location</dt>
-            <dd className="mt-1 font-medium">{item.currentLocation}</dd>
-          </div>
-          <div>
-            <dt className="text-xs text-slate-500">Working condition</dt>
-            <dd className="mt-1 font-medium">{item.condition}</dd>
-          </div>
+          {availableEquipmentLayout ? (
+            <>
+              <div className="text-left">
+                <dt className="text-xs text-slate-500">Working condition</dt>
+                <dd className={compactResult ? "mt-0.5 font-medium" : "mt-1 font-medium"}>
+                  {item.status === "missing" ? "Unknown" : item.condition}
+                </dd>
+              </div>
+              <div className="justify-self-end text-left">
+                <div>
+                  <dt className="whitespace-nowrap text-xs text-slate-500">Current location</dt>
+                  <dd className={compactResult ? "mt-0.5 font-medium" : "mt-1 font-medium"}>
+                    {item.currentLocation}
+                  </dd>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="justify-self-end text-left">
+                <div>
+                  <dt className="text-xs text-slate-500">Working condition</dt>
+                  <dd className={compactResult ? "mt-0.5 font-medium" : "mt-1 font-medium"}>
+                    {item.status === "missing" ? "Unknown" : item.condition}
+                  </dd>
+                </div>
+              </div>
+              <div className={showDefault ? "col-span-1" : undefined}>
+                <dt className="whitespace-nowrap text-xs text-slate-500">Current location</dt>
+                <dd className={compactResult ? "mt-0.5 font-medium" : "mt-1 font-medium"}>
+                  {item.currentLocation}
+                </dd>
+              </div>
+            </>
+          )}
         </dl>
         {action && <div className="mt-auto pt-3">{action}</div>}
       </div>
@@ -1365,7 +1477,7 @@ function EquipmentRow({
               </div>
               <div>
                 <dt className="text-xs text-slate-500">Working condition</dt>
-                <dd className="mt-1 font-semibold">{item.condition}</dd>
+                <dd className="mt-1 font-semibold">{item.status === "missing" ? "Unknown" : item.condition}</dd>
               </div>
             </dl>
           </div>
@@ -1388,6 +1500,9 @@ export default function Home() {
   const [selectedSlots, setSelectedSlots] = useState<string[]>([]);
   const [query, setQuery] = useState("");
   const [searched, setSearched] = useState(false);
+  const [alternativeSearchLabel, setAlternativeSearchLabel] = useState("");
+  const [alternativeSourceRoom, setAlternativeSourceRoom] = useState("");
+  const [alternativeSourceItemId, setAlternativeSourceItemId] = useState("");
   const [location, setLocation] = useState("");
   const [locationQuery, setLocationQuery] = useState("");
   const [directoryTab, setDirectoryTab] = useState("available");
@@ -1405,6 +1520,18 @@ export default function Home() {
   const [greeting, setGreeting] = useState("Ready to practise?");
 
   useEffect(() => {
+    // Keep the prototype at the real device width on mobile. This also protects
+    // every screen from accidental page-level horizontal overflow.
+    let viewportMeta = document.querySelector<HTMLMetaElement>('meta[name="viewport"]');
+    if (!viewportMeta) {
+      viewportMeta = document.createElement("meta");
+      viewportMeta.name = "viewport";
+      document.head.appendChild(viewportMeta);
+    }
+    viewportMeta.content = "width=device-width, initial-scale=1, viewport-fit=cover";
+    document.documentElement.style.overflowX = "clip";
+    document.body.style.overflowX = "clip";
+
     setDemoConflict(
       new URLSearchParams(window.location.search).get("demo") === "conflict",
     );
@@ -1579,20 +1706,55 @@ export default function Home() {
   if (screen === "date") {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const currentMonth = startOfMonth(today);
+
+    // Booking eligibility and calendar browsing are intentionally separate:
+    // users may inspect nearby months, but only today through seven days ahead
+    // can ever be selected.
     const latestBookableDate = new Date(today);
     latestBookableDate.setDate(today.getDate() + 7);
+
+    const earliestBrowseMonth = new Date(
+      today.getFullYear(),
+      today.getMonth() - 12,
+      1,
+    );
+    const latestBrowseMonth = new Date(
+      today.getFullYear(),
+      today.getMonth() + 12,
+      1,
+    );
+    const previousMonthStart = new Date(
+      calendarMonth.getFullYear(),
+      calendarMonth.getMonth() - 1,
+      1,
+    );
     const nextMonthStart = new Date(
       calendarMonth.getFullYear(),
       calendarMonth.getMonth() + 1,
       1,
     );
+
+    const monthKey = (date: Date) =>
+      date.getFullYear() * 12 + date.getMonth();
+    const canBrowsePrevious =
+      monthKey(previousMonthStart) >= monthKey(earliestBrowseMonth);
+    const canBrowseNext =
+      monthKey(nextMonthStart) <= monthKey(latestBrowseMonth);
+
+    // These values come from the real JavaScript calendar for the displayed
+    // month/year, so weekday placement, month length, leap years and year
+    // rollover are all calculated rather than hard-coded.
     const days = new Date(
       calendarMonth.getFullYear(),
       calendarMonth.getMonth() + 1,
       0,
     ).getDate();
-    const leading = calendarMonth.getDay();
+    const leading = new Date(
+      calendarMonth.getFullYear(),
+      calendarMonth.getMonth(),
+      1,
+    ).getDay();
+
     return (
       <Shell
         title="Choose a date"
@@ -1602,74 +1764,84 @@ export default function Home() {
         <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
           <div className="mb-4 flex items-center justify-between">
             <button
-              disabled={sameDay(calendarMonth, currentMonth)}
+              disabled={!canBrowsePrevious}
               onClick={() => {
-                setSelectedDate(null);
-                setCalendarMonth(
-                  new Date(
-                    calendarMonth.getFullYear(),
-                    calendarMonth.getMonth() - 1,
-                    1,
-                  ),
-                );
+                if (canBrowsePrevious) setCalendarMonth(previousMonthStart);
               }}
-              aria-label="Previous month"
+              aria-label={`Previous month${canBrowsePrevious ? `, ${monthName(previousMonthStart)}` : ""}`}
               className="grid h-11 w-11 place-items-center rounded-xl text-xl text-slate-500 hover:bg-violet-50 hover:text-violet-700 disabled:cursor-not-allowed disabled:text-slate-300 disabled:hover:bg-transparent"
             >
               ‹
             </button>
             <strong aria-live="polite">{monthName(calendarMonth)}</strong>
             <button
-              disabled={nextMonthStart > latestBookableDate}
+              disabled={!canBrowseNext}
               onClick={() => {
-                setSelectedDate(null);
-                setCalendarMonth(nextMonthStart);
+                if (canBrowseNext) setCalendarMonth(nextMonthStart);
               }}
-              aria-label="Next month"
+              aria-label={`Next month${canBrowseNext ? `, ${monthName(nextMonthStart)}` : ""}`}
               className="grid h-11 w-11 place-items-center rounded-xl text-xl text-slate-500 hover:bg-violet-50 hover:text-violet-700 disabled:cursor-not-allowed disabled:text-slate-300 disabled:hover:bg-transparent"
             >
               ›
             </button>
           </div>
+
           <div className="grid grid-cols-7 gap-1 text-center text-sm">
             {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
               <span key={i} className="py-2 text-xs font-bold text-slate-400">
                 {d}
               </span>
             ))}
+
             {Array.from({ length: leading }, (_, i) => (
               <span key={`blank-${i}`} aria-hidden="true" />
             ))}
+
             {Array.from({ length: days }, (_, i) => i + 1).map((d) => {
               const value = new Date(
                 calendarMonth.getFullYear(),
                 calendarMonth.getMonth(),
                 d,
               );
+              value.setHours(0, 0, 0, 0);
+
               const isToday = sameDay(value, today);
               const isPast = value < today;
               const isTooFar = value > latestBookableDate;
+              const isBookable = !isPast && !isTooFar;
               const isSelected = selectedDate
                 ? sameDay(value, selectedDate)
                 : false;
+
               return (
                 <button
-                  key={d}
-                  disabled={isPast || isTooFar}
+                  key={`${calendarMonth.getFullYear()}-${calendarMonth.getMonth()}-${d}`}
+                  disabled={!isBookable}
                   onClick={() => setSelectedDate(value)}
                   aria-label={`${longDate(value)}${isToday ? ", today" : ""}${isPast ? ", unavailable" : isTooFar ? ", booking not open yet" : ""}`}
                   aria-current={isToday ? "date" : undefined}
-                  className={`h-11 rounded-xl text-sm font-medium transition ${isSelected ? "bg-violet-600 text-white shadow-lg shadow-violet-200" : isPast || isTooFar ? "cursor-not-allowed text-slate-300" : isToday ? "bg-violet-50 text-violet-700 ring-1 ring-violet-300" : "hover:bg-slate-50"}`}
+                  aria-pressed={isSelected}
+                  className={`h-11 rounded-xl text-sm font-medium transition ${
+                    isSelected
+                      ? "bg-violet-600 text-white shadow-lg shadow-violet-200"
+                      : !isBookable
+                        ? "cursor-not-allowed text-slate-300"
+                        : isToday
+                          ? "bg-violet-50 text-violet-700 ring-1 ring-violet-300"
+                          : "hover:bg-slate-50"
+                  }`}
                 >
                   {d}
                 </button>
               );
             })}
           </div>
+
           <p className="mt-4 text-center text-xs font-medium text-slate-500">
             Bookings open on a rolling seven-day window.
           </p>
         </div>
+
         <ActionBar>
           <Primary disabled={!selectedDate} onClick={() => go("mpr")}>
             View Availability <ArrowRight />
@@ -1690,15 +1862,9 @@ export default function Home() {
             <button
               key={r}
               onClick={() => setMprSelected(r)}
-              className={`flex min-h-16 w-full items-center justify-between rounded-2xl border p-4 text-left font-semibold transition ${mprSelected === r ? "border-violet-500 bg-violet-50 text-violet-800 shadow-sm" : "border-slate-200 bg-white hover:border-violet-200"}`}
+              className={`flex min-h-16 w-full items-center justify-center rounded-2xl border p-4 text-center font-semibold transition ${mprSelected === r ? "border-violet-500 bg-violet-50 text-violet-800 shadow-sm" : "border-slate-200 bg-white hover:border-violet-200"}`}
             >
               <span>{r}</span>
-              {mprSelected === r && (
-                <Check
-                  className="rounded-full bg-violet-600 p-1 text-white"
-                  size={24}
-                />
-              )}
             </button>
           ))}
         </div>
@@ -1753,7 +1919,7 @@ export default function Home() {
         }}
         booked={booked}
         back={back}
-        alternativeRoom={screen === "slots5" && isAlternativeRoom}
+        alternativeRoom={isAlternativeRoom}
         originalTime={alternativeOriginalTime}
         originalSlots={alternativeOriginalSlots}
         onContinue={() => go(`setup${room.slice(-1)}` as Screen)}
@@ -1770,47 +1936,168 @@ export default function Home() {
             ? mpr5
             : mpr3;
     const ready = data.filter((x) => x.status === "ready");
-    const unavailable = data.filter((x) => x.status !== "ready");
+    const issueOrder: Record<Equipment["status"], number> = {
+      missing: 0,
+      service: 1,
+      away: 2,
+      attention: 3,
+      ready: 4,
+    };
+    const unavailable = data
+      .filter((x) => x.status !== "ready")
+      .sort(
+        (a, b) =>
+          issueOrder[a.status] - issueOrder[b.status] ||
+          a.name.localeCompare(b.name),
+      );
+    const issueReason = (item: Equipment) =>
+      item.status === "missing"
+        ? "Its current location cannot be confirmed."
+        : item.status === "attention"
+          ? "Needs tuning before reliable use."
+          : item.status === "service"
+            ? "Out of service and not currently usable."
+            : `Currently located outside ${room}.`;
+
     return (
       <Shell
         title={`${room} setup`}
-        subtitle="Review assigned equipment before continuing."
+        subtitle="Review equipment readiness before continuing."
+        scrollHint={
+          unavailable.length === 0
+            ? "All assigned equipment is currently available."
+            : undefined
+        }
+        back={back}
+      >
+        <Summary room={room} time={time} date={bookingDate} />
+
+        {unavailable.length > 0 ? (
+          <>
+            <div className="mb-2.5 mt-4 flex min-w-0 items-start gap-2 sm:mb-3 sm:mt-6 sm:items-center">
+              <TriangleAlert className="mt-0.5 shrink-0 text-amber-600 sm:mt-0" size={20} />
+              <h2 className="min-w-0 break-words text-[1.05rem] font-semibold leading-6 sm:text-lg">
+                {unavailable.length} of {data.length} assigned {unavailable.length === 1 ? "item needs" : "items need"} attention
+              </h2>
+            </div>
+            <div className="grid items-stretch gap-3 sm:grid-cols-2">
+              {unavailable.map((item) => {
+                const mpr5AlternativeQuery =
+                  item.id.startsWith("INST-")
+                    ? "Instrument cable"
+                    : item.id.includes("SNARE")
+                      ? "Snare drum"
+                      : item.id.includes("FLOOR-TOM")
+                        ? "Floor tom"
+                        : item.id.includes("RACK-TOM")
+                          ? "Rack tom"
+                          : item.id.includes("KICK")
+                            ? "Kick drum"
+                            : item.name;
+                const canSearchAlternatives =
+                  (room === "MPR 3" &&
+                    (item.id === "MIX-01" || item.id === "MS-01")) ||
+                  room === "MPR 5";
+                return (
+                  <Issue
+                    key={item.id}
+                    item={item}
+                    reason={issueReason(item)}
+                    action={canSearchAlternatives ? "Search alternatives" : undefined}
+                    onAction={
+                      room === "MPR 3" && item.id === "MIX-01"
+                        ? () => {
+                            setAlternativeSourceRoom("MPR 3");
+                            setAlternativeSourceItemId(item.id);
+                            setQuery("Mixer");
+                            setSearched(false);
+                            go("mixer-search");
+                          }
+                        : room === "MPR 3" && item.id === "MS-01"
+                          ? () => {
+                              setAlternativeSourceRoom("MPR 3");
+                              setAlternativeSourceItemId(item.id);
+                              setQuery("Microphone stand");
+                              setSearched(false);
+                              go("stand-search");
+                            }
+                          : room === "MPR 5"
+                            ? () => {
+                                setAlternativeSourceRoom("MPR 5");
+                                setAlternativeSourceItemId(item.id);
+                                setAlternativeSearchLabel(
+                                  mpr5AlternativeQuery.toLowerCase(),
+                                );
+                                setQuery(mpr5AlternativeQuery);
+                                setSearched(false);
+                                go("alternative-search");
+                              }
+                            : undefined
+                    }
+                  />
+                );
+              })}
+            </div>
+          </>
+        ) : (
+          <div className="mt-4 flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-950 sm:mt-6">
+            <Check className="mt-0.5 shrink-0 text-emerald-700" size={20} />
+            <div>
+              <p className="font-semibold">All assigned equipment is currently available</p>
+              <p className="mt-1 text-sm text-emerald-800">
+                No equipment issues are currently shown for {room}.
+              </p>
+            </div>
+          </div>
+        )}
+
+        <ActionBar>
+          <button
+            type="button"
+            onClick={() => go("available-equipment")}
+            className="flex min-h-12 w-full items-center justify-between rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-left text-emerald-900 transition hover:border-emerald-300 hover:bg-emerald-100"
+          >
+            <span>
+              <strong className="text-sm">View available equipment ({ready.length})</strong>
+              <small className="mt-0.5 block text-xs text-emerald-700">
+                View the {ready.length} {ready.length === 1 ? "item" : "items"} currently available in {room}.
+              </small>
+            </span>
+            <ArrowRight className="shrink-0" size={19} />
+          </button>
+          <Primary onClick={() => go("review")}>
+            Continue with {room} <ArrowRight />
+          </Primary>
+        </ActionBar>
+      </Shell>
+    );
+  }
+
+  if (screen === "available-equipment") {
+    const data =
+      room === "MPR 2"
+        ? mpr2
+        : room === "MPR 4"
+          ? mpr4
+          : room === "MPR 5"
+            ? mpr5
+            : mpr3;
+    const ready = data.filter((item) => item.status === "ready");
+    return (
+      <Shell
+        title={`Available equipment in ${room}`}
+        subtitle={`${ready.length} items currently available`}
+        scrollHint="For viewing only — equipment is not selected or reserved here."
         back={back}
         home={home}
       >
-        <Summary room={room} time={time} date={bookingDate} />
-        <h2 className="mb-2.5 mt-4 text-lg font-semibold sm:mb-3 sm:mt-6">
-          Available now{" "}
-          <span className="text-emerald-600">
-            {ready.length}/{data.length}
-          </span>
-        </h2>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {ready.map((x) => (
-            <EquipmentRow key={x.id} item={x} />
+        <div className="grid items-stretch divide-y divide-slate-300 px-1 sm:relative sm:grid-cols-2 sm:gap-x-6 sm:before:pointer-events-none sm:before:absolute sm:before:inset-y-0 sm:before:left-1/2 sm:before:w-px sm:before:-translate-x-1/2 sm:before:bg-slate-300 sm:before:content-[''] sm:divide-y-0 sm:px-0 [&>*:nth-child(n+3)]:sm:border-t [&>*:nth-child(n+3)]:sm:border-slate-300">
+          {ready.map((item) => (
+            <div key={item.id} className="min-w-0 px-0 sm:px-4">
+              <EquipmentRow item={item} showStatus={false} availableEquipmentLayout />
+            </div>
           ))}
         </div>
-        <ActionBar>
-          {unavailable.length > 0 && (
-            <button
-              onClick={() => go(room === "MPR 5" ? "issues5" : "issues3")}
-              className="flex min-h-11 w-full items-center justify-between rounded-2xl border border-amber-300 bg-amber-50 px-3.5 py-2 text-left text-amber-950 transition hover:bg-amber-100 sm:min-h-12 sm:px-4 sm:py-3"
-            >
-              <span>
-                <strong className="text-sm">
-                  {unavailable.length} assigned items need attention
-                </strong>
-                <small className="block text-xs leading-4 text-amber-800 sm:mt-0.5">
-                  View their status and your options.
-                </small>
-              </span>
-              <ArrowRight className="shrink-0" size={19} />
-            </button>
-          )}
-          <Primary onClick={() => go("review")}>
-            Continue to Reservation <ArrowRight />
-          </Primary>
-        </ActionBar>
       </Shell>
     );
   }
@@ -1831,6 +2118,8 @@ export default function Home() {
             reason="Currently located outside MPR 3."
             action="Search Alternatives"
             onAction={() => {
+              setAlternativeSourceRoom("MPR 3");
+              setAlternativeSourceItemId(mixer.id);
               setQuery("Mixer");
               setSearched(false);
               go("mixer-search");
@@ -1841,6 +2130,8 @@ export default function Home() {
             reason="Currently located outside MPR 3."
             action="Search Alternatives"
             onAction={() => {
+              setAlternativeSourceRoom("MPR 3");
+              setAlternativeSourceItemId(microphoneStand.id);
               setQuery("Microphone stand");
               setSearched(false);
               go("stand-search");
@@ -1849,7 +2140,7 @@ export default function Home() {
         </div>
         <ActionBar>
           <Primary onClick={() => go("review")}>
-            Continue Booking without These Items
+            Continue with MPR 3
           </Primary>
         </ActionBar>
       </Shell>
@@ -1879,32 +2170,61 @@ export default function Home() {
       >
         <Summary room="MPR 5" time={time} date={bookingDate} />
         <div className="mt-4 grid items-stretch gap-3 sm:grid-cols-2">
-          {affected.map((item) => (
-            <Issue
-              key={item.id}
-              item={item}
-              reason={
-                item.status === "missing"
-                  ? "Its current location cannot be confirmed."
-                  : item.status === "attention"
-                    ? "Needs tuning before reliable use."
-                    : item.status === "service"
-                      ? "Out of service and not currently usable."
-                      : "Currently located outside MPR 5."
-              }
-            />
-          ))}
+          {affected.map((item) => {
+            const alternativeQuery =
+              item.id.startsWith("INST-")
+                ? "Instrument cable"
+                : item.id.includes("SNARE")
+                  ? "Snare drum"
+                  : item.id.includes("FLOOR-TOM")
+                    ? "Floor tom"
+                    : item.id.includes("RACK-TOM")
+                      ? "Rack tom"
+                      : item.id.includes("KICK")
+                        ? "Kick drum"
+                        : item.name;
+            return (
+              <Issue
+                key={item.id}
+                item={item}
+                reason={
+                  item.status === "missing"
+                    ? "Its current location cannot be confirmed."
+                    : item.status === "attention"
+                      ? "Needs tuning before reliable use."
+                      : item.status === "service"
+                        ? "Out of service and not currently usable."
+                        : "Currently located outside MPR 5."
+                }
+                action="Search alternatives"
+                onAction={() => {
+                  setAlternativeSourceRoom("MPR 5");
+                  setAlternativeSourceItemId(item.id);
+                  setAlternativeSearchLabel(alternativeQuery.toLowerCase());
+                  setQuery(alternativeQuery);
+                  setSearched(false);
+                  go("alternative-search");
+                }}
+              />
+            );
+          })}
         </div>
         <ActionBar>
           <Primary onClick={() => go("review")}>
-            Continue Booking without These Items
+            Continue with MPR 5
           </Primary>
         </ActionBar>
       </Shell>
     );
   }
-  if (screen === "mixer-search" || screen === "stand-search") {
+  if (
+    screen === "mixer-search" ||
+    screen === "stand-search" ||
+    screen === "alternative-search"
+  ) {
     const mixer = screen === "mixer-search";
+    const stand = screen === "stand-search";
+    const sourceRoom = alternativeSourceRoom || room;
     const resultOrder: Record<Equipment["status"], number> = {
       ready: 0,
       away: 1,
@@ -1912,23 +2232,115 @@ export default function Home() {
       missing: 3,
       service: 4,
     };
+    const isBookableMprLocation = (location: string) =>
+      /^MPR [2345]$/.test(location);
+    const isRoomDefiningAlternative = (item: Equipment) =>
+      [
+        "keyboard-piano",
+        "mixer",
+        "monitor-speaker",
+        "kick-drum",
+        "snare-drum",
+        "rack-tom",
+        "floor-tom",
+      ].includes(equipmentType(item));
+    const canViewAlternativeMpr = (item: Equipment) =>
+      item.status === "ready" &&
+      isBookableMprLocation(item.currentLocation) &&
+      item.currentLocation !== sourceRoom &&
+      isRoomDefiningAlternative(item);
+    const mprNumber = (location: string) => {
+      const match = location.match(/^MPR ([2345])$/);
+      return match ? Number(match[1]) : null;
+    };
+    const orderedNonMprLocations = [
+      "MP Lab 1",
+      "MP Lab 2",
+      "Live Room",
+      "Studio",
+      "Auditorium",
+      "Store Room",
+    ];
+    const nonMprLocationPriority = (item: Equipment) => {
+      const locations = [item.currentLocation ?? "", item.defaultLocation ?? ""];
+      const ranks = locations
+        .map((location) => orderedNonMprLocations.indexOf(location))
+        .filter((rank) => rank !== -1);
+      return ranks.length ? Math.min(...ranks) : orderedNonMprLocations.length;
+    };
+    const alternativeGroupPriority = (item: Equipment) => {
+      const currentMpr = mprNumber(item.currentLocation ?? "");
+      const defaultMpr = mprNumber(item.defaultLocation ?? "");
+      const isAvailable = item.status === "ready";
+      const isMprRelated = currentMpr !== null || defaultMpr !== null;
+
+      // 1. Fully usable equipment currently in an MPR.
+      if (isAvailable && currentMpr !== null) {
+        return [0, currentMpr - 2];
+      }
+
+      // 2. Fully functional MPR-related equipment that is merely elsewhere.
+      // It stays near the MPR results, but keeps its truthful status/location.
+      if (
+        isMprRelated &&
+        item.condition === "Fully functional" &&
+        item.status !== "missing" &&
+        item.status !== "out"
+      ) {
+        const mpr = currentMpr ?? defaultMpr!;
+        return [1, mpr - 2];
+      }
+
+      // 3. All other available equipment, in the requested location order.
+      if (isAvailable) {
+        return [2, nonMprLocationPriority(item)];
+      }
+
+      // 4. Genuine attention/unusable results always come last, even when
+      // assigned to or currently inside an MPR. Location only orders within
+      // this final group.
+      const mprRank =
+        currentMpr !== null
+          ? currentMpr - 2
+          : defaultMpr !== null
+            ? defaultMpr - 2
+            : null;
+
+      return [
+        3,
+        mprRank !== null ? mprRank : 4 + nonMprLocationPriority(item),
+        resultOrder[item.status],
+      ];
+    };
     const results = directoryEquipment
-      .filter((item) => equipmentMatches(item, query))
-      .sort(
-        (a, b) =>
-          resultOrder[a.status] - resultOrder[b.status] ||
-          a.name.localeCompare(b.name),
-      );
-    const scrollHint =
-      searched && results.length > 4
-        ? `Scroll to review all ${results.length} matching items.`
-        : "";
+      .filter(
+        (item) =>
+          item.id !== alternativeSourceItemId &&
+          alternativeEquipmentMatches(item, query),
+      )
+      .sort((a, b) => {
+        const [aGroup, aLocation] = alternativeGroupPriority(a);
+        const [bGroup, bLocation] = alternativeGroupPriority(b);
+        return (
+          aGroup - bGroup ||
+          aLocation - bLocation ||
+          (a.currentLocation ?? "").localeCompare(b.currentLocation ?? "") ||
+          a.name.localeCompare(b.name) ||
+          a.id.localeCompare(b.id)
+        );
+      });
     return (
       <Shell
-        title={`Search for another ${mixer ? "mixer" : "microphone stand"}`}
-        subtitle="Search the full equipment directory before deciding."
+        title={`Search for another ${
+          mixer ? "mixer" : stand ? "microphone stand" : alternativeSearchLabel
+        }`}
+        subtitle="Find alternatives by location and condition."
         scrollHint=""
-        back={back}
+        back={() => {
+          if (room !== sourceRoom) setRoom(sourceRoom);
+          back();
+        }}
+        stickyHeader={false}
       >
         <label className="text-sm font-semibold" htmlFor="equipment-query">
           Equipment name or ID
@@ -1953,7 +2365,12 @@ export default function Home() {
           <Button
             type="submit"
             disabled={!query.trim()}
-            className="min-h-12 rounded-2xl bg-violet-600 px-5 max-sm:w-full"
+            variant={searched ? "outline" : "default"}
+            className={
+              searched
+                ? "min-h-11 rounded-2xl border-violet-300 bg-white px-5 font-semibold text-violet-700 shadow-none hover:border-violet-400 hover:bg-violet-50 hover:text-violet-800 max-sm:w-full"
+                : "min-h-12 rounded-2xl bg-violet-600 px-5 max-sm:w-full"
+            }
           >
             <Search size={18} /> Search
           </Button>
@@ -1965,29 +2382,34 @@ export default function Home() {
                 {results.length} {results.length === 1 ? "result" : "results"}{" "}
                 for “{query.trim()}”
               </p>
-              {scrollHint && (
-                <p className="mt-1 text-sm text-slate-500">{scrollHint}</p>
-              )}
-              <div className="mt-3 grid items-stretch gap-3 sm:grid-cols-2">
+              <p className="mt-1 text-sm leading-5 text-slate-500">
+                For reference only — equipment cannot be reserved here.
+              </p>
+              <div className="mt-3 grid items-stretch divide-y divide-slate-300 border-y border-slate-200 sm:relative sm:grid-cols-2 sm:gap-x-6 sm:before:pointer-events-none sm:before:absolute sm:before:inset-y-0 sm:before:left-1/2 sm:before:w-px sm:before:-translate-x-1/2 sm:before:bg-slate-300 sm:before:content-[''] sm:divide-y-0 sm:border-y-0 [&>*:nth-child(n+3)]:sm:border-t [&>*:nth-child(n+3)]:sm:border-slate-300">
                 {results.map((item) => (
                   <EquipmentRow
                     key={item.id}
                     item={item}
                     showDefault
+                    compactResult
                     action={
-                      item.id === "MIX-02" ? (
-                        <Button
-                          onClick={() => {
-                            setAlternativeOriginalTime(time);
-                            setAlternativeOriginalSlots(selectedSlots);
-                            setRoom("MPR 5");
-                            setIsAlternativeRoom(true);
-                            go("slots5");
-                          }}
-                          className="min-h-11 w-full rounded-xl bg-orange-500 text-white hover:bg-orange-600"
-                        >
-                          View MPR 5 Availability <ArrowRight />
-                        </Button>
+                      canViewAlternativeMpr(item) ? (
+                        <div className="flex justify-center">
+                          <Button
+                            onClick={() => {
+                              const targetRoom = item.currentLocation;
+                              setAlternativeOriginalTime(time);
+                              setAlternativeOriginalSlots(selectedSlots);
+                              setRoom(targetRoom);
+                              setIsAlternativeRoom(true);
+                              go(`slots${targetRoom.slice(-1)}` as Screen);
+                            }}
+                            variant="ghost"
+                            className="h-auto min-h-11 w-auto justify-start gap-1.5 rounded-xl border border-violet-200 !bg-violet-50/70 px-3.5 text-sm font-semibold !text-violet-700 shadow-none transition-colors hover:!border-violet-300 hover:!bg-violet-100 hover:!text-violet-800 active:!bg-violet-200 focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2"
+                          >
+                            View {item.currentLocation} availability <ArrowRight className="h-4 w-4" />
+                          </Button>
+                        </div>
                       ) : undefined
                     }
                   />
@@ -1999,18 +2421,14 @@ export default function Home() {
           ))}
         <ActionBar>
           <Button
-            variant="outline"
-            onClick={() => go("review")}
-            className="min-h-12 w-full rounded-2xl border-violet-300 bg-white font-semibold text-violet-700 shadow-sm hover:border-violet-400 hover:bg-violet-50 hover:text-violet-800"
+            onClick={() => {
+              setRoom(sourceRoom);
+              setIsAlternativeRoom(false);
+              go("review");
+            }}
+            className="min-h-12 w-full rounded-2xl bg-violet-600 font-semibold text-white shadow-sm hover:bg-violet-700 focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2"
           >
-            Continue Booking Without {mixer ? "Mixer" : "Microphone Stand"}
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => setScreen("setup3")}
-            className="min-h-12 w-full rounded-2xl border-slate-300 bg-white font-semibold text-slate-700 shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:text-slate-900"
-          >
-            Return to MPR 3 Setup
+            Continue booking with {sourceRoom}
           </Button>
         </ActionBar>
       </Shell>
@@ -2131,9 +2549,6 @@ export default function Home() {
           </div>
           <div>
             <h2 className="text-xl font-semibold">You’re practice ready.</h2>
-            <p className="mt-1 text-sm leading-6 text-emerald-50">
-              {room} is reserved for {time}.
-            </p>
           </div>
         </div>
         <ConfirmationDetails
@@ -2164,7 +2579,7 @@ export default function Home() {
           <p className="mt-1.5 text-sm leading-5 text-rose-800 sm:mt-2 sm:leading-6">
             {selectedSlots.length > 1
               ? `This 30-minute interval is part of your selected ${time} booking in ${room} on ${longDate(bookingDate)}.`
-              : `Another student reserved ${room} on ${longDate(bookingDate)} from ${time} before your booking was confirmed.`}
+              : `Another student completed their booking before yours could be confirmed.`}
           </p>
         </div>
         <ActionBar>
@@ -2304,7 +2719,7 @@ export default function Home() {
                     )}
                     <TabsContent
                       value="available"
-                      className="mt-4 grid gap-3 sm:grid-cols-2"
+                      className="mt-4 grid items-stretch divide-y divide-slate-300 sm:relative sm:grid-cols-2 sm:gap-x-6 sm:before:pointer-events-none sm:before:absolute sm:before:inset-y-0 sm:before:left-1/2 sm:before:w-px sm:before:-translate-x-1/2 sm:before:bg-slate-300 sm:before:content-[''] sm:divide-y-0 [&>*:nth-child(n+3)]:sm:border-t [&>*:nth-child(n+3)]:sm:border-slate-300"
                     >
                       {directoryMatches.available.length ? (
                         directoryMatches.available.map((x) => (
@@ -2319,7 +2734,7 @@ export default function Home() {
                     </TabsContent>
                     <TabsContent
                       value="unavailable"
-                      className="mt-4 grid gap-3 sm:grid-cols-2"
+                      className="mt-4 grid items-stretch divide-y divide-slate-300 sm:relative sm:grid-cols-2 sm:gap-x-6 sm:before:pointer-events-none sm:before:absolute sm:before:inset-y-0 sm:before:left-1/2 sm:before:w-px sm:before:-translate-x-1/2 sm:before:bg-slate-300 sm:before:content-[''] sm:divide-y-0 [&>*:nth-child(n+3)]:sm:border-t [&>*:nth-child(n+3)]:sm:border-slate-300"
                     >
                       {directoryMatches.unavailable.length ? (
                         directoryMatches.unavailable.map((x) => (
@@ -2431,7 +2846,7 @@ export default function Home() {
           )}
           <TabsContent
             value="available"
-            className="mt-5 grid gap-3 sm:grid-cols-2"
+            className="mt-5 grid items-stretch divide-y divide-slate-300 sm:relative sm:grid-cols-2 sm:gap-x-6 sm:before:pointer-events-none sm:before:absolute sm:before:inset-y-0 sm:before:left-1/2 sm:before:w-px sm:before:-translate-x-1/2 sm:before:bg-slate-300 sm:before:content-[''] sm:divide-y-0 [&>*:nth-child(n+3)]:sm:border-t [&>*:nth-child(n+3)]:sm:border-slate-300"
           >
             {!locationHasEquipmentRecords ? (
               <NoEquipmentRecords />
@@ -2449,7 +2864,7 @@ export default function Home() {
           </TabsContent>
           <TabsContent
             value="unavailable"
-            className="mt-5 grid gap-3 sm:grid-cols-2"
+            className="mt-5 grid items-stretch divide-y divide-slate-300 sm:relative sm:grid-cols-2 sm:gap-x-6 sm:before:pointer-events-none sm:before:absolute sm:before:inset-y-0 sm:before:left-1/2 sm:before:w-px sm:before:-translate-x-1/2 sm:before:bg-slate-300 sm:before:content-[''] sm:divide-y-0 [&>*:nth-child(n+3)]:sm:border-t [&>*:nth-child(n+3)]:sm:border-slate-300"
           >
             {!locationHasEquipmentRecords ? (
               <NoEquipmentRecords />
@@ -2490,8 +2905,8 @@ function HomeScreen({
 }) {
   const bars = [28, 46, 64, 38, 74, 52, 34, 68, 44, 58, 30, 50];
   return (
-    <main className="min-h-screen bg-[#f7f8fc] text-[#151a31]">
-      <div className="mx-auto grid min-h-screen max-w-6xl lg:grid-cols-[0.9fr_1.1fr]">
+    <main className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#f7f8fc] text-[#151a31]">
+      <div className="mx-auto grid min-h-screen w-full min-w-0 max-w-6xl lg:grid-cols-[0.9fr_1.1fr]">
         <section className="relative hidden overflow-hidden bg-[#10152b] p-14 lg:flex lg:flex-col lg:justify-between">
           <div className="absolute -left-24 top-24 h-72 w-72 rounded-full bg-violet-600/25 blur-3xl" />
           <div className="relative flex items-center gap-3 text-sm font-semibold tracking-wide text-white">
@@ -2524,8 +2939,8 @@ function HomeScreen({
             ))}
           </div>
         </section>
-        <section className="flex min-h-screen items-center px-5 py-5 sm:px-10 sm:py-8 lg:px-20">
-          <div className="mx-auto w-full max-w-xl">
+        <section className="flex min-h-screen min-w-0 items-center overflow-x-hidden px-5 py-5 sm:px-10 sm:py-8 lg:px-20">
+          <div className="mx-auto w-full min-w-0 max-w-xl">
             <div className="mb-6 flex items-center justify-between sm:mb-10 lg:hidden">
               <Brand />
               <span className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-slate-500 shadow-sm">
@@ -2584,15 +2999,15 @@ function HomeCard({
   return (
     <button
       onClick={onClick}
-      className={`group flex w-full items-center gap-3 rounded-[1.4rem] px-4 py-3.5 text-left shadow-sm transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-300 sm:gap-4 sm:p-5 ${dark ? "bg-[#151a31] text-white hover:bg-[#1b213c]" : "border border-violet-200 bg-[#f7f5ff] text-[#151a31] shadow-violet-100/70 hover:border-violet-300 hover:bg-[#f1edff]"}`}
+      className={`group flex w-full min-w-0 max-w-full items-center gap-3 rounded-[1.4rem] px-4 py-3.5 text-left shadow-sm transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-300 sm:gap-4 sm:p-5 ${dark ? "bg-[#151a31] text-white hover:bg-[#1b213c]" : "border border-violet-200 bg-[#f7f5ff] text-[#151a31] shadow-violet-100/70 hover:border-violet-300 hover:bg-[#f1edff]"}`}
     >
       <span
         className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl sm:h-12 sm:w-12 sm:rounded-2xl ${dark ? "bg-violet-500" : "bg-violet-600 text-white"}`}
       >
         {icon}
       </span>
-      <span className="flex-1">
-        <strong className="block text-lg">{title}</strong>
+      <span className="min-w-0 flex-1">
+        <strong className="block break-words text-lg">{title}</strong>
         <span
           className={`mt-1 block text-sm ${dark ? "text-slate-300" : "text-slate-600"}`}
         >
@@ -2600,7 +3015,7 @@ function HomeCard({
         </span>
       </span>
       <ArrowRight
-        className={`transition-transform group-hover:translate-x-1 ${dark ? "" : "text-violet-700"}`}
+        className={`shrink-0 transition-transform group-hover:translate-x-1 ${dark ? "" : "text-violet-700"}`}
       />
     </button>
   );
@@ -2630,94 +3045,739 @@ function Slots({
 }) {
   const nextDay = new Date(date);
   nextDay.setDate(date.getDate() + 1);
-  const [limitMessage, setLimitMessage] = useState("");
+  const [activePeriod, setActivePeriod] = useState(0);
+  const slotListRef = useRef<HTMLElement | null>(null);
+  const availabilityHeaderRef = useRef<HTMLElement | null>(null);
+  const periodContentStartRef = useRef<HTMLParagraphElement | null>(null);
+  const periodTabsRef = useRef<HTMLDivElement | null>(null);
+  const initialPeriodPositionedRef = useRef(false);
+  const pendingInitialPeriodRef = useRef<number | null>(null);
+  const [periodScrollProgress, setPeriodScrollProgress] = useState(0);
+  const [periodScrollThumbPercent, setPeriodScrollThumbPercent] = useState(27);
+  const [periodIndicatorLeft, setPeriodIndicatorLeft] = useState(0);
+  const [periodIndicatorWidth, setPeriodIndicatorWidth] = useState(0);
+  const periodScrollTrackRef = useRef<HTMLDivElement | null>(null);
+  const periodScrollDraggingRef = useRef(false);
+  const pendingPeriodAlignmentRef = useRef<number | null>(null);
+  const periodAlignmentFrameRef = useRef<number | null>(null);
+  const periodTabsDragRef = useRef({
+    pointerId: -1,
+    startX: 0,
+    startY: 0,
+    startScrollLeft: 0,
+    dragging: false,
+    moved: false,
+  });
   const selectedRange = timeRangeLabel(selectedSlots);
   const selectionHasBookedSlot = selectedSlots.some((slot) => booked.has(slot));
 
   useEffect(() => {
-    if (!limitMessage) return;
-    const timer = window.setTimeout(() => setLimitMessage(""), 3500);
-    return () => window.clearTimeout(timer);
-  }, [limitMessage]);
+    // Resolve the initial/default period for the selected date. The visual
+    // positioning is handled separately after the tab row has rendered so the
+    // indicator and scroller always match the active period on first entry.
+    let initialIndex = 0;
+
+    if (selectedSlots.length > 0) {
+      const selectedPeriodIndex = periods.findIndex((period) =>
+        period.times.includes(selectedSlots[0]),
+      );
+      if (selectedPeriodIndex >= 0) {
+        initialIndex = selectedPeriodIndex;
+      }
+    } else {
+      const now = new Date();
+      if (!sameDay(date, now)) {
+        initialIndex = 0;
+      } else {
+        const minutes = now.getHours() * 60 + now.getMinutes();
+        if (minutes >= 360 && minutes < 540) initialIndex = 0;
+        else if (minutes >= 540 && minutes < 720) initialIndex = 1;
+        else if (minutes >= 720 && minutes < 1020) initialIndex = 2;
+        else if (minutes >= 1020 && minutes < 1200) initialIndex = 3;
+        else if (minutes >= 1200) initialIndex = 4;
+        else initialIndex = 5;
+      }
+    }
+
+    pendingInitialPeriodRef.current = initialIndex;
+    initialPeriodPositionedRef.current = false;
+    setActivePeriod(initialIndex);
+    // Intentionally date-only: manual tab choice is preserved while selecting a range.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [date]);
 
   const selectSlot = (slot: string) => {
     const slotIndex = allTimeSlots.indexOf(slot);
     if (slotIndex < 0 || booked.has(slot)) return;
 
-    let next: string[] = [];
-
     if (selectedSlots.length === 0) {
-      next = [slot];
-    } else {
-      const selectedIndices = selectedSlots
-        .map((item) => allTimeSlots.indexOf(item))
-        .filter((index) => index >= 0);
-      const firstIndex = Math.min(...selectedIndices);
-      const lastIndex = Math.max(...selectedIndices);
-
-      if (selectedSlots.length > 1 && slotIndex >= firstIndex && slotIndex <= lastIndex) {
-        next = allTimeSlots.slice(firstIndex, slotIndex + 1);
-      } else if (selectedSlots.length === 1 && slotIndex === firstIndex) {
-        next = [];
-      } else {
-        const rangeStart = Math.min(firstIndex, slotIndex);
-        const rangeEnd = Math.max(firstIndex, slotIndex);
-        const candidate = allTimeSlots.slice(rangeStart, rangeEnd + 1);
-
-        if (candidate.some((candidateSlot) => booked.has(candidateSlot))) {
-          // A booked interval separates this slot from the current selection,
-          // so treat the click as the start of a new range instead of an invalid extension.
-          next = [slot];
-        } else if (candidate.length > 6) {
-          const isAdjacentExtension =
-            slotIndex === firstIndex - 1 || slotIndex === lastIndex + 1;
-          if (isAdjacentExtension) {
-            setLimitMessage("Maximum 3 hours selected");
-            return;
-          }
-          // A distant available slot is a new intended start, not an attempt
-          // to stretch the existing selection beyond the 3-hour limit.
-          next = [slot];
-        } else {
-          next = candidate;
-        }
-      }
+      setSelectedSlots([slot]);
+      return;
     }
 
-    setLimitMessage("");
-    setSelectedSlots(next);
+    const selectedIndices = selectedSlots
+      .map((item) => allTimeSlots.indexOf(item))
+      .filter((index) => index >= 0);
+    const firstIndex = Math.min(...selectedIndices);
+    const lastIndex = Math.max(...selectedIndices);
+
+    // Clicking inside the current selection keeps the existing range-editing behavior.
+    if (selectedSlots.length > 1 && slotIndex >= firstIndex && slotIndex <= lastIndex) {
+      setSelectedSlots(allTimeSlots.slice(firstIndex, slotIndex + 1));
+      return;
+    }
+
+    // Clicking the only selected start again clears it.
+    if (selectedSlots.length === 1 && slotIndex === firstIndex) {
+      setSelectedSlots([]);
+      return;
+    }
+
+    const rangeStart = Math.min(firstIndex, slotIndex);
+    const rangeEnd = Math.max(firstIndex, slotIndex);
+    const candidate = allTimeSlots.slice(rangeStart, rangeEnd + 1);
+    const canExtendForward =
+      slotIndex > lastIndex &&
+      candidate.length <= 6 &&
+      !candidate.some((candidateSlot) => booked.has(candidateSlot));
+
+    if (canExtendForward) {
+      setSelectedSlots(candidate);
+      return;
+    }
+
+    // "Available" always means begin a new range here.
+    // This also removes the old two-click clearing requirement.
+    setSelectedSlots([slot]);
   };
+
+  const selectedIndicesForGuidance = selectedSlots
+    .map((item) => allTimeSlots.indexOf(item))
+    .filter((index) => index >= 0);
+  const selectedStartIndex =
+    selectedIndicesForGuidance.length > 0
+      ? Math.min(...selectedIndicesForGuidance)
+      : -1;
+  const selectedEndIndex =
+    selectedIndicesForGuidance.length > 0
+      ? Math.max(...selectedIndicesForGuidance)
+      : -1;
+  const maxEndIndex =
+    selectedStartIndex >= 0
+      ? Math.min(selectedStartIndex + 5, allTimeSlots.length - 1)
+      : -1;
+
+  const validExtensionSlots =
+    selectedStartIndex >= 0 && selectedSlots.length < 6
+      ? allTimeSlots
+          .slice(selectedEndIndex + 1, maxEndIndex + 1)
+          .filter((candidateSlot, offset) => {
+            const candidateIndex = selectedEndIndex + 1 + offset;
+            return (
+              !booked.has(candidateSlot) &&
+              !allTimeSlots
+                .slice(selectedStartIndex, candidateIndex + 1)
+                .some((rangeSlot) => booked.has(rangeSlot))
+            );
+          })
+      : [];
+
+  const extensionInCurrentPeriod =
+    activePeriod >= 0 &&
+    periods[activePeriod].times.some((time) => validExtensionSlots.includes(time));
+  const extensionPeriodIndex = periods.findIndex(
+    (period, index) =>
+      index !== activePeriod &&
+      period.times.some((time) => validExtensionSlots.includes(time)),
+  );
+  const extensionPeriodLabel =
+    extensionPeriodIndex >= 0
+      ? periods[extensionPeriodIndex].name.startsWith("Late Night")
+        ? "Late Night"
+        : periods[extensionPeriodIndex].name
+      : "";
+  const extensionInAnotherPeriod = extensionPeriodIndex >= 0;
+  const maxBookingReached = selectedSlots.length >= 6;
+
+  const selectionGuidance =
+    selectedSlots.length === 0
+      ? "Choose a start time · Book up to 3 hours"
+      : maxBookingReached
+        ? "3 hours selected · Maximum booking length reached"
+        : validExtensionSlots.length === 0
+          ? `${durationLabel(selectedSlots.length)} selected · No later times available to extend`
+          : !extensionInCurrentPeriod && extensionInAnotherPeriod
+            ? `${durationLabel(selectedSlots.length)} selected · More times available in ${extensionPeriodLabel}`
+            : selectedSlots.length === 1
+              ? "30 min selected · Want longer? Select an end time"
+              : `${durationLabel(selectedSlots.length)} selected · Choose another end time to adjust`;
+
+  const alignPeriodIndicatorToSelectedTab = (index: number) => {
+    const scroller = periodTabsRef.current;
+    const track = periodScrollTrackRef.current;
+    if (!scroller || !track) return;
+
+    const tabs = Array.from(
+      scroller.querySelectorAll<HTMLElement>('[role="tab"]'),
+    );
+    const tab = tabs[index];
+    if (!tab) return;
+
+    const trackRect = track.getBoundingClientRect();
+    const tabRect = tab.getBoundingClientRect();
+    const thumbWidth = Math.min(128, Math.max(112, trackRect.width * 0.27));
+    const travel = Math.max(0, trackRect.width - thumbWidth);
+
+    // Both the tab strip and indicator track share the same horizontal frame.
+    // Measure the selected pill after scrolling has settled, then center the
+    // bar beneath it while respecting the physical ends of the track.
+    const tabCenterInTrack = tabRect.left + tabRect.width / 2 - trackRect.left;
+    const left = Math.max(
+      0,
+      Math.min(travel, tabCenterInTrack - thumbWidth / 2),
+    );
+
+    setPeriodIndicatorWidth(thumbWidth);
+    setPeriodIndicatorLeft(left);
+  };
+
+  const alignPeriodContentToStickyHeader = () => {
+    const contentStart = periodContentStartRef.current;
+    const header = availabilityHeaderRef.current;
+    if (!contentStart || !header) return;
+
+    const headerBottom = header.getBoundingClientRect().bottom;
+    const contentTop = contentStart.getBoundingClientRect().top;
+    const gap = window.matchMedia("(min-width: 640px)").matches ? 16 : 12;
+    const delta = contentTop - (headerBottom + gap);
+
+    // A manual period change returns to the beginning of the availability
+    // content directly beneath the sticky header.
+    if (Math.abs(delta) > 1) {
+      window.scrollBy({ top: delta, behavior: "auto" });
+    }
+  };
+
+  const settlePeriodIndicatorUnderTab = (index: number) => {
+    pendingPeriodAlignmentRef.current = index;
+
+    if (periodAlignmentFrameRef.current !== null) {
+      cancelAnimationFrame(periodAlignmentFrameRef.current);
+      periodAlignmentFrameRef.current = null;
+    }
+
+    let lastScrollLeft = Number.NaN;
+    let stableFrames = 0;
+
+    const checkSettled = () => {
+      const scroller = periodTabsRef.current;
+      if (!scroller || pendingPeriodAlignmentRef.current !== index) {
+        periodAlignmentFrameRef.current = null;
+        return;
+      }
+
+      const currentScrollLeft = scroller.scrollLeft;
+
+      if (
+        Number.isFinite(lastScrollLeft) &&
+        Math.abs(currentScrollLeft - lastScrollLeft) < 0.25
+      ) {
+        stableFrames += 1;
+      } else {
+        stableFrames = 0;
+      }
+
+      lastScrollLeft = currentScrollLeft;
+
+      // Three consecutive stable animation frames means either:
+      // 1) the smooth scroll has genuinely finished, or
+      // 2) this selection required no scroll at all because both tabs share
+      //    the same clamped viewport position (the edge case that was broken).
+      if (stableFrames >= 3) {
+        alignPeriodIndicatorToSelectedTab(index);
+        pendingPeriodAlignmentRef.current = null;
+        periodAlignmentFrameRef.current = null;
+        return;
+      }
+
+      periodAlignmentFrameRef.current = requestAnimationFrame(checkSettled);
+    };
+
+    periodAlignmentFrameRef.current = requestAnimationFrame(checkSettled);
+  };
+
+  const changePeriod = (index: number, resetPeriodContent = false) => {
+    setActivePeriod(index);
+
+    if (resetPeriodContent) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          alignPeriodContentToStickyHeader();
+        });
+      });
+    }
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const scroller = periodTabsRef.current;
+        if (!scroller || !window.matchMedia("(max-width: 639px)").matches) {
+          return;
+        }
+
+        const tabs = Array.from(
+          scroller.querySelectorAll<HTMLElement>('[role="tab"]'),
+        );
+        const selectedTab = tabs[index];
+        if (!selectedTab) return;
+
+        const maxScroll = Math.max(
+          0,
+          scroller.scrollWidth - scroller.clientWidth,
+        );
+
+        let targetScroll = 0;
+
+        if (index === 0) {
+          targetScroll = 0;
+        } else if (index === periods.length - 1) {
+          targetScroll = maxScroll;
+        } else {
+          const scrollerRect = scroller.getBoundingClientRect();
+          const tabRect = selectedTab.getBoundingClientRect();
+          const currentTabCenter = tabRect.left + tabRect.width / 2;
+          const desiredCenter = scrollerRect.left + scrollerRect.width / 2;
+          const delta = currentTabCenter - desiredCenter;
+
+          targetScroll = Math.max(
+            0,
+            Math.min(maxScroll, scroller.scrollLeft + delta),
+          );
+        }
+
+        scroller.scrollTo({
+          left: targetScroll,
+          behavior: "smooth",
+        });
+
+        // The scroll listener follows movement live. This watcher finalises
+        // the bar beneath the selected pill even when targetScroll equals the
+        // current scrollLeft and the browser emits no scroll event.
+        settlePeriodIndicatorUnderTab(index);
+      });
+    });
+  };
+
+  useEffect(() => {
+    const pendingIndex = pendingInitialPeriodRef.current;
+
+    // Wait until React has actually committed the period calculated for this
+    // date. This prevents the initial Early Morning state (0) from being
+    // positioned before the current-time period (for example Afternoon = 2)
+    // has reached the DOM.
+    if (
+      pendingIndex === null ||
+      activePeriod !== pendingIndex ||
+      initialPeriodPositionedRef.current
+    ) {
+      return;
+    }
+
+    const frame = requestAnimationFrame(() => {
+      const scroller = periodTabsRef.current;
+      const track = periodScrollTrackRef.current;
+      if (!scroller || !track) return;
+
+      initialPeriodPositionedRef.current = true;
+      pendingInitialPeriodRef.current = null;
+      changePeriod(activePeriod);
+    });
+
+    return () => cancelAnimationFrame(frame);
+    // Manual period changes already position themselves through changePeriod().
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [date, activePeriod]);
+
+  useEffect(() => {
+    const scroller = periodTabsRef.current;
+    const track = periodScrollTrackRef.current;
+    if (!scroller || !track) return;
+
+    const updatePeriodIndicator = () => {
+      const maxScroll = Math.max(
+        0,
+        scroller.scrollWidth - scroller.clientWidth,
+      );
+      const progress =
+        maxScroll > 0 ? scroller.scrollLeft / maxScroll : 0;
+
+      setPeriodScrollProgress(Math.max(0, Math.min(1, progress)));
+
+      // The bar is always the real horizontal-scroll indicator.
+      // Manual swipe, programmatic tab centering, automatic current-period
+      // positioning and bar dragging all converge on this same geometry.
+      const trackWidth = track.getBoundingClientRect().width;
+      const thumbWidth = Math.min(128, Math.max(112, trackWidth * 0.27));
+      const travel = Math.max(0, trackWidth - thumbWidth);
+      const clampedProgress = Math.max(0, Math.min(1, progress));
+
+      setPeriodIndicatorWidth(thumbWidth);
+      setPeriodIndicatorLeft(clampedProgress * travel);
+
+    };
+
+    updatePeriodIndicator();
+    scroller.addEventListener("scroll", updatePeriodIndicator, {
+      passive: true,
+    });
+    window.addEventListener("resize", updatePeriodIndicator);
+
+    return () => {
+      scroller.removeEventListener("scroll", updatePeriodIndicator);
+      window.removeEventListener("resize", updatePeriodIndicator);
+      if (periodAlignmentFrameRef.current !== null) {
+        cancelAnimationFrame(periodAlignmentFrameRef.current);
+        periodAlignmentFrameRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const scroller = periodTabsRef.current;
+    if (!scroller) return;
+
+    const updatePeriodScrollIndicator = () => {
+      const maxScroll = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
+      const progress = maxScroll > 0 ? scroller.scrollLeft / maxScroll : 0;
+      const visibleRatio =
+        scroller.scrollWidth > 0
+          ? scroller.clientWidth / scroller.scrollWidth
+          : 1;
+
+      setPeriodScrollProgress(Math.max(0, Math.min(1, progress)));
+      // Keep the draggable control compact. Its horizontal position comes
+      // only from the tab strip's real scroll progress.
+      setPeriodScrollThumbPercent(27);
+    };
+
+    updatePeriodScrollIndicator();
+    scroller.addEventListener("scroll", updatePeriodScrollIndicator, {
+      passive: true,
+    });
+    window.addEventListener("resize", updatePeriodScrollIndicator);
+
+    return () => {
+      scroller.removeEventListener("scroll", updatePeriodScrollIndicator);
+      window.removeEventListener("resize", updatePeriodScrollIndicator);
+    };
+  }, []);
+
+  const setPeriodScrollFromPointer = (clientX: number) => {
+    const scroller = periodTabsRef.current;
+    const track = periodScrollTrackRef.current;
+    if (!scroller || !track) return;
+
+    const rect = track.getBoundingClientRect();
+    const thumbWidth =
+      periodIndicatorWidth > 0
+        ? periodIndicatorWidth
+        : Math.min(120, rect.width * 0.27);
+    const travel = Math.max(0, rect.width - thumbWidth);
+
+    const thumbLeft = Math.max(
+      0,
+      Math.min(
+        travel,
+        clientX - rect.left - thumbWidth / 2,
+      ),
+    );
+
+    const progress = travel > 0 ? thumbLeft / travel : 0;
+    const maxScroll = Math.max(
+      0,
+      scroller.scrollWidth - scroller.clientWidth,
+    );
+
+    scroller.scrollLeft = progress * maxScroll;
+  };
+
+  const selectNearestPeriodAfterDrag = () => {
+    const scroller = periodTabsRef.current;
+    if (!scroller) return;
+
+    const tabs = Array.from(
+      scroller.querySelectorAll<HTMLElement>('[role="tab"]'),
+    );
+    if (!tabs.length) return;
+
+    const maxScroll = Math.max(
+      0,
+      scroller.scrollWidth - scroller.clientWidth,
+    );
+
+    // At the physical ends, the viewport center is naturally closer to an
+    // inner tab. Explicitly map those end positions to the first/last period.
+    const edgeTolerance = 2;
+
+    if (scroller.scrollLeft <= edgeTolerance) {
+      changePeriod(0, true);
+      return;
+    }
+
+    if (scroller.scrollLeft >= maxScroll - edgeTolerance) {
+      changePeriod(periods.length - 1, true);
+      return;
+    }
+
+    const scrollerRect = scroller.getBoundingClientRect();
+    const viewportCenter = scrollerRect.left + scrollerRect.width / 2;
+
+    let nearestIndex = 0;
+    let nearestDistance = Number.POSITIVE_INFINITY;
+
+    tabs.forEach((tab, index) => {
+      const rect = tab.getBoundingClientRect();
+      const tabCenter = rect.left + rect.width / 2;
+      const distance = Math.abs(tabCenter - viewportCenter);
+
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestIndex = index;
+      }
+    });
+
+    changePeriod(nearestIndex, true);
+  };
+
+  const handlePeriodTabsPointerDown = (
+    event: React.PointerEvent<HTMLDivElement>,
+  ) => {
+    const scroller = periodTabsRef.current;
+    if (!scroller || event.button !== 0) return;
+
+    pendingPeriodAlignmentRef.current = null;
+    if (periodAlignmentFrameRef.current !== null) {
+      cancelAnimationFrame(periodAlignmentFrameRef.current);
+      periodAlignmentFrameRef.current = null;
+    }
+
+    periodTabsDragRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      startScrollLeft: scroller.scrollLeft,
+      dragging: false,
+      moved: false,
+    };
+  };
+
+  const handlePeriodTabsPointerMove = (
+    event: React.PointerEvent<HTMLDivElement>,
+  ) => {
+    const scroller = periodTabsRef.current;
+    const drag = periodTabsDragRef.current;
+    if (!scroller || drag.pointerId !== event.pointerId) return;
+
+    const dx = event.clientX - drag.startX;
+    const dy = event.clientY - drag.startY;
+
+    if (!drag.dragging) {
+      // Wait until the gesture is clearly horizontal. This preserves normal
+      // vertical page scrolling and normal taps on the period buttons.
+      if (Math.abs(dx) < 6) return;
+      if (Math.abs(dx) <= Math.abs(dy)) return;
+
+      drag.dragging = true;
+      drag.moved = true;
+      event.currentTarget.setPointerCapture(event.pointerId);
+    }
+
+    event.preventDefault();
+    scroller.scrollLeft = drag.startScrollLeft - dx;
+  };
+
+  const handlePeriodTabsPointerEnd = (
+    event: React.PointerEvent<HTMLDivElement>,
+  ) => {
+    const drag = periodTabsDragRef.current;
+    if (drag.pointerId !== event.pointerId) return;
+
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+
+    drag.pointerId = -1;
+    drag.dragging = false;
+
+    // Keep moved=true through the synthetic click that follows pointerup,
+    // then clear it. This prevents a swipe ending over a pill from selecting it.
+    requestAnimationFrame(() => {
+      periodTabsDragRef.current.moved = false;
+    });
+  };
+
+  const handlePeriodTabsClickCapture = (
+    event: React.MouseEvent<HTMLDivElement>,
+  ) => {
+    if (!periodTabsDragRef.current.moved) return;
+    event.preventDefault();
+    event.stopPropagation();
+  };
+
+  const handlePeriodScrollPointerDown = (
+    event: React.PointerEvent<HTMLDivElement>,
+  ) => {
+    if (window.matchMedia("(min-width: 640px)").matches) return;
+    pendingPeriodAlignmentRef.current = null;
+    if (periodAlignmentFrameRef.current !== null) {
+      cancelAnimationFrame(periodAlignmentFrameRef.current);
+      periodAlignmentFrameRef.current = null;
+    }
+    periodScrollDraggingRef.current = true;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setPeriodScrollFromPointer(event.clientX);
+  };
+
+  const handlePeriodScrollPointerMove = (
+    event: React.PointerEvent<HTMLDivElement>,
+  ) => {
+    if (!periodScrollDraggingRef.current) return;
+    setPeriodScrollFromPointer(event.clientX);
+  };
+
+  const handlePeriodScrollPointerEnd = (
+    event: React.PointerEvent<HTMLDivElement>,
+  ) => {
+    const wasDragging = periodScrollDraggingRef.current;
+    periodScrollDraggingRef.current = false;
+
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+
+    if (wasDragging) {
+      requestAnimationFrame(selectNearestPeriodAfterDrag);
+    }
+  };
+
+  const periodTabs = (
+    <div>
+      <div
+        ref={periodTabsRef}
+        className="overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        role="tablist"
+        aria-label="Time periods"
+        onPointerDown={handlePeriodTabsPointerDown}
+        onPointerMove={handlePeriodTabsPointerMove}
+        onPointerUp={handlePeriodTabsPointerEnd}
+        onPointerCancel={handlePeriodTabsPointerEnd}
+        onClickCapture={handlePeriodTabsClickCapture}
+        style={{ touchAction: "pan-y" }}
+      >
+        <div className="flex min-w-max gap-2 sm:min-w-0 sm:w-full sm:items-center sm:justify-between sm:gap-2 sm:pr-0">
+        {periods.map((period, index) => {
+          const label = period.name.startsWith("Late Night") ? "Late Night" : period.name;
+          const isActive = activePeriod === index;
+          const hasExtensionHere =
+            index !== activePeriod &&
+            period.times.some((time) => validExtensionSlots.includes(time));
+          return (
+            <button
+              key={period.name}
+              type="button"
+              role="tab"
+              aria-selected={isActive}
+              onClick={() => changePeriod(index, true)}
+              className={`min-h-10 shrink-0 whitespace-nowrap rounded-full px-3 text-[13px] font-semibold transition sm:min-h-9 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-200 sm:px-3.5 lg:px-4 lg:text-sm ${
+                isActive
+                  ? "bg-violet-600 text-white shadow-sm"
+                  : "border border-slate-200 bg-white text-slate-600 hover:border-violet-200 hover:text-violet-700"
+              }`}
+            >
+              <span className="inline-flex items-center gap-1.5">
+                {label}
+                {hasExtensionHere && (
+                  <span
+                    className="h-2 w-2 rounded-full bg-violet-500"
+                    aria-label="More booking times available here"
+                    title="More booking times available here"
+                  />
+                )}
+              </span>
+            </button>
+          );
+        })}
+        </div>
+      </div>
+
+      <div
+        ref={periodScrollTrackRef}
+        role="scrollbar"
+        aria-label="Scroll time periods"
+        aria-orientation="horizontal"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(periodScrollProgress * 100)}
+        onPointerDown={handlePeriodScrollPointerDown}
+        onPointerMove={handlePeriodScrollPointerMove}
+        onPointerUp={handlePeriodScrollPointerEnd}
+        onPointerCancel={handlePeriodScrollPointerEnd}
+        className="relative mx-1 mt-1 h-7 touch-none cursor-ew-resize sm:hidden"
+      >
+        <div className="absolute left-0 right-0 top-1/2 h-1 -translate-y-1/2 overflow-hidden rounded-full bg-slate-200">
+          <div
+            className="h-full rounded-full bg-violet-500"
+            style={{
+              width:
+                periodIndicatorWidth > 0
+                  ? `${periodIndicatorWidth}px`
+                  : "27%",
+              transform: `translateX(${periodIndicatorLeft}px)`,
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <Shell
+      headerRef={availabilityHeaderRef}
       title={`${room} availability`}
       subtitle={longDate(date)}
       back={back}
       headerExtra={
-        selectedSlots.length > 0 ? (
-          <div className="flex items-center justify-between gap-2 rounded-xl border border-violet-200 bg-white px-3 py-2 text-sm shadow-sm sm:gap-3 sm:px-4 sm:py-3">
-            <span className="font-medium text-slate-600">Selected time</span>
-            <strong className="text-right text-violet-800">
-              {selectedRange} · {durationLabel(selectedSlots.length)}
-            </strong>
+        <div className="space-y-2 sm:space-y-1.5">
+          {selectedSlots.length > 0 && (
+            <div
+              className="flex items-center justify-between gap-3 rounded-lg bg-slate-100/80 px-3 py-2 text-sm sm:px-4 sm:py-1.5"
+              aria-label={`Selected time ${selectedRange}, ${durationLabel(selectedSlots.length)}`}
+            >
+              <span className="text-slate-500">Selected time</span>
+              <strong className="text-right text-violet-800">
+                {selectedRange} · {durationLabel(selectedSlots.length)}
+              </strong>
+            </div>
+          )}
+          <div className="rounded-xl border border-violet-100 bg-violet-50/95 px-3.5 py-2.5 text-sm font-medium leading-5 text-violet-800 sm:py-2">
+            {selectionGuidance}
           </div>
-        ) : undefined
+          {periodTabs}
+        </div>
       }
     >
-      <div className="mb-3 flex items-center gap-2.5 rounded-2xl bg-white px-3.5 py-2.5 shadow-sm sm:mb-5 sm:gap-3 sm:p-4">
-        <MapPin className="text-violet-600" size={20} />
-        <div>
-          <small className="text-slate-500">Selected MPR</small>
-          <p className="font-semibold">{room}</p>
+      <div ref={periodContentStartRef} />
+      <div className="mb-3 flex min-h-14 items-center gap-2.5 rounded-xl border border-slate-200/80 bg-white px-3 py-2 shadow-sm sm:mb-4 sm:px-3.5">
+        <MapPin className="shrink-0 text-violet-600" size={18} />
+        <div className="min-w-0 leading-tight">
+          <small className="text-xs text-slate-500">Selected MPR</small>
+          <p className="mt-0.5 text-sm font-semibold">{room}</p>
         </div>
         <button
           onClick={back}
-          className="ml-auto flex items-center gap-1 text-sm font-semibold text-violet-700"
+          className="ml-auto flex min-h-10 shrink-0 items-center gap-1 rounded-lg px-2 text-sm font-semibold text-violet-700 hover:bg-violet-50"
         >
-          Change <ChevronDown size={15} />
+          Change <ChevronDown size={14} />
         </button>
-      </div>
-      <div className="mb-3 rounded-xl bg-violet-50/70 px-3.5 py-2.5 text-sm font-medium leading-5 text-violet-800 sm:mb-5 sm:px-4">
-        Select a start and end time · Max 3 hours
       </div>
       {alternativeRoom && (
         <p className="mb-3 rounded-xl border border-violet-200 bg-violet-50 px-3.5 py-2.5 text-sm leading-5 text-violet-900 sm:mb-5 sm:px-4 sm:py-3">
@@ -2726,54 +3786,84 @@ function Slots({
             : <>Your selected time is available in {room}. <span className="font-medium">Keep it selected or choose another available time.</span></>}
         </p>
       )}
-      <div className="space-y-4 sm:space-y-6">
-        {periods.map((p) => (
-          <section key={p.name}>
-            <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-slate-500">
-              {p.name.startsWith("Late Night")
-                ? `Late Night · ${shortDate(nextDay)}`
-                : p.name}
-            </h2>
-            <div className="space-y-2">
-              {p.times.map((t) => {
-                const isBooked = booked.has(t);
-                const isSelected = selectedSlots.includes(t) && !isBooked;
+      <section
+        ref={slotListRef}
+        role="tabpanel"
+        aria-label={
+          periods[activePeriod].name.startsWith("Late Night")
+            ? `Late Night, ${shortDate(nextDay)}`
+            : periods[activePeriod].name
+        }
+      >
+        {periods[activePeriod].name.startsWith("Late Night") && (
+          <p className="mb-2 text-xs font-medium text-slate-500">
+            After midnight · {shortDate(nextDay)}
+          </p>
+        )}
+        <div className="space-y-2">
+          {periods[activePeriod].times.filter((t) => !booked.has(t)).length > 0 ? (
+            periods[activePeriod].times
+              .filter((t) => !booked.has(t))
+              .map((t) => {
+                const isSelected = selectedSlots.includes(t);
+                const tIndex = allTimeSlots.indexOf(t);
+                const selectedIndices = selectedSlots
+                  .map((item) => allTimeSlots.indexOf(item))
+                  .filter((index) => index >= 0);
+                const startIndex =
+                  selectedIndices.length > 0 ? Math.min(...selectedIndices) : -1;
+                const extensionCandidate =
+                  selectedSlots.length > 0 &&
+                  !isSelected &&
+                  tIndex > startIndex &&
+                  tIndex - startIndex + 1 <= 6 &&
+                  !allTimeSlots
+                    .slice(startIndex, tIndex + 1)
+                    .some((candidateSlot) => booked.has(candidateSlot));
                 return (
                   <button
                     key={t}
-                    disabled={isBooked}
                     onClick={() => selectSlot(t)}
-                    className={`flex min-h-14 w-full items-center justify-between rounded-2xl border px-4 text-left ${isSelected ? "border-violet-600 bg-violet-600 text-white shadow-lg shadow-violet-200" : isBooked ? "border-slate-200 bg-slate-100 text-slate-400" : "border-emerald-100 bg-white hover:border-emerald-400"}`}
+                    className={`flex min-h-14 w-full items-center justify-between rounded-2xl border px-4 text-left ${
+                      isSelected
+                        ? "border-violet-600 bg-violet-600 text-white shadow-lg shadow-violet-200"
+                        : extensionCandidate
+                          ? "border-violet-200 bg-violet-50/40 hover:border-violet-400"
+                          : "border-emerald-100 bg-white hover:border-emerald-400"
+                    }`}
                   >
                     <span className="font-semibold">{t}</span>
                     <span
-                      className={`rounded-full px-2.5 py-1 text-xs font-bold ${isSelected ? "bg-white/20" : isBooked ? "bg-slate-200" : "bg-emerald-100 text-emerald-700"}`}
+                      className={`rounded-full px-2.5 py-1 text-xs font-bold ${
+                        isSelected
+                          ? "bg-white/20"
+                          : extensionCandidate
+                            ? "bg-violet-100 text-violet-700"
+                            : "bg-emerald-100 text-emerald-700"
+                      }`}
                     >
                       {isSelected
-                        ? "Selected"
-                        : isBooked
-                          ? "Booked"
+                        ? selectedSlots.length === 1
+                          ? "Start"
+                          : t === selectedSlots[0]
+                            ? "Start"
+                            : t === selectedSlots[selectedSlots.length - 1]
+                              ? "End"
+                              : "Selected"
+                        : extensionCandidate
+                          ? "Extend"
                           : "Available"}
                     </span>
                   </button>
                 );
-              })}
+              })
+          ) : (
+            <div className="rounded-2xl border border-slate-200 bg-white px-4 py-5 text-sm text-slate-600">
+              No available times in this period. Choose another time period.
             </div>
-          </section>
-        ))}
-      </div>
-      {limitMessage && (
-        <div
-          className="pointer-events-none fixed bottom-[calc(5.75rem+env(safe-area-inset-bottom))] left-1/2 z-40 w-[calc(100%-2rem)] max-w-[720px] -translate-x-1/2 rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 text-amber-950 shadow-lg"
-          role="status"
-          aria-live="polite"
-        >
-          <p className="text-sm font-semibold">{limitMessage}</p>
-          <p className="mt-0.5 text-xs text-amber-800">
-            Choose a range of up to 3 hours that does not cross a booked time.
-          </p>
+          )}
         </div>
-      )}
+      </section>
       <ActionBar>
         <Primary
           disabled={selectedSlots.length === 0 || selectionHasBookedSlot}
@@ -2810,9 +3900,9 @@ function Issue({
 
   return (
     <>
-      <div className="flex h-full flex-col rounded-2xl border border-amber-200 bg-white p-4 shadow-sm">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex min-w-0 items-start gap-3">
+      <div className="flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-amber-200 bg-white p-3.5 shadow-sm sm:p-4">
+        <div>
+          <div className="flex min-w-0 items-start gap-2.5 sm:gap-3">
             <button
               type="button"
               onClick={() => setImageOpen(true)}
@@ -2827,22 +3917,27 @@ function Issue({
                 loading="lazy"
               />
             </button>
-            <div className="min-w-0">
-              <h2 className="font-semibold">{item.name}</h2>
-              <p className="text-xs font-bold text-violet-600">{item.id}</p>
+            <div className="min-w-0 flex-1">
+              <h2 className="min-w-0 break-words font-semibold leading-5">{item.name}</h2>
+              <div className="mt-1 flex min-w-0 items-center justify-between gap-2">
+                <p className="min-w-0 text-xs font-bold text-violet-600">{item.id}</p>
+                <div className="ml-auto shrink-0">
+                  <StatusPill status={item.status} condition={item.condition} />
+                </div>
+              </div>
             </div>
           </div>
-          <StatusPill status={item.status} condition={item.condition} />
         </div>
-        <p className="mt-3 text-sm leading-6 text-slate-600">{reason}</p>
-        <dl className="mt-3 grid grid-cols-2 gap-3 border-t border-slate-100 pt-3 text-sm">
+        <dl className="mt-3 grid grid-cols-1 gap-3 border-t border-slate-100 pt-3 text-sm min-[360px]:grid-cols-2">
           <div>
             <dt className="text-xs text-slate-500">Current location</dt>
             <dd className="mt-1 font-semibold">{item.currentLocation}</dd>
           </div>
-          <div>
-            <dt className="text-xs text-slate-500">Working condition</dt>
-            <dd className="mt-1 font-semibold">{item.condition}</dd>
+          <div className="min-[360px]:justify-self-end text-left">
+            <div>
+              <dt className="text-xs text-slate-500">Working condition</dt>
+              <dd className="mt-1 font-semibold">{item.status === "missing" ? "Unknown" : item.condition}</dd>
+            </div>
           </div>
         </dl>
         {action && onAction && (
@@ -2904,7 +3999,7 @@ function Issue({
               </div>
               <div>
                 <dt className="text-xs text-slate-500">Working condition</dt>
-                <dd className="mt-1 font-semibold">{item.condition}</dd>
+                <dd className="mt-1 font-semibold">{item.status === "missing" ? "Unknown" : item.condition}</dd>
               </div>
             </dl>
           </div>

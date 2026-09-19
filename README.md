@@ -65,6 +65,6 @@ Build the project:
 
 ## Project Status
 
-Practice Ready is currently a functional interactive prototype developed for HCI/UI-UX evaluation and usability testing.
+Practice Ready is a functional interactive prototype developed for HCI/UI-UX evaluation and formal usability testing.
 
 Equipment, room availability, scheduling information, and equipment status used in the prototype are illustrative prototype data and should not be treated as an authoritative live inventory or booking system for the True School of Music.
