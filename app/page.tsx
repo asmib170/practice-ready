@@ -1308,6 +1308,7 @@ function Shell({
   headerRef,
   compactActionBarPadding = false,
   compactMobileHeader = false,
+  lockMobileViewport = false,
 }: {
   children: React.ReactNode;
   title: string;
@@ -1321,6 +1322,7 @@ function Shell({
   headerRef?: React.RefObject<HTMLElement | null>;
   compactActionBarPadding?: boolean;
   compactMobileHeader?: boolean;
+  lockMobileViewport?: boolean;
 }) {
   const contextualScrollHint =
     scrollHint ??
@@ -1340,7 +1342,7 @@ function Shell({
                   ? "Scroll to review all equipment in this location."
                   : undefined);
   return (
-    <main className="relative min-h-screen w-full max-w-full overflow-x-clip bg-[#f3f5fb] dark:bg-[#0F1220] text-[#151a31] dark:text-[#F5F7FF]">
+    <main className={`relative w-full max-w-full bg-[#f3f5fb] dark:bg-[#0F1220] text-[#151a31] dark:text-[#F5F7FF] ${lockMobileViewport ? "h-[100dvh] overflow-hidden sm:min-h-screen sm:h-auto sm:overflow-x-clip" : "min-h-screen overflow-x-clip"}`}>
       <div className="hidden sm:block">
         <ThemeToggle />
       </div>
@@ -1482,7 +1484,7 @@ function Shell({
           </g>
         </svg>
       </div>
-      <div className="relative z-10 mx-auto min-h-screen w-full min-w-0 max-w-[760px] overflow-x-clip bg-transparent sm:bg-[#f8f9fd] dark:bg-transparent sm:dark:bg-[#151A2B] shadow-[0_0_60px_rgba(21,26,49,.08)]">
+      <div className={`relative z-10 mx-auto w-full min-w-0 max-w-[760px] overflow-x-clip bg-transparent sm:bg-[#f8f9fd] dark:bg-transparent sm:dark:bg-[#151A2B] shadow-[0_0_60px_rgba(21,26,49,.08)] ${lockMobileViewport ? "h-full min-h-0 overflow-y-hidden sm:min-h-screen sm:h-auto sm:overflow-y-visible" : "min-h-screen"}`}>
         <header ref={headerRef} className={`${stickyHeader ? "sticky top-0 z-20" : "relative z-10"} border-b border-slate-200/80 dark:border-[#30384D]/80 bg-[#f8f9fd]/96 dark:bg-[#151A2B]/96 sm:bg-[#f8f9fd]/98 sm:dark:bg-[#151A2B]/98 px-5 ${compactMobileHeader ? "pb-2 pt-2 sm:pb-3 sm:pt-3" : "pb-3 pt-3"} sm:px-8`}>
           <div className={`${compactMobileHeader ? "mb-1.5 sm:mb-2.5" : "mb-2.5"} flex items-center justify-between`}>
             {back ? (
@@ -2409,6 +2411,7 @@ export default function Home() {
         subtitle="Select a date to view MPR availability."
         back={back}
         compactActionBarPadding
+        lockMobileViewport
       >
         <div className="rounded-3xl border border-slate-200 dark:border-[#30384D] bg-white dark:bg-[#1B2133] p-4 shadow-sm">
           <div className="mb-4 flex items-center justify-between">
@@ -2505,6 +2508,7 @@ export default function Home() {
         title="Choose an MPR"
         subtitle={`Selected date: ${longDate(selectedDate || new Date())}`}
         back={back}
+        lockMobileViewport
       >
         <div className="grid gap-3 sm:grid-cols-2">
           {["MPR 2", "MPR 3", "MPR 4", "MPR 5"].map((r) => (
@@ -3369,7 +3373,7 @@ export default function Home() {
           defaultValue="search"
           onValueChange={(v) => v === "browse" && go("directory-browse")}
         >
-          <TabsList className="grid h-12 w-full grid-cols-2 rounded-2xl dark:bg-[#202739]">
+          <TabsList className="grid h-11 w-full grid-cols-2 rounded-2xl dark:bg-[#202739] sm:h-12">
             <TabsTrigger value="search" className="rounded-xl dark:text-[#9AA6BC] dark:data-[state=active]:bg-[#252C3E] dark:data-[state=active]:text-violet-200 dark:data-[state=active]:ring-1 dark:data-[state=active]:ring-violet-500/70">
               Search Equipment
             </TabsTrigger>
@@ -3377,7 +3381,7 @@ export default function Home() {
               Browse by Location
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="search" className="mt-2 sm:mt-5">
+          <TabsContent value="search" className="mt-1.5 sm:mt-5">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -3400,7 +3404,7 @@ export default function Home() {
               >
                 Equipment name or ID
               </label>
-              <div className="mt-0.5 flex flex-col gap-1 sm:mt-2 sm:gap-2 sm:flex-row">
+              <div className="mt-0.5 flex flex-col gap-0.5 sm:mt-2 sm:gap-2 sm:flex-row">
                 <Input
                   id="directory-query"
                   autoComplete="off"
@@ -3411,7 +3415,7 @@ export default function Home() {
                     setDirectoryTab("available");
                   }}
                   placeholder="e.g. microphone or SM58"
-                  className="min-h-12 rounded-2xl bg-white dark:!bg-[#1B2133] dark:!text-[#F5F7FF] dark:placeholder:!text-[#74809A]"
+                  className="min-h-11 rounded-2xl bg-white dark:!bg-[#1B2133] dark:!text-[#F5F7FF] dark:placeholder:!text-[#74809A] sm:min-h-12"
                 />
                 <Button
                   type="submit"
@@ -3419,8 +3423,8 @@ export default function Home() {
                   variant={searched ? "outline" : "default"}
                   className={
                     searched
-                      ? "min-h-12 w-full rounded-2xl border-violet-300 bg-white px-5 font-semibold text-violet-700 shadow-none hover:border-violet-400 hover:bg-violet-50 hover:text-violet-800 dark:border-violet-500/70 dark:bg-[#211A38] dark:text-violet-200 dark:hover:border-violet-400 dark:hover:bg-[#2B2145] dark:hover:text-violet-100 sm:w-auto"
-                      : "min-h-12 w-full rounded-2xl border border-violet-600 bg-violet-600 text-white hover:bg-violet-700 dark:border-violet-500 dark:bg-violet-600 dark:hover:bg-violet-500 disabled:border-violet-300 dark:disabled:border-violet-500/60 disabled:bg-violet-50 dark:disabled:bg-[#211A38] disabled:text-violet-600 dark:disabled:text-violet-300 disabled:opacity-100 sm:w-auto"
+                      ? "min-h-11 w-full rounded-2xl border-violet-300 bg-white px-5 font-semibold text-violet-700 shadow-none hover:border-violet-400 hover:bg-violet-50 hover:text-violet-800 dark:border-violet-500/70 dark:bg-[#211A38] dark:text-violet-200 dark:hover:border-violet-400 dark:hover:bg-[#2B2145] dark:hover:text-violet-100 sm:min-h-12 sm:w-auto"
+                      : "min-h-11 w-full rounded-2xl border border-violet-600 bg-violet-600 text-white hover:bg-violet-700 dark:border-violet-500 dark:bg-violet-600 dark:hover:bg-violet-500 disabled:border-violet-300 dark:disabled:border-violet-500/60 disabled:bg-violet-50 dark:disabled:bg-[#211A38] disabled:text-violet-600 dark:disabled:text-violet-300 disabled:opacity-100 sm:min-h-12 sm:w-auto"
                   }
                 >
                   <Search /> Search
@@ -3443,7 +3447,7 @@ export default function Home() {
             {searched &&
               (directoryMatches.all.length > 0 ? (
                 <>
-                  <p className="mt-2 text-sm font-medium text-slate-600 dark:text-[#AAB3C7] sm:mt-5">
+                  <p className="mt-1.5 text-sm font-medium text-slate-600 dark:text-[#AAB3C7] sm:mt-5">
                     {directoryMatches.all.length}{" "}
                     {directoryMatches.all.length === 1 ? "result" : "results"}{" "}
                     for “{query.trim()}”
@@ -3451,9 +3455,9 @@ export default function Home() {
                   <Tabs
                     value={directoryTab}
                     onValueChange={setDirectoryTab}
-                    className="mt-1.5 sm:mt-3"
+                    className="mt-1 sm:mt-3"
                   >
-                    <TabsList className="grid h-12 w-full grid-cols-2 rounded-2xl dark:bg-[#202739]">
+                    <TabsList className="grid h-11 w-full grid-cols-2 rounded-2xl dark:bg-[#202739] sm:h-12">
                       <TabsTrigger value="available" className={statusTabClass}>
                         Available{" "}
                         <span className="ml-1 text-xs opacity-70">
@@ -3471,13 +3475,13 @@ export default function Home() {
                       </TabsTrigger>
                     </TabsList>
                     {scrollHint && (
-                      <p className="mt-1.5 text-[13px] leading-5 font-normal text-slate-500 dark:text-[#9AA6BC] sm:mt-3 sm:text-sm">
+                      <p className="mt-1 text-[13px] leading-5 font-normal text-slate-500 dark:text-[#9AA6BC] sm:mt-3 sm:text-sm">
                         {scrollHint}
                       </p>
                     )}
                     <TabsContent
                       value="available"
-                      className="mt-1.5 grid items-stretch divide-y divide-slate-300 dark:divide-[#30384D] sm:mt-4 sm:relative sm:grid-cols-2 sm:gap-x-6 sm:before:pointer-events-none sm:before:absolute sm:before:inset-y-0 sm:before:left-1/2 sm:before:w-px sm:before:-translate-x-1/2 sm:before:bg-slate-300 dark:sm:before:bg-[#30384D] sm:before:content-[''] sm:divide-y-0 [&>*:nth-child(n+3)]:sm:border-t [&>*:nth-child(n+3)]:sm:border-slate-300 dark:[&>*:nth-child(n+3)]:sm:border-[#30384D]"
+                      className="mt-1 grid items-stretch divide-y divide-slate-300 dark:divide-[#30384D] sm:mt-4 sm:relative sm:grid-cols-2 sm:gap-x-6 sm:before:pointer-events-none sm:before:absolute sm:before:inset-y-0 sm:before:left-1/2 sm:before:w-px sm:before:-translate-x-1/2 sm:before:bg-slate-300 dark:sm:before:bg-[#30384D] sm:before:content-[''] sm:divide-y-0 [&>*:nth-child(n+3)]:sm:border-t [&>*:nth-child(n+3)]:sm:border-slate-300 dark:[&>*:nth-child(n+3)]:sm:border-[#30384D]"
                     >
                       {directoryMatches.available.length ? (
                         directoryMatches.available.map((x) => (
@@ -3741,7 +3745,7 @@ function HomeScreen({
 }) {
   const bars = [28, 46, 64, 38, 74, 52, 34, 68, 44, 58, 30, 50];
   return (
-    <main className="relative min-h-screen w-full max-w-full overflow-x-hidden bg-[#f7f8fc] dark:bg-[#171D2D] text-[#151a31] dark:text-[#F5F7FF]">
+    <main className="relative h-[100dvh] w-full max-w-full overflow-hidden bg-[#f7f8fc] dark:bg-[#171D2D] text-[#151a31] dark:text-[#F5F7FF] lg:h-auto lg:min-h-screen lg:overflow-x-hidden">
       <style>{`
         /* Fast, polished hover feedback on the Home screen. */
         [class*="hover:"],
@@ -3862,7 +3866,7 @@ function HomeScreen({
           </g>
         </svg>
       </div>
-      <div className="relative z-10 mx-auto grid min-h-screen w-full min-w-0 max-w-6xl lg:grid-cols-[0.9fr_1.1fr]">
+      <div className="relative z-10 mx-auto grid h-full min-h-0 w-full min-w-0 max-w-6xl lg:min-h-screen lg:grid-cols-[0.9fr_1.1fr]">
         <section className="relative hidden overflow-hidden bg-[#111733] dark:bg-[#0B0F1B] p-14 lg:flex lg:flex-col lg:justify-between">
           <div className="practice-ready-panel-ambient pointer-events-none absolute -left-24 top-24 h-72 w-72 rounded-full bg-violet-600/25 dark:bg-violet-400/20 blur-3xl" />
           <div className="practice-ready-panel-ambient pointer-events-none absolute -right-24 bottom-24 h-64 w-64 rounded-full bg-orange-300/10 dark:bg-orange-300/8 blur-3xl" style={{ animationDelay: "-5s" }} />
@@ -3901,7 +3905,7 @@ function HomeScreen({
             ))}
           </div>
         </section>
-        <section className="relative flex min-h-screen min-w-0 items-center overflow-hidden px-5 py-5 sm:px-10 sm:py-8 lg:overflow-x-hidden lg:px-20">
+        <section className="relative flex h-full min-h-0 min-w-0 items-center overflow-hidden px-5 py-5 sm:px-10 sm:py-8 lg:min-h-screen lg:overflow-x-hidden lg:px-20">
           <div className="relative z-10 mx-auto w-full min-w-0 max-w-xl">
             <div className="mb-6 flex items-center justify-between sm:mb-10 lg:hidden">
               <Brand />
