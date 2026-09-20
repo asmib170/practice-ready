@@ -1205,7 +1205,7 @@ const monthName = (date: Date) =>
     date,
   );
 
-function ThemeToggle() {
+function ThemeToggle({ fixed = true }: { fixed?: boolean }) {
   const [isDarkTheme, setIsDarkTheme] = useState<boolean | null>(null);
   const [isThemeSpinning, setIsThemeSpinning] = useState(false);
 
@@ -1259,7 +1259,6 @@ function ThemeToggle() {
           animation: practice-ready-theme-spin .72s cubic-bezier(.4, 0, .2, 1);
         }
         .practice-ready-global-theme-toggle {
-          position: fixed;
           top: 1.25rem;
           right: 1.25rem;
         }
@@ -1279,7 +1278,7 @@ function ThemeToggle() {
         disabled={isDarkTheme === null || isThemeSpinning}
         aria-label={isDarkTheme ? "Switch to light mode" : "Switch to dark mode"}
         title={isDarkTheme ? "Switch to light mode" : "Switch to dark mode"}
-        className="practice-ready-global-theme-toggle z-50 grid h-11 w-11 place-items-center rounded-2xl border border-slate-200/80 bg-white/96 text-slate-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:scale-105 hover:border-violet-300 hover:bg-violet-50/90 hover:shadow-md disabled:cursor-default disabled:opacity-80 dark:border-[#30384D]/90 dark:bg-[#1B2133]/96 dark:text-[#E7EAF2] dark:hover:border-[#4A3A67] dark:hover:bg-[#252C3E]"
+        className={`${fixed ? "fixed" : "absolute"} practice-ready-global-theme-toggle z-50 grid h-11 w-11 place-items-center rounded-2xl border border-slate-200/80 bg-white/96 text-slate-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:scale-105 hover:border-violet-300 hover:bg-violet-50/90 hover:shadow-md disabled:cursor-default disabled:opacity-80 dark:border-[#30384D]/90 dark:bg-[#1B2133]/96 dark:text-[#E7EAF2] dark:hover:border-[#4A3A67] dark:hover:bg-[#252C3E]`}
       >
         <span
           className={isThemeSpinning ? "practice-ready-theme-spin" : undefined}
@@ -1308,6 +1307,7 @@ function Shell({
   stickyHeader = true,
   headerRef,
   compactActionBarPadding = false,
+  compactMobileHeader = false,
 }: {
   children: React.ReactNode;
   title: string;
@@ -1320,6 +1320,7 @@ function Shell({
   stickyHeader?: boolean;
   headerRef?: React.RefObject<HTMLElement | null>;
   compactActionBarPadding?: boolean;
+  compactMobileHeader?: boolean;
 }) {
   const contextualScrollHint =
     scrollHint ??
@@ -1482,8 +1483,8 @@ function Shell({
         </svg>
       </div>
       <div className="relative z-10 mx-auto min-h-screen w-full min-w-0 max-w-[760px] overflow-x-clip bg-transparent sm:bg-[#f8f9fd] dark:bg-transparent sm:dark:bg-[#151A2B] shadow-[0_0_60px_rgba(21,26,49,.08)]">
-        <header ref={headerRef} className={`${stickyHeader ? "sticky top-0 z-20" : "relative z-10"} border-b border-slate-200/80 dark:border-[#30384D]/80 bg-[#f8f9fd]/96 dark:bg-[#151A2B]/96 sm:bg-[#f8f9fd]/98 sm:dark:bg-[#151A2B]/98 px-5 pb-3 pt-3 sm:px-8 sm:pb-3 sm:pt-3`}>
-          <div className="mb-2.5 flex items-center justify-between sm:mb-2.5">
+        <header ref={headerRef} className={`${stickyHeader ? "sticky top-0 z-20" : "relative z-10"} border-b border-slate-200/80 dark:border-[#30384D]/80 bg-[#f8f9fd]/96 dark:bg-[#151A2B]/96 sm:bg-[#f8f9fd]/98 sm:dark:bg-[#151A2B]/98 px-5 ${compactMobileHeader ? "pb-2 pt-2 sm:pb-3 sm:pt-3" : "pb-3 pt-3"} sm:px-8`}>
+          <div className={`${compactMobileHeader ? "mb-1.5 sm:mb-2.5" : "mb-2.5"} flex items-center justify-between`}>
             {back ? (
               <button
                 onClick={back}
@@ -1515,7 +1516,7 @@ function Shell({
               )}
             </div>
             {headerTitleAside && (
-              <div className="mt-3 min-w-0 sm:mt-0">{headerTitleAside}</div>
+              <div className={`${compactMobileHeader ? "mt-2 sm:mt-0" : "mt-3 sm:mt-0"} min-w-0`}>{headerTitleAside}</div>
             )}
           </div>
           {contextualScrollHint && (
@@ -1523,9 +1524,9 @@ function Shell({
               {contextualScrollHint}
             </p>
           )}
-          {headerExtra && <div className="mt-4 sm:mt-3">{headerExtra}</div>}
+          {headerExtra && <div className={compactMobileHeader ? "mt-2.5 sm:mt-3" : "mt-4 sm:mt-3"}>{headerExtra}</div>}
         </header>
-        <div className={`w-full min-w-0 max-w-full px-5 pt-3.5 sm:px-8 sm:pt-5 ${compactActionBarPadding ? "pb-24 sm:pb-24" : "pb-36 sm:pb-40"}`}>{children}</div>
+        <div className={`w-full min-w-0 max-w-full px-5 ${compactMobileHeader ? "pt-2.5 sm:pt-5" : "pt-3.5 sm:pt-5"} sm:px-8 ${compactActionBarPadding ? "pb-24 sm:pb-24" : "pb-36 sm:pb-40"}`}>{children}</div>
       </div>
     </main>
   );
@@ -2788,7 +2789,7 @@ export default function Home() {
             autoComplete="off"
           />
           {normalizedAvailableQuery && (
-            <p className="mt-3 text-sm font-normal text-slate-500 dark:text-[#9AA6BC]">
+            <p className="mt-2 text-[13px] leading-5 font-normal text-slate-500 dark:text-[#9AA6BC] sm:mt-3 sm:text-sm">
               {filteredReady.length} available{" "}
               {filteredReady.length === 1 ? "item matches" : "items match"} “
               {availableEquipmentQuery.trim()}”.
@@ -3097,7 +3098,7 @@ export default function Home() {
         {searched &&
           (results.length > 0 ? (
             <>
-              <p className="mt-5 text-sm font-medium text-slate-600 dark:text-[#AAB3C7]">
+              <p className="mt-3 text-sm font-medium text-slate-600 dark:text-[#AAB3C7] sm:mt-5">
                 {results.length} {results.length === 1 ? "result" : "results"}{" "}
                 for “{query.trim()}”
               </p>
@@ -3368,7 +3369,7 @@ export default function Home() {
               Browse by Location
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="search" className="mt-5">
+          <TabsContent value="search" className="mt-3 sm:mt-5">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -3391,7 +3392,7 @@ export default function Home() {
               >
                 Equipment name or ID
               </label>
-              <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+              <div className="mt-1 flex flex-col gap-1 sm:mt-2 sm:gap-2 sm:flex-row">
                 <Input
                   id="directory-query"
                   autoComplete="off"
@@ -3419,7 +3420,7 @@ export default function Home() {
               </div>
             </form>
             {!searched && (
-              <div className="flex min-h-[360px] flex-col items-center justify-center px-6 text-center sm:min-h-[420px]">
+              <div className="flex min-h-[270px] flex-col items-center justify-center px-6 pb-4 text-center sm:min-h-[420px] sm:pb-0">
                 <div className="grid h-16 w-16 place-items-center rounded-full bg-violet-50 dark:bg-[#211A38] text-violet-500 dark:text-violet-300">
                   <Search size={30} strokeWidth={1.8} />
                 </div>
@@ -3442,7 +3443,7 @@ export default function Home() {
                   <Tabs
                     value={directoryTab}
                     onValueChange={setDirectoryTab}
-                    className="mt-3"
+                    className="mt-2 sm:mt-3"
                   >
                     <TabsList className="grid h-12 w-full grid-cols-2 rounded-2xl dark:bg-[#202739]">
                       <TabsTrigger value="available" className={statusTabClass}>
@@ -3468,7 +3469,7 @@ export default function Home() {
                     )}
                     <TabsContent
                       value="available"
-                      className="mt-4 grid items-stretch divide-y divide-slate-300 dark:divide-[#30384D] sm:relative sm:grid-cols-2 sm:gap-x-6 sm:before:pointer-events-none sm:before:absolute sm:before:inset-y-0 sm:before:left-1/2 sm:before:w-px sm:before:-translate-x-1/2 sm:before:bg-slate-300 dark:sm:before:bg-[#30384D] sm:before:content-[''] sm:divide-y-0 [&>*:nth-child(n+3)]:sm:border-t [&>*:nth-child(n+3)]:sm:border-slate-300 dark:[&>*:nth-child(n+3)]:sm:border-[#30384D]"
+                      className="mt-2.5 grid items-stretch divide-y divide-slate-300 dark:divide-[#30384D] sm:mt-4 sm:relative sm:grid-cols-2 sm:gap-x-6 sm:before:pointer-events-none sm:before:absolute sm:before:inset-y-0 sm:before:left-1/2 sm:before:w-px sm:before:-translate-x-1/2 sm:before:bg-slate-300 dark:sm:before:bg-[#30384D] sm:before:content-[''] sm:divide-y-0 [&>*:nth-child(n+3)]:sm:border-t [&>*:nth-child(n+3)]:sm:border-slate-300 dark:[&>*:nth-child(n+3)]:sm:border-[#30384D]"
                     >
                       {directoryMatches.available.length ? (
                         directoryMatches.available.map((x) => (
@@ -3832,7 +3833,6 @@ function HomeScreen({
           .practice-ready-panel-ambient { animation: none !important; }
         }
       `}</style>
-      <ThemeToggle />
       <div className="practice-ready-wave-field pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         <svg
           className="absolute -left-[12%] -top-[10%] h-[120%] w-[124%]"
@@ -3895,9 +3895,7 @@ function HomeScreen({
           <div className="relative z-10 mx-auto w-full min-w-0 max-w-xl">
             <div className="mb-6 flex items-center justify-between sm:mb-10 lg:hidden">
               <Brand />
-              <span className="rounded-full bg-white dark:bg-[#1B2133] px-3 py-1.5 text-xs font-semibold text-slate-500 dark:text-[#9AA6BC] shadow-sm">
-                TSM
-              </span>
+              <ThemeToggle fixed={false} />
             </div>
             <p className="mb-2 text-sm font-semibold text-violet-700 dark:text-violet-300">
               {greeting}
@@ -4636,7 +4634,7 @@ function Slots({
       `}</style>
       <div
         ref={periodTabsRef}
-        className="overflow-x-auto pb-1 pt-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="overflow-x-auto pb-0.5 pt-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:pb-1 sm:pt-1.5"
         role="tablist"
         aria-label="Time periods"
         onPointerDown={handlePeriodTabsPointerDown}
@@ -4697,7 +4695,7 @@ function Slots({
         onPointerMove={handlePeriodScrollPointerMove}
         onPointerUp={handlePeriodScrollPointerEnd}
         onPointerCancel={handlePeriodScrollPointerEnd}
-        className="relative mx-1 mt-1 h-7 touch-none cursor-ew-resize sm:hidden"
+        className="relative mx-1 mt-0.5 h-5 touch-none cursor-ew-resize sm:hidden"
       >
         <div className="absolute left-0 right-0 top-1/2 h-1 -translate-y-1/2 overflow-hidden rounded-full bg-slate-200 dark:bg-[#2A3246]">
           <div
@@ -4718,11 +4716,12 @@ function Slots({
   return (
     <Shell
       headerRef={availabilityHeaderRef}
+      compactMobileHeader
       title={`${room} availability`}
       subtitle={longDate(date)}
       back={back}
       headerTitleAside={
-        <div className="flex min-h-12 items-center gap-2.5 rounded-xl border border-slate-200/80 dark:border-[#30384D]/80 bg-white dark:bg-[#1B2133] px-3 py-1.5 shadow-sm sm:min-h-0 sm:py-2">
+        <div className="flex min-h-11 items-center gap-2.5 rounded-xl border border-slate-200/80 dark:border-[#30384D]/80 bg-white dark:bg-[#1B2133] px-3 py-1 shadow-sm sm:min-h-0 sm:py-2">
           <MapPin className="shrink-0 text-violet-600 dark:text-violet-300" size={18} />
           <div className="min-w-0 flex items-baseline gap-1.5 leading-tight sm:block">
             <small className="text-xs text-slate-500 dark:text-[#9AA6BC]">
@@ -4732,14 +4731,14 @@ function Slots({
           </div>
           <button
             onClick={back}
-            className="ml-auto flex min-h-10 shrink-0 items-center gap-1 rounded-lg px-2 text-sm font-semibold text-violet-700 dark:text-violet-300 hover:bg-violet-50 dark:hover:bg-[#2B2145] sm:min-h-9"
+            className="ml-auto flex min-h-9 shrink-0 items-center gap-1 rounded-lg px-2 text-sm font-semibold text-violet-700 dark:text-violet-300 hover:bg-violet-50 dark:hover:bg-[#2B2145] sm:min-h-9"
           >
             Change <ChevronDown size={14} />
           </button>
         </div>
       }
       headerExtra={
-        <div className="space-y-2 sm:space-y-1.5">
+        <div className="space-y-1.5 sm:space-y-1.5">
           {selectedSlots.length > 0 && (
             <div
               className="flex items-center justify-between gap-3 rounded-lg bg-slate-100/80 dark:bg-[#202739]/80 px-3 py-2 text-sm sm:px-4 sm:py-1.5"
@@ -4751,7 +4750,7 @@ function Slots({
               </strong>
             </div>
           )}
-          <div className="rounded-xl border border-violet-100 dark:border-violet-500/45 bg-violet-50/95 dark:bg-[#211A38]/95 px-3.5 py-2.5 text-sm font-medium leading-5 text-violet-800 dark:text-violet-200 sm:py-2">
+          <div className="rounded-xl border border-violet-100 dark:border-violet-500/45 bg-violet-50/95 dark:bg-[#211A38]/95 px-3.5 py-2 text-sm font-medium leading-5 text-violet-800 dark:text-violet-200 sm:py-2">
             {selectionGuidance}
           </div>
           {periodTabs}
@@ -4776,11 +4775,11 @@ function Slots({
         }
       >
         {periods[activePeriod].name.startsWith("Late Night") && (
-          <p className="mb-2 text-xs font-medium text-slate-500 dark:text-[#9AA6BC]">
+          <p className="mb-1.5 text-xs font-medium text-slate-500 dark:text-[#9AA6BC] sm:mb-2">
             After midnight · {shortDate(nextDay)}
           </p>
         )}
-        <div className="space-y-2">
+        <div className="space-y-1.5 sm:space-y-2">
           {periods[activePeriod].times.map((t) => {
             const isBooked = booked.has(t);
             const isSelected = !isBooked && selectedSlots.includes(t);
@@ -4805,7 +4804,7 @@ function Slots({
                 type="button"
                 disabled={isBooked}
                 onClick={() => selectSlot(t)}
-                className={`flex min-h-14 w-full items-center justify-between rounded-2xl border px-4 text-left ${
+                className={`flex min-h-13 w-full items-center justify-between rounded-2xl border px-4 text-left sm:min-h-14 ${
                   isBooked
                     ? "cursor-not-allowed border-slate-200 dark:border-[#30384D] bg-slate-100 dark:bg-[#252C3E] text-slate-400 dark:text-[#74809A]"
                     : isSelected
