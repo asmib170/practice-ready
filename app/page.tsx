@@ -3941,6 +3941,7 @@ function HomeScreen({
                 title="Booking Conflict Demo"
                 text="See what happens when another student books your selected slot first."
                 onClick={onConflict}
+                className="!bg-[#F0ECFF] hover:!bg-[#EAE4FF] dark:!bg-[#1B2133] dark:hover:!bg-[#202739]"
               />
             </div>
           </div>
@@ -3955,17 +3956,19 @@ function HomeCard({
   title,
   text,
   onClick,
+  className = "",
 }: {
   dark?: boolean;
   icon: React.ReactNode;
   title: string;
   text: string;
   onClick: () => void;
+  className?: string;
 }) {
   return (
     <button
       onClick={onClick}
-      className={`group flex w-full min-w-0 max-w-full items-center gap-3 rounded-[1.4rem] px-4 py-3.5 text-left shadow-sm transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-300 sm:gap-4 sm:p-5 ${dark ? "bg-[#20284A] text-white hover:bg-[#28335A] dark:border dark:border-violet-500/60 dark:bg-[#21183d] dark:shadow-[0_10px_28px_rgba(124,58,237,0.16)] dark:hover:border-violet-400/80 dark:hover:bg-[#2a1d4b]" : "border border-violet-200 dark:border-[#30384D] bg-[#F1EDFF] dark:bg-[#1B2133] text-[#151a31] dark:text-[#F5F7FF] shadow-violet-100/70 dark:shadow-none hover:border-violet-300 dark:hover:border-violet-500/70 hover:bg-[#EAE4FF] dark:hover:bg-[#202739]"}`}
+      className={`group flex w-full min-w-0 max-w-full items-center gap-3 rounded-[1.4rem] px-4 py-3.5 text-left shadow-sm transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-300 sm:gap-4 sm:p-5 ${dark ? "bg-[#20284A] text-white hover:bg-[#28335A] dark:border dark:border-violet-500/60 dark:bg-[#21183d] dark:shadow-[0_10px_28px_rgba(124,58,237,0.16)] dark:hover:border-violet-400/80 dark:hover:bg-[#2a1d4b]" : "border border-violet-200 dark:border-[#30384D] bg-[#F1EDFF] dark:bg-[#1B2133] text-[#151a31] dark:text-[#F5F7FF] shadow-violet-100/70 dark:shadow-none hover:border-violet-300 dark:hover:border-violet-500/70 hover:bg-[#EAE4FF] dark:hover:bg-[#202739]"} ${className}`}
     >
       <span
         className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl sm:h-12 sm:w-12 sm:rounded-2xl ${dark ? "bg-violet-500 dark:bg-violet-500" : "bg-violet-600 text-white"}`}
@@ -4650,7 +4653,7 @@ function Slots({
       `}</style>
       <div
         ref={periodTabsRef}
-        className="overflow-x-auto pb-0 pt-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:pb-1 sm:pt-1.5"
+        className="-mt-1 overflow-x-auto pb-0 pt-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mt-0 sm:pb-1 sm:pt-1.5"
         role="tablist"
         aria-label="Time periods"
         onPointerDown={handlePeriodTabsPointerDown}
