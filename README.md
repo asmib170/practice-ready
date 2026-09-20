@@ -4,7 +4,7 @@
 
 The project addresses a practical problem faced by students: before arriving for practice, they may not have a reliable way to know whether an MPR is available, what equipment is assigned to it, where that equipment is currently located, or whether it is in working condition.
 
-Practice Ready brings this information together so students can make a more informed room booking before beginning a practice session.
+Practice Ready brings this information together so students can make a more informed room-booking decision before beginning a practice session.
 
 ## Live Links
 
@@ -38,11 +38,24 @@ The interface was refined around principles including visibility of system statu
 
 ## Prototype
 
-The current prototype supports the complete room-booking journey as well as supporting interactions for checking room setups, equipment locations, equipment working conditions, and equipment reference information.
+The current responsive prototype supports the complete room-booking journey across desktop and mobile.
 
-It also includes alternative and error states, such as equipment-availability issues and a simulated simultaneous-booking conflict, to demonstrate how users can understand and recover from problems during the booking process.
+Users can:
 
-The interface is designed to work across desktop and mobile layouts.
+- Select a date, MPR and consecutive 30-minute time slots, with a maximum booking duration of three hours.
+- Review an MPR's equipment readiness before continuing with a reservation.
+- View currently available equipment assigned to an MPR and search that list by equipment name or ID.
+- Search the Equipment Directory by equipment name or ID.
+- Browse equipment by TSM location.
+- Compare Available and Unavailable equipment states.
+- View default location, current location and working condition where relevant.
+- Search for alternatives when assigned equipment is unavailable.
+- Recover from equipment-availability issues without implying that equipment can be borrowed or relocated.
+- Experience a simulated simultaneous-booking conflict through the dedicated **Booking Conflict Demo** and recover by adjusting the selected time or choosing another MPR.
+
+Equipment search prioritizes the actual requested equipment before related label matches while preserving the established location order. Search results also avoid unintended substring matches and automatically open the Unavailable tab when no available matches exist but unavailable matches do.
+
+The interface includes responsive light and dark themes, animated ambient backgrounds, written equipment-status labels, consistent interaction states and mobile-safe sticky actions.
 
 ## Technology
 
@@ -57,14 +70,34 @@ The interface is designed to work across desktop and mobile layouts.
 
 Install dependencies:
 
-    pnpm install
+```bash
+pnpm install
+```
+
+Run the development server:
+
+```bash
+pnpm dev
+```
 
 Build the project:
 
-    pnpm build
+```bash
+pnpm build
+```
+
+Start the production build locally:
+
+```bash
+npx vinext start
+```
+
+If the server reports `http://0.0.0.0:3000`, open `http://localhost:3000` in the browser.
 
 ## Project Status
 
 Practice Ready is a functional interactive prototype developed for HCI/UI-UX evaluation and formal usability testing.
 
-Equipment, room availability, scheduling information, and equipment status used in the prototype are illustrative prototype data and should not be treated as an authoritative live inventory or booking system for the True School of Music.
+The current version includes the complete booking happy path, equipment-readiness and alternative-search flows, equipment-directory search and location browsing, responsive desktop/mobile layouts, light and dark themes, and a deterministic Booking Conflict Demo.
+
+Equipment, room availability, scheduling information, equipment IDs, quantities, locations and condition states used in the prototype are illustrative prototype data and should not be treated as an authoritative live inventory or booking system for the True School of Music.
