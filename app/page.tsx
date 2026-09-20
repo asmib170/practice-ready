@@ -1512,7 +1512,11 @@ function Shell({
                 {title}
               </h1>
               {subtitle && (
-                <p className="min-w-0 break-words text-pretty mt-1.5 text-[15px] leading-5 text-slate-600 dark:text-[#AAB3C7] sm:mt-1 sm:leading-5">
+                <p
+                  className={`min-w-0 break-words mt-1.5 text-[15px] leading-5 text-slate-600 dark:text-[#AAB3C7] sm:mt-1 sm:leading-5 ${
+                    title === "Equipment directory" ? "text-left" : "text-pretty"
+                  }`}
+                >
                   {subtitle}
                 </p>
               )}
