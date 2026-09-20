@@ -1816,16 +1816,16 @@ function EquipmentRow({
         className={
           compactResult
             ? `flex h-full min-w-0 flex-col bg-transparent px-1 py-3 dark:bg-transparent sm:px-4 sm:py-4 ${availableEquipmentLayout ? "dark:px-3 sm:dark:px-4" : ""}`
-            : `flex h-full flex-col bg-transparent ${compactAvailableMobile ? "py-3 sm:py-5" : "py-4 sm:py-5"} ${availableEquipmentLayout ? "dark:bg-transparent dark:px-3 sm:dark:px-4" : transparentDarkSurface ? "dark:bg-transparent" : "dark:bg-[#1B2133]"}`
+            : `flex h-full flex-col bg-transparent py-3 sm:py-5 ${availableEquipmentLayout ? "dark:bg-transparent dark:px-3 sm:dark:px-4" : transparentDarkSurface ? "dark:bg-transparent" : "dark:bg-[#1B2133]"}`
         }
       >
-        <div className={`flex items-start ${compactAvailableMobile ? "gap-2.5 sm:gap-4" : "gap-3 sm:gap-4"}`}>
+        <div className="flex items-start gap-2.5 sm:gap-4">
           <div className="shrink-0">
             <div className="shrink-0">
               <button
                 type="button"
                 onClick={() => setImageOpen(true)}
-                className={`group relative cursor-zoom-in overflow-hidden rounded-xl border border-slate-200 dark:border-[#30384D] bg-white dark:bg-[#1B2133] transition-colors hover:border-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 ${compactAvailableMobile ? "h-14 w-14 sm:h-[72px] sm:w-[72px]" : "h-16 w-16 sm:h-[72px] sm:w-[72px]"}`}
+                className="group relative h-[54px] w-[54px] cursor-zoom-in overflow-hidden rounded-xl border border-slate-200 dark:border-[#30384D] bg-white dark:bg-[#1B2133] transition-colors hover:border-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 sm:h-[72px] sm:w-[72px]"
                 aria-label={`View larger image of ${item.name}`}
               >
                 <img
@@ -1873,16 +1873,14 @@ function EquipmentRow({
         <dl
           className={
             compactResult
-              ? "mt-2.5 grid grid-cols-2 gap-x-4 gap-y-2 border-t border-slate-200 dark:border-[#30384D] pt-2.5 text-sm"
-              : compactAvailableMobile
-                ? "mt-2 grid grid-cols-2 gap-x-4 gap-y-2 border-t border-slate-200 dark:border-[#30384D] pt-2 text-sm sm:mt-3 sm:gap-4 sm:pt-3"
-                : "mt-3 grid grid-cols-2 gap-4 border-t border-slate-200 dark:border-[#30384D] pt-3 text-sm"
+              ? "mt-2 grid grid-cols-2 gap-x-4 gap-y-2 border-t border-slate-200 dark:border-[#30384D] pt-2 text-sm sm:mt-2.5 sm:pt-2.5"
+              : "mt-2 grid grid-cols-2 gap-x-4 gap-y-2 border-t border-slate-200 dark:border-[#30384D] pt-2 text-sm sm:mt-3 sm:gap-4 sm:pt-3"
           }
         >
           {showDefault && (
             <div>
               <dt className="whitespace-nowrap text-xs text-slate-500 dark:text-[#9AA6BC]">Default location</dt>
-              <dd className={compactResult ? "mt-0.5 font-medium" : "mt-1 font-medium"}>
+              <dd className={compactResult ? "mt-0.5 font-medium" : "mt-0.5 font-medium sm:mt-1"}>
                 {item.defaultLocation}
               </dd>
             </div>
@@ -1891,14 +1889,14 @@ function EquipmentRow({
             <>
               <div className="text-left">
                 <dt className="text-xs text-slate-500 dark:text-[#9AA6BC]">Working condition</dt>
-                <dd className={compactResult ? "mt-0.5 font-medium" : "mt-1 font-medium"}>
+                <dd className={compactResult ? "mt-0.5 font-medium" : "mt-0.5 font-medium sm:mt-1"}>
                   {item.status === "missing" ? "Unknown" : item.condition}
                 </dd>
               </div>
               <div className="justify-self-end text-left">
                 <div>
                   <dt className="whitespace-nowrap text-xs text-slate-500 dark:text-[#9AA6BC]">Current location</dt>
-                  <dd className={compactResult ? "mt-0.5 font-medium" : "mt-1 font-medium"}>
+                  <dd className={compactResult ? "mt-0.5 font-medium" : "mt-0.5 font-medium sm:mt-1"}>
                     {item.currentLocation}
                   </dd>
                 </div>
@@ -1909,21 +1907,21 @@ function EquipmentRow({
               <div className="justify-self-end text-left">
                 <div>
                   <dt className="text-xs text-slate-500 dark:text-[#9AA6BC]">Working condition</dt>
-                  <dd className={compactResult ? "mt-0.5 font-medium" : "mt-1 font-medium"}>
+                  <dd className={compactResult ? "mt-0.5 font-medium" : "mt-0.5 font-medium sm:mt-1"}>
                     {item.status === "missing" ? "Unknown" : item.condition}
                   </dd>
                 </div>
               </div>
               <div className={showDefault ? "col-span-1" : undefined}>
                 <dt className="whitespace-nowrap text-xs text-slate-500 dark:text-[#9AA6BC]">Current location</dt>
-                <dd className={compactResult ? "mt-0.5 font-medium" : "mt-1 font-medium"}>
+                <dd className={compactResult ? "mt-0.5 font-medium" : "mt-0.5 font-medium sm:mt-1"}>
                   {item.currentLocation}
                 </dd>
               </div>
             </>
           )}
         </dl>
-        {action && <div className="mt-auto pt-3">{action}</div>}
+        {action && <div className="mt-auto pt-2 sm:pt-3">{action}</div>}
       </div>
 
       {imageOpen && (
