@@ -1205,7 +1205,7 @@ const monthName = (date: Date) =>
     date,
   );
 
-function ThemeToggle({ fixed = true }: { fixed?: boolean }) {
+function ThemeToggle({ fixed = true, inline = false }: { fixed?: boolean; inline?: boolean }) {
   const [isDarkTheme, setIsDarkTheme] = useState<boolean | null>(null);
   const [isThemeSpinning, setIsThemeSpinning] = useState(false);
 
@@ -1278,7 +1278,7 @@ function ThemeToggle({ fixed = true }: { fixed?: boolean }) {
         disabled={isDarkTheme === null || isThemeSpinning}
         aria-label={isDarkTheme ? "Switch to light mode" : "Switch to dark mode"}
         title={isDarkTheme ? "Switch to light mode" : "Switch to dark mode"}
-        className={`${fixed ? "fixed" : "absolute"} practice-ready-global-theme-toggle z-50 grid h-11 w-11 place-items-center rounded-2xl border border-slate-200/80 bg-white/96 text-slate-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:scale-105 hover:border-violet-300 hover:bg-violet-50/90 hover:shadow-md disabled:cursor-default disabled:opacity-80 dark:border-[#30384D]/90 dark:bg-[#1B2133]/96 dark:text-[#E7EAF2] dark:hover:border-[#4A3A67] dark:hover:bg-[#252C3E]`}
+        className={`${inline ? "relative shrink-0" : fixed ? "fixed practice-ready-global-theme-toggle" : "absolute practice-ready-global-theme-toggle"} z-50 grid h-11 w-11 place-items-center rounded-2xl border border-slate-200/80 bg-white/96 text-slate-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:scale-105 hover:border-violet-300 hover:bg-violet-50/90 hover:shadow-md disabled:cursor-default disabled:opacity-80 dark:border-[#30384D]/90 dark:bg-[#1B2133]/96 dark:text-[#E7EAF2] dark:hover:border-[#4A3A67] dark:hover:bg-[#252C3E]`}
       >
         <span
           className={isThemeSpinning ? "practice-ready-theme-spin" : undefined}
@@ -1784,6 +1784,7 @@ function EquipmentRow({
   availableEquipmentLayout = false,
   transparentDarkSurface = false,
   availableStatusOnIdRow = false,
+  compactAvailableMobile = false,
 }: {
   item: Equipment;
   showDefault?: boolean;
@@ -1793,6 +1794,7 @@ function EquipmentRow({
   availableEquipmentLayout?: boolean;
   transparentDarkSurface?: boolean;
   availableStatusOnIdRow?: boolean;
+  compactAvailableMobile?: boolean;
 }) {
   const [imageOpen, setImageOpen] = useState(false);
   const imageUrl = equipmentImageUrl(item);
@@ -1812,16 +1814,16 @@ function EquipmentRow({
         className={
           compactResult
             ? `flex h-full min-w-0 flex-col bg-transparent px-1 py-3 dark:bg-transparent sm:px-4 sm:py-4 ${availableEquipmentLayout ? "dark:px-3 sm:dark:px-4" : ""}`
-            : `flex h-full flex-col bg-transparent py-4 sm:py-5 ${availableEquipmentLayout ? "dark:bg-transparent dark:px-3 sm:dark:px-4" : transparentDarkSurface ? "dark:bg-transparent" : "dark:bg-[#1B2133]"}`
+            : `flex h-full flex-col bg-transparent ${compactAvailableMobile ? "py-3 sm:py-5" : "py-4 sm:py-5"} ${availableEquipmentLayout ? "dark:bg-transparent dark:px-3 sm:dark:px-4" : transparentDarkSurface ? "dark:bg-transparent" : "dark:bg-[#1B2133]"}`
         }
       >
-        <div className="flex items-start gap-3 sm:gap-4">
+        <div className={`flex items-start ${compactAvailableMobile ? "gap-2.5 sm:gap-4" : "gap-3 sm:gap-4"}`}>
           <div className="shrink-0">
             <div className="shrink-0">
               <button
                 type="button"
                 onClick={() => setImageOpen(true)}
-                className="group relative h-16 w-16 cursor-zoom-in overflow-hidden rounded-xl border border-slate-200 dark:border-[#30384D] bg-white dark:bg-[#1B2133] transition-colors hover:border-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 sm:h-[72px] sm:w-[72px]"
+                className={`group relative cursor-zoom-in overflow-hidden rounded-xl border border-slate-200 dark:border-[#30384D] bg-white dark:bg-[#1B2133] transition-colors hover:border-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 ${compactAvailableMobile ? "h-14 w-14 sm:h-[72px] sm:w-[72px]" : "h-16 w-16 sm:h-[72px] sm:w-[72px]"}`}
                 aria-label={`View larger image of ${item.name}`}
               >
                 <img
@@ -1870,7 +1872,9 @@ function EquipmentRow({
           className={
             compactResult
               ? "mt-2.5 grid grid-cols-2 gap-x-4 gap-y-2 border-t border-slate-200 dark:border-[#30384D] pt-2.5 text-sm"
-              : "mt-3 grid grid-cols-2 gap-4 border-t border-slate-200 dark:border-[#30384D] pt-3 text-sm"
+              : compactAvailableMobile
+                ? "mt-2 grid grid-cols-2 gap-x-4 gap-y-2 border-t border-slate-200 dark:border-[#30384D] pt-2 text-sm sm:mt-3 sm:gap-4 sm:pt-3"
+                : "mt-3 grid grid-cols-2 gap-4 border-t border-slate-200 dark:border-[#30384D] pt-3 text-sm"
           }
         >
           {showDefault && (
@@ -2767,13 +2771,14 @@ export default function Home() {
 
     return (
       <Shell
+        compactMobileHeader
         title={`Available equipment in ${room}`}
         subtitle={`${ready.length} items currently available`}
         scrollHint="For viewing only — equipment is not selected or reserved here."
         back={back}
         home={home}
       >
-        <div className="mb-5">
+        <div className="mb-3 sm:mb-5">
           <label
             className="text-sm font-semibold"
             htmlFor="available-equipment-query"
@@ -2782,7 +2787,7 @@ export default function Home() {
           </label>
           <Input
             id="available-equipment-query"
-            className="mt-2 h-12 rounded-2xl bg-white dark:!bg-[#1B2133] dark:!text-[#F5F7FF] dark:placeholder:!text-[#74809A]"
+            className="mt-1 h-11 rounded-2xl bg-white dark:!bg-[#1B2133] dark:!text-[#F5F7FF] dark:placeholder:!text-[#74809A] sm:mt-2 sm:h-12"
             value={availableEquipmentQuery}
             onChange={(e) => setAvailableEquipmentQuery(e.target.value)}
             placeholder="Search by equipment name or ID..."
@@ -2806,6 +2811,7 @@ export default function Home() {
                   showStatus={false}
                   availableEquipmentLayout
                   availableStatusOnIdRow
+                  compactAvailableMobile
                 />
               </div>
             ))}
@@ -3056,6 +3062,7 @@ export default function Home() {
         }`}
         subtitle="Find alternatives by location and condition."
         scrollHint=""
+        compactMobileHeader
         back={() => {
           if (!alternativeFromDirectory && room !== sourceRoom) setRoom(sourceRoom);
           back();
@@ -3066,7 +3073,7 @@ export default function Home() {
           Equipment name or ID
         </label>
         <form
-          className="mt-2 flex gap-2 max-sm:flex-col"
+          className="mt-1 flex gap-1 max-sm:flex-col sm:mt-2 sm:gap-2"
           onSubmit={(event) => {
             event.preventDefault();
             if (query.trim()) setSearched(true);
@@ -3080,7 +3087,7 @@ export default function Home() {
               setQuery(e.target.value);
               setSearched(false);
             }}
-            className="min-h-12 rounded-2xl bg-white dark:!bg-[#1B2133] dark:!text-[#F5F7FF] dark:placeholder:!text-[#74809A]"
+            className="min-h-11 rounded-2xl bg-white dark:!bg-[#1B2133] dark:!text-[#F5F7FF] dark:placeholder:!text-[#74809A] sm:min-h-12"
           />
           <Button
             type="submit"
@@ -3089,7 +3096,7 @@ export default function Home() {
             className={
               searched
                 ? "min-h-11 rounded-2xl border-violet-300 bg-white dark:bg-[#211A38] dark:border-violet-500/70 px-5 font-semibold text-violet-700 dark:text-violet-200 shadow-none hover:border-violet-400 hover:bg-violet-50 dark:hover:bg-[#2B2145] dark:hover:border-violet-400 hover:text-violet-800 dark:hover:text-violet-100 max-sm:w-full"
-                : "min-h-12 rounded-2xl bg-violet-600 dark:bg-violet-600 dark:hover:bg-violet-500 px-5 max-sm:w-full"
+                : "min-h-11 rounded-2xl bg-violet-600 dark:bg-violet-600 dark:hover:bg-violet-500 px-5 max-sm:w-full sm:min-h-12"
             }
           >
             <Search size={18} /> Search
@@ -3098,20 +3105,21 @@ export default function Home() {
         {searched &&
           (results.length > 0 ? (
             <>
-              <p className="mt-3 text-sm font-medium text-slate-600 dark:text-[#AAB3C7] sm:mt-5">
+              <p className="mt-2 text-sm font-medium text-slate-600 dark:text-[#AAB3C7] sm:mt-5">
                 {results.length} {results.length === 1 ? "result" : "results"}{" "}
                 for “{query.trim()}”
               </p>
-              <p className="mt-1 text-sm leading-5 text-slate-500 dark:text-[#9AA6BC]">
+              <p className="mt-0.5 text-[13px] leading-5 text-slate-500 dark:text-[#9AA6BC] sm:mt-1 sm:text-sm">
                 For reference only — equipment cannot be reserved here.
               </p>
-              <div className="mt-3 grid items-stretch divide-y divide-slate-300 dark:divide-[#30384D] border-y border-slate-200 dark:border-[#30384D] sm:relative sm:grid-cols-2 sm:gap-x-6 sm:before:pointer-events-none sm:before:absolute sm:before:inset-y-0 sm:before:left-1/2 sm:before:w-px sm:before:-translate-x-1/2 sm:before:bg-slate-300 dark:sm:before:bg-[#30384D] sm:before:content-[''] sm:divide-y-0 sm:border-y-0 [&>*:nth-child(n+3)]:sm:border-t [&>*:nth-child(n+3)]:sm:border-slate-300 dark:[&>*:nth-child(n+3)]:sm:border-[#30384D]">
+              <div className="mt-2 grid items-stretch divide-y divide-slate-300 dark:divide-[#30384D] border-y border-slate-200 dark:border-[#30384D] sm:mt-3 sm:relative sm:grid-cols-2 sm:gap-x-6 sm:before:pointer-events-none sm:before:absolute sm:before:inset-y-0 sm:before:left-1/2 sm:before:w-px sm:before:-translate-x-1/2 sm:before:bg-slate-300 dark:sm:before:bg-[#30384D] sm:before:content-[''] sm:divide-y-0 sm:border-y-0 [&>*:nth-child(n+3)]:sm:border-t [&>*:nth-child(n+3)]:sm:border-slate-300 dark:[&>*:nth-child(n+3)]:sm:border-[#30384D]">
                 {results.map((item) => (
                   <EquipmentRow
                     key={item.id}
                     item={item}
                     showDefault
                     compactResult
+                    compactAvailableMobile
                     action={
                       !alternativeFromDirectory && canViewAlternativeMpr(item) ? (
                         <div className="flex justify-center">
@@ -3369,7 +3377,7 @@ export default function Home() {
               Browse by Location
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="search" className="mt-3 sm:mt-5">
+          <TabsContent value="search" className="mt-2 sm:mt-5">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -3392,7 +3400,7 @@ export default function Home() {
               >
                 Equipment name or ID
               </label>
-              <div className="mt-1 flex flex-col gap-1 sm:mt-2 sm:gap-2 sm:flex-row">
+              <div className="mt-0.5 flex flex-col gap-1 sm:mt-2 sm:gap-2 sm:flex-row">
                 <Input
                   id="directory-query"
                   autoComplete="off"
@@ -3435,7 +3443,7 @@ export default function Home() {
             {searched &&
               (directoryMatches.all.length > 0 ? (
                 <>
-                  <p className="mt-5 text-sm font-medium text-slate-600 dark:text-[#AAB3C7]">
+                  <p className="mt-2 text-sm font-medium text-slate-600 dark:text-[#AAB3C7] sm:mt-5">
                     {directoryMatches.all.length}{" "}
                     {directoryMatches.all.length === 1 ? "result" : "results"}{" "}
                     for “{query.trim()}”
@@ -3443,7 +3451,7 @@ export default function Home() {
                   <Tabs
                     value={directoryTab}
                     onValueChange={setDirectoryTab}
-                    className="mt-2 sm:mt-3"
+                    className="mt-1.5 sm:mt-3"
                   >
                     <TabsList className="grid h-12 w-full grid-cols-2 rounded-2xl dark:bg-[#202739]">
                       <TabsTrigger value="available" className={statusTabClass}>
@@ -3463,17 +3471,17 @@ export default function Home() {
                       </TabsTrigger>
                     </TabsList>
                     {scrollHint && (
-                      <p className="mt-3 text-sm font-normal text-slate-500 dark:text-[#9AA6BC]">
+                      <p className="mt-1.5 text-[13px] leading-5 font-normal text-slate-500 dark:text-[#9AA6BC] sm:mt-3 sm:text-sm">
                         {scrollHint}
                       </p>
                     )}
                     <TabsContent
                       value="available"
-                      className="mt-2.5 grid items-stretch divide-y divide-slate-300 dark:divide-[#30384D] sm:mt-4 sm:relative sm:grid-cols-2 sm:gap-x-6 sm:before:pointer-events-none sm:before:absolute sm:before:inset-y-0 sm:before:left-1/2 sm:before:w-px sm:before:-translate-x-1/2 sm:before:bg-slate-300 dark:sm:before:bg-[#30384D] sm:before:content-[''] sm:divide-y-0 [&>*:nth-child(n+3)]:sm:border-t [&>*:nth-child(n+3)]:sm:border-slate-300 dark:[&>*:nth-child(n+3)]:sm:border-[#30384D]"
+                      className="mt-1.5 grid items-stretch divide-y divide-slate-300 dark:divide-[#30384D] sm:mt-4 sm:relative sm:grid-cols-2 sm:gap-x-6 sm:before:pointer-events-none sm:before:absolute sm:before:inset-y-0 sm:before:left-1/2 sm:before:w-px sm:before:-translate-x-1/2 sm:before:bg-slate-300 dark:sm:before:bg-[#30384D] sm:before:content-[''] sm:divide-y-0 [&>*:nth-child(n+3)]:sm:border-t [&>*:nth-child(n+3)]:sm:border-slate-300 dark:[&>*:nth-child(n+3)]:sm:border-[#30384D]"
                     >
                       {directoryMatches.available.length ? (
                         directoryMatches.available.map((x) => (
-                          <EquipmentRow key={x.id} item={x} showDefault transparentDarkSurface />
+                          <EquipmentRow key={x.id} item={x} showDefault transparentDarkSurface compactAvailableMobile />
                         ))
                       ) : (
                         <SearchTabEmpty
@@ -3488,7 +3496,7 @@ export default function Home() {
                     >
                       {directoryMatches.unavailable.length ? (
                         directoryMatches.unavailable.map((x) => (
-                          <EquipmentRow key={x.id} item={x} showDefault transparentDarkSurface />
+                          <EquipmentRow key={x.id} item={x} showDefault transparentDarkSurface compactAvailableMobile />
                         ))
                       ) : (
                         <SearchTabEmpty
@@ -3572,19 +3580,20 @@ export default function Home() {
         : "";
     return (
       <Shell
+        compactMobileHeader
         title={`${location} equipment`}
         subtitle="Review current locations and working conditions."
         scrollHint=""
         back={back}
         home={home}
       >
-        <div className="mb-5">
+        <div className="mb-3 sm:mb-5">
           <label className="text-sm font-semibold" htmlFor="location-equipment-query">
             Search equipment in {location}
           </label>
           <Input
             id="location-equipment-query"
-            className="mt-2 h-12 rounded-2xl bg-white dark:!bg-[#1B2133] dark:!text-[#F5F7FF] dark:placeholder:!text-[#74809A]"
+            className="mt-1 h-11 rounded-2xl bg-white dark:!bg-[#1B2133] dark:!text-[#F5F7FF] dark:placeholder:!text-[#74809A] sm:mt-2 sm:h-12"
             value={locationQuery}
             onChange={(e) => {
               const nextQuery = e.target.value;
@@ -3633,13 +3642,13 @@ export default function Home() {
             </TabsTrigger>
           </TabsList>
           {scrollHint && (
-            <p className="mt-3 text-sm font-normal text-slate-500 dark:text-[#9AA6BC]">
+            <p className="mt-1.5 text-[13px] leading-5 font-normal text-slate-500 dark:text-[#9AA6BC] sm:mt-3 sm:text-sm">
               {scrollHint}
             </p>
           )}
           <TabsContent
             value="available"
-            className={`mt-5 grid items-stretch divide-y divide-slate-300 dark:divide-[#30384D] sm:relative sm:grid-cols-2 sm:gap-x-6 sm:divide-y-0 [&>*:nth-child(n+3)]:sm:border-t [&>*:nth-child(n+3)]:sm:border-slate-300 dark:[&>*:nth-child(n+3)]:sm:border-[#30384D] ${filteredAvailableItems.length > 0 ? "sm:before:pointer-events-none sm:before:absolute sm:before:inset-y-0 sm:before:left-1/2 sm:before:w-px sm:before:-translate-x-1/2 sm:before:bg-slate-300 dark:sm:before:bg-[#30384D] sm:before:content-['']" : ""}`}
+            className={`mt-2.5 grid items-stretch divide-y divide-slate-300 dark:divide-[#30384D] sm:mt-5 sm:relative sm:grid-cols-2 sm:gap-x-6 sm:divide-y-0 [&>*:nth-child(n+3)]:sm:border-t [&>*:nth-child(n+3)]:sm:border-slate-300 dark:[&>*:nth-child(n+3)]:sm:border-[#30384D] ${filteredAvailableItems.length > 0 ? "sm:before:pointer-events-none sm:before:absolute sm:before:inset-y-0 sm:before:left-1/2 sm:before:w-px sm:before:-translate-x-1/2 sm:before:bg-slate-300 dark:sm:before:bg-[#30384D] sm:before:content-['']" : ""}`}
           >
             {!locationHasEquipmentRecords ? (
               <NoEquipmentRecords />
@@ -3653,13 +3662,13 @@ export default function Home() {
               )
             ) : (
               filteredAvailableItems.map((x) => (
-                <EquipmentRow key={x.id} item={x} availableEquipmentLayout />
+                <EquipmentRow key={x.id} item={x} availableEquipmentLayout compactAvailableMobile />
               ))
             )}
           </TabsContent>
           <TabsContent
             value="unavailable"
-            className={`mt-5 grid items-stretch divide-y divide-slate-300 dark:divide-[#30384D] sm:relative sm:grid-cols-2 sm:gap-x-6 sm:divide-y-0 [&>*:nth-child(n+3)]:sm:border-t [&>*:nth-child(n+3)]:sm:border-slate-300 dark:[&>*:nth-child(n+3)]:sm:border-[#30384D] ${filteredUnavailableItems.length > 0 ? "sm:before:pointer-events-none sm:before:absolute sm:before:inset-y-0 sm:before:left-1/2 sm:before:w-px sm:before:-translate-x-1/2 sm:before:bg-slate-300 dark:sm:before:bg-[#30384D] sm:before:content-['']" : ""}`}
+            className={`mt-2.5 grid items-stretch divide-y divide-slate-300 dark:divide-[#30384D] sm:mt-5 sm:relative sm:grid-cols-2 sm:gap-x-6 sm:divide-y-0 [&>*:nth-child(n+3)]:sm:border-t [&>*:nth-child(n+3)]:sm:border-slate-300 dark:[&>*:nth-child(n+3)]:sm:border-[#30384D] ${filteredUnavailableItems.length > 0 ? "sm:before:pointer-events-none sm:before:absolute sm:before:inset-y-0 sm:before:left-1/2 sm:before:w-px sm:before:-translate-x-1/2 sm:before:bg-slate-300 dark:sm:before:bg-[#30384D] sm:before:content-['']" : ""}`}
           >
             {!locationHasEquipmentRecords ? (
               <NoEquipmentRecords />
@@ -3682,6 +3691,7 @@ export default function Home() {
                     key={x.id}
                     item={x}
                     availableEquipmentLayout
+                    compactAvailableMobile
                     action={
                       <div className="flex justify-center">
                         <Button
@@ -3895,7 +3905,7 @@ function HomeScreen({
           <div className="relative z-10 mx-auto w-full min-w-0 max-w-xl">
             <div className="mb-6 flex items-center justify-between sm:mb-10 lg:hidden">
               <Brand />
-              <ThemeToggle fixed={false} />
+              <ThemeToggle inline />
             </div>
             <p className="mb-2 text-sm font-semibold text-violet-700 dark:text-violet-300">
               {greeting}
@@ -4634,7 +4644,7 @@ function Slots({
       `}</style>
       <div
         ref={periodTabsRef}
-        className="overflow-x-auto pb-0.5 pt-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:pb-1 sm:pt-1.5"
+        className="overflow-x-auto pb-0 pt-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:pb-1 sm:pt-1.5"
         role="tablist"
         aria-label="Time periods"
         onPointerDown={handlePeriodTabsPointerDown}
@@ -4695,7 +4705,7 @@ function Slots({
         onPointerMove={handlePeriodScrollPointerMove}
         onPointerUp={handlePeriodScrollPointerEnd}
         onPointerCancel={handlePeriodScrollPointerEnd}
-        className="relative mx-1 mt-0.5 h-5 touch-none cursor-ew-resize sm:hidden"
+        className="relative mx-1 mt-0 h-4 touch-none cursor-ew-resize sm:hidden"
       >
         <div className="absolute left-0 right-0 top-1/2 h-1 -translate-y-1/2 overflow-hidden rounded-full bg-slate-200 dark:bg-[#2A3246]">
           <div
@@ -4741,7 +4751,7 @@ function Slots({
         <div className="space-y-1.5 sm:space-y-1.5">
           {selectedSlots.length > 0 && (
             <div
-              className="flex items-center justify-between gap-3 rounded-lg bg-slate-100/80 dark:bg-[#202739]/80 px-3 py-2 text-sm sm:px-4 sm:py-1.5"
+              className="flex items-center justify-between gap-3 rounded-lg bg-slate-100/80 dark:bg-[#202739]/80 px-3 py-1.5 text-sm sm:px-4 sm:py-1.5"
               aria-label={`Selected time ${selectedRange}, ${durationLabel(selectedSlots.length)}`}
             >
               <span className="text-slate-500 dark:text-[#9AA6BC]">Selected time</span>
@@ -4750,7 +4760,7 @@ function Slots({
               </strong>
             </div>
           )}
-          <div className="rounded-xl border border-violet-100 dark:border-violet-500/45 bg-violet-50/95 dark:bg-[#211A38]/95 px-3.5 py-2 text-sm font-medium leading-5 text-violet-800 dark:text-violet-200 sm:py-2">
+          <div className="rounded-xl border border-violet-100 dark:border-violet-500/45 bg-violet-50/95 dark:bg-[#211A38]/95 px-3.5 py-1.5 text-sm font-medium leading-5 text-violet-800 dark:text-violet-200 sm:py-2">
             {selectionGuidance}
           </div>
           {periodTabs}
@@ -4775,11 +4785,11 @@ function Slots({
         }
       >
         {periods[activePeriod].name.startsWith("Late Night") && (
-          <p className="mb-1.5 text-xs font-medium text-slate-500 dark:text-[#9AA6BC] sm:mb-2">
+          <p className="mb-1 text-xs font-medium text-slate-500 dark:text-[#9AA6BC] sm:mb-2">
             After midnight · {shortDate(nextDay)}
           </p>
         )}
-        <div className="space-y-1.5 sm:space-y-2">
+        <div className="space-y-1 sm:space-y-2">
           {periods[activePeriod].times.map((t) => {
             const isBooked = booked.has(t);
             const isSelected = !isBooked && selectedSlots.includes(t);
