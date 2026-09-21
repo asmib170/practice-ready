@@ -2384,6 +2384,7 @@ export default function Home() {
   const [room, setRoom] = useState("MPR 3");
   const [mprSelected, setMprSelected] = useState("");
   const [selectedPeriod, setSelectedPeriod] = useState<number | null>(null);
+  const [returnToTimeSlotsAfterMprChange, setReturnToTimeSlotsAfterMprChange] = useState(false);
   const [time, setTime] = useState("");
   const [selectedSlots, setSelectedSlots] = useState<string[]>([]);
   const [query, setQuery] = useState("");
@@ -2463,7 +2464,7 @@ export default function Home() {
     });
     setScreen("mpr");
     setMprSelected(room);
-    setSelectedPeriod(null);
+    setReturnToTimeSlotsAfterMprChange(true);
     setTime("");
     setSelectedSlots([]);
     window.scrollTo(0, 0);
@@ -2476,6 +2477,7 @@ export default function Home() {
     setCalendarMonth(startOfMonth(new Date()));
     setMprSelected("");
     setSelectedPeriod(null);
+    setReturnToTimeSlotsAfterMprChange(false);
     setRoom("MPR 3");
     setTime("");
     setSelectedSlots([]);
@@ -2945,8 +2947,9 @@ export default function Home() {
           <Primary
             disabled={!mprSelected}
             onClick={() => {
+              const returnDirectlyToTimeSlots = returnToTimeSlotsAfterMprChange;
               setRoom(mprSelected);
-              setSelectedPeriod(null);
+              if (!returnDirectlyToTimeSlots) setSelectedPeriod(null);
               if (recoveringFromConflict && mprSelected === "MPR 5") {
                 setAlternativeOriginalTime(time);
                 setAlternativeOriginalSlots(selectedSlots);
@@ -2959,7 +2962,12 @@ export default function Home() {
                 setAlternativeOriginalSlots([]);
               }
               setRecoveringFromConflict(false);
-              go("period");
+              setReturnToTimeSlotsAfterMprChange(false);
+              go(
+                returnDirectlyToTimeSlots
+                  ? (`slots${mprSelected.slice(-1)}` as Screen)
+                  : "period",
+              );
             }}
           >
             Choose a Time Period <ArrowRight />
