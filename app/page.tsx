@@ -3868,6 +3868,9 @@ function HomeScreen({
           </g>
         </svg>
       </div>
+      <div className="hidden lg:block">
+        <ThemeToggle />
+      </div>
       <div className="relative z-10 mx-auto grid h-full min-h-0 w-full min-w-0 max-w-6xl lg:min-h-screen lg:grid-cols-[0.9fr_1.1fr]">
         <section className="relative hidden overflow-hidden bg-[#111733] dark:bg-[#0B0F1B] p-14 lg:flex lg:flex-col lg:justify-between">
           <div className="practice-ready-panel-ambient pointer-events-none absolute -left-24 top-24 h-72 w-72 rounded-full bg-violet-600/25 dark:bg-violet-400/20 blur-3xl" />
