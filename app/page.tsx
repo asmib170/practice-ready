@@ -4777,13 +4777,6 @@ function Slots({
       }
     >
       <div ref={periodContentStartRef} />
-      {alternativeRoom && (
-        <p className="mb-3 rounded-xl border border-violet-200 dark:border-violet-500/70 bg-violet-50 dark:bg-[#211A38] px-3.5 py-2.5 text-sm leading-5 text-violet-900 dark:text-violet-200 sm:mb-5 sm:px-4 sm:py-3">
-          {originalSlots.some((slot) => booked.has(slot))
-            ? <>Your selected time isn&apos;t available in {room}. <span className="font-medium">Choose another available time below.</span></>
-            : <>Your selected time is available in {room}. <span className="font-medium">Keep it selected or choose another available time.</span></>}
-        </p>
-      )}
       <section
         ref={slotListRef}
         role="tabpanel"
