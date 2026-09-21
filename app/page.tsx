@@ -2604,13 +2604,15 @@ export default function Home() {
         subtitle={`Selected date: ${longDate(selectedDate || new Date())}`}
         back={back}
         lockMobileViewport
+        compactMobileHeader
+        compactActionBarPadding
       >
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-2 sm:grid-cols-2 sm:gap-3">
           {["MPR 2", "MPR 3", "MPR 4", "MPR 5"].map((r) => (
             <button
               key={r}
               onClick={() => setMprSelected(r)}
-              className={`flex min-h-16 w-full items-center justify-center rounded-2xl border p-4 text-center font-semibold transition-all duration-150 ${mprSelected === r ? "border-violet-500 bg-violet-50 dark:bg-[#211A38] text-violet-800 dark:text-violet-100 shadow-sm hover:-translate-y-0.5 hover:shadow-md" : "border-slate-200 bg-white dark:border-violet-500/40 dark:bg-[#1B2133] dark:text-[#F5F7FF] hover:-translate-y-0.5 hover:border-violet-300 hover:bg-violet-50/70 hover:shadow-md dark:hover:border-violet-500/70 dark:hover:bg-[#211A38]"}`}
+              className={`flex min-h-14 w-full items-center justify-center rounded-2xl border p-3 text-center font-semibold transition-all duration-150 sm:min-h-16 sm:p-4 ${mprSelected === r ? "border-violet-500 bg-violet-50 dark:bg-[#211A38] text-violet-800 dark:text-violet-100 shadow-sm hover:-translate-y-0.5 hover:shadow-md" : "border-slate-200 bg-white dark:border-violet-500/40 dark:bg-[#1B2133] dark:text-[#F5F7FF] hover:-translate-y-0.5 hover:border-violet-300 hover:bg-violet-50/70 hover:shadow-md dark:hover:border-violet-500/70 dark:hover:bg-[#211A38]"}`}
             >
               <span>{r}</span>
             </button>
@@ -2659,6 +2661,8 @@ export default function Home() {
         subtitle={`Selected date: ${longDate(selectedDate || new Date())}`}
         back={back}
         lockMobileViewport
+        compactMobileHeader
+        compactActionBarPadding
         headerTitleAside={
           <div className="hidden sm:flex min-h-11 items-center gap-2.5 rounded-xl border border-slate-200/80 dark:border-[#30384D]/80 bg-white dark:bg-[#1B2133] px-3 py-2 shadow-sm">
             <MapPin className="shrink-0 text-violet-600 dark:text-violet-300" size={18} />
@@ -2677,26 +2681,26 @@ export default function Home() {
           </div>
         }
       >
-        <div className="mb-3 flex items-center gap-3 rounded-2xl border border-slate-200 dark:border-[#30384D] bg-white dark:bg-[#1B2133] px-4 py-3 shadow-sm sm:hidden">
-          <MapPin className="shrink-0 text-violet-600 dark:text-violet-300" size={18} />
-          <span className="text-sm text-slate-500 dark:text-[#9AA6BC]">Selected MPR</span>
+        <div className="mb-2 flex min-h-12 items-center gap-2.5 rounded-2xl border border-slate-200 dark:border-[#30384D] bg-white dark:bg-[#1B2133] px-3.5 py-2 shadow-sm sm:hidden">
+          <MapPin className="shrink-0 text-violet-600 dark:text-violet-300" size={17} />
+          <span className="text-[13px] text-slate-500 dark:text-[#9AA6BC]">Selected MPR</span>
           <strong className="ml-auto text-sm">{room}</strong>
           <button
             onClick={back}
-            className="ml-2 flex items-center gap-1 text-sm font-semibold text-violet-700 dark:text-violet-300"
+            className="ml-1.5 flex items-center gap-1 text-[13px] font-semibold text-violet-700 dark:text-violet-300"
           >
             Change <ChevronDown size={14} />
           </button>
         </div>
 
-        <div className="grid gap-2.5 sm:grid-cols-2 sm:gap-3">
+        <div className="grid gap-1.5 sm:grid-cols-2 sm:gap-3">
           {periodOptions.map((period, index) => (
             <button
               key={period.label}
               type="button"
               onClick={() => setSelectedPeriod(index)}
               aria-pressed={selectedPeriod === index}
-              className={`flex min-h-16 w-full items-center justify-between rounded-2xl border px-4 py-3 text-left transition-all duration-150 ${
+              className={`flex min-h-[52px] w-full items-center justify-between rounded-2xl border px-3.5 py-2 text-left transition-all duration-150 sm:min-h-16 sm:px-4 sm:py-3 ${
                 selectedPeriod === index
                   ? "border-violet-500 bg-violet-50 dark:bg-[#211A38] text-violet-800 dark:text-violet-100 shadow-sm hover:-translate-y-0.5 hover:shadow-md"
                   : "border-slate-200 bg-white dark:border-violet-500/40 dark:bg-[#1B2133] dark:text-[#F5F7FF] hover:-translate-y-0.5 hover:border-violet-300 hover:bg-violet-50/70 hover:shadow-md dark:hover:border-violet-500/70 dark:hover:bg-[#211A38]"
@@ -2704,7 +2708,7 @@ export default function Home() {
             >
               <span>
                 <span className="block font-semibold">{period.label}</span>
-                <span className="mt-0.5 block text-sm font-normal text-slate-500 dark:text-[#9AA6BC]">
+                <span className="mt-0 block text-[13px] leading-4 font-normal text-slate-500 dark:text-[#9AA6BC] sm:mt-0.5 sm:text-sm sm:leading-normal">
                   {period.range}
                 </span>
               </span>
