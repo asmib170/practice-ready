@@ -42,7 +42,9 @@ The current responsive prototype supports the complete room-booking journey acro
 
 Users can:
 
-- Select a date, MPR and consecutive 30-minute time slots, with a maximum booking duration of three hours.
+- Select a date, MPR, time period and consecutive 30-minute time slots, with a maximum booking duration of three hours.
+- Switch between time periods while viewing detailed room availability.
+- Change the selected MPR directly from the time-slot screen while preserving the chosen time period and rechecking room-specific availability.
 - Review an MPR's equipment readiness before continuing with a reservation.
 - View currently available equipment assigned to an MPR and search that list by equipment name or ID.
 - Search the Equipment Directory by equipment name or ID.
@@ -53,7 +55,7 @@ Users can:
 - Recover from equipment-availability issues without implying that equipment can be borrowed or relocated.
 - Experience a simulated simultaneous-booking conflict through the dedicated **Booking Conflict Demo** and recover by adjusting the selected time or choosing another MPR.
 
-Equipment search prioritizes the actual requested equipment before related label matches while preserving the established location order. Search results also avoid unintended substring matches and automatically open the Unavailable tab when no available matches exist but unavailable matches do.
+Equipment search supports meaningful partial terms, word prefixes and equipment-specific combinations across the Equipment Directory, MPR equipment lists, location browsing and contextual alternative searches. Results prioritize the actual requested equipment type before related label matches, preserve the established location order, avoid unintended substring matches and automatically open the Unavailable tab when no available matches exist but unavailable matches do.
 
 The interface includes responsive light and dark themes, animated ambient backgrounds, written equipment-status labels, consistent interaction states and mobile-safe sticky actions.
 
@@ -74,12 +76,6 @@ Install dependencies:
 pnpm install
 ```
 
-Run the development server:
-
-```bash
-pnpm dev
-```
-
 Build the project:
 
 ```bash
@@ -94,10 +90,12 @@ npx vinext start
 
 If the server reports `http://0.0.0.0:3000`, open `http://localhost:3000` in the browser.
 
+> Note: for this project, the production-preview workflow above is the recommended way to preview the actual app locally.
+
 ## Project Status
 
 Practice Ready is a functional interactive prototype developed for HCI/UI-UX evaluation and formal usability testing.
 
-The current version includes the complete booking happy path, equipment-readiness and alternative-search flows, equipment-directory search and location browsing, responsive desktop/mobile layouts, light and dark themes, and a deterministic Booking Conflict Demo.
+The current version includes the complete booking happy path with explicit time-period selection, consecutive 30-minute slot booking, contextual MPR changes, equipment-readiness and alternative-search flows, equipment-directory search and location browsing, responsive desktop/mobile layouts, light and dark themes, and a deterministic Booking Conflict Demo.
 
 Equipment, room availability, scheduling information, equipment IDs, quantities, locations and condition states used in the prototype are illustrative prototype data and should not be treated as an authoritative live inventory or booking system for the True School of Music.
