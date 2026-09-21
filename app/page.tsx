@@ -1163,6 +1163,120 @@ const locationEquipmentSearchRank = (
   return 99;
 };
 
+
+const resolveEquipmentFilterPrefix = (value: string) => {
+  const query = normalizeEquipmentSearch(value);
+  if (!query) return "";
+
+  // Current-list searches behave like live filters. Once a user has typed a
+  // meaningful prefix of a common equipment term, treat it as that full term
+  // so "mic", "micro", "microp"... all behave like "microphone", and the
+  // same interaction applies to other equipment categories.
+  const canonicalTerms = [
+    "microphone",
+    "microphone stand",
+    "mixer",
+    "monitor",
+    "monitor speaker",
+    "keyboard",
+    "digital piano",
+    "piano",
+    "amplifier",
+    "guitar",
+    "electric guitar",
+    "acoustic guitar",
+    "bass guitar",
+    "instrument cable",
+    "xlr cable",
+    "cable",
+    "headphones",
+    "speaker",
+    "drum",
+    "drum kit",
+    "floor tom",
+    "rack tom",
+    "snare drum",
+    "kick drum",
+    "hi hat",
+    "crash cymbal",
+    "ride cymbal",
+    "harmonium",
+    "tanpura",
+    "controller",
+    "adapter",
+    "power cable",
+    "stand",
+  ];
+
+  if (query.length >= 3) {
+    const exactOrPrefix = canonicalTerms.find(
+      (term) => term === query || term.startsWith(query),
+    );
+    if (exactOrPrefix) return exactOrPrefix;
+  }
+
+  return query;
+};
+
+const equipmentWordsPrefixMatch = (text: string, query: string) => {
+  const textWords = normalizeEquipmentSearch(text).split(" ").filter(Boolean);
+  const queryWords = normalizeEquipmentSearch(query).split(" ").filter(Boolean);
+  if (!queryWords.length) return false;
+
+  return queryWords.every((queryWord) =>
+    textWords.some(
+      (textWord) =>
+        textWord === queryWord ||
+        (queryWord.length >= 3 && textWord.startsWith(queryWord)),
+    ),
+  );
+};
+
+const liveListEquipmentSearchRank = (item: Equipment, value: string) => {
+  const rawQuery = normalizeEquipmentSearch(value);
+  if (!rawQuery) return 0;
+
+  const resolvedQuery = resolveEquipmentFilterPrefix(rawQuery);
+  const itemName = normalizeEquipmentSearch(item.name);
+  const itemId = normalizeEquipmentSearch(item.id);
+
+  // For microphone prefixes, actual microphones should come before related
+  // labels such as microphone stands.
+  if (
+    rawQuery.length >= 3 &&
+    "microphone".startsWith(rawQuery)
+  ) {
+    const hasMicrophoneWord = itemName
+      .split(" ")
+      .some((word) => word === "microphone");
+    if (hasMicrophoneWord && equipmentType(item) !== "microphone-stand") return 0;
+    if (
+      equipmentWordsPrefixMatch(itemName, rawQuery) ||
+      equipmentWordsPrefixMatch(itemId, rawQuery)
+    ) {
+      return 1;
+    }
+    return 99;
+  }
+
+  // Reuse the established category ordering whenever the typed prefix resolves
+  // to a known equipment term.
+  const establishedRank = locationEquipmentSearchRank(item, resolvedQuery);
+  if (establishedRank < 99) return establishedRank;
+
+  // Otherwise behave like a true live filter over the labels/IDs already on
+  // this screen, matching meaningful word prefixes such as "guit", "cabl",
+  // "headp", etc.
+  if (
+    equipmentWordsPrefixMatch(itemName, rawQuery) ||
+    equipmentWordsPrefixMatch(itemId, rawQuery)
+  ) {
+    return 2;
+  }
+
+  return 99;
+};
+
 const clockLabel = (absoluteMinutes: number) => {
   const minutesInDay = ((absoluteMinutes % 1440) + 1440) % 1440;
   const hour24 = Math.floor(minutesInDay / 60);
@@ -2946,7 +3060,7 @@ export default function Home() {
           .map((item, index) => ({
             item,
             index,
-            rank: locationEquipmentSearchRank(
+            rank: liveListEquipmentSearchRank(
               item,
               normalizedAvailableQuery,
             ),
@@ -3739,7 +3853,7 @@ export default function Home() {
         .map((item, index) => ({
           item,
           index,
-          rank: locationEquipmentSearchRank(item, normalizedLocationQuery),
+          rank: liveListEquipmentSearchRank(item, normalizedLocationQuery),
         }))
         .filter(({ rank }) => rank < 99)
         .sort((a, b) => a.rank - b.rank || a.index - b.index)
@@ -3794,11 +3908,11 @@ export default function Home() {
 
               const hasAvailableMatch = availableItemsForLocation.some(
                 (item) =>
-                  locationEquipmentSearchRank(item, normalizedNextQuery) < 99,
+                  liveListEquipmentSearchRank(item, normalizedNextQuery) < 99,
               );
               const hasUnavailableMatch = unavailableItemsForLocation.some(
                 (item) =>
-                  locationEquipmentSearchRank(item, normalizedNextQuery) < 99,
+                  liveListEquipmentSearchRank(item, normalizedNextQuery) < 99,
               );
 
               if (hasAvailableMatch) {
