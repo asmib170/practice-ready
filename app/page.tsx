@@ -2736,18 +2736,54 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const handleButtonSound = (event: MouseEvent) => {
-      const target = event.target as HTMLElement | null;
-      const button = target?.closest("button");
-      if (!button || button.disabled || button.getAttribute("aria-disabled") === "true") {
-        return;
+    let lastInteractionSoundAt = 0;
+
+    const resolveInteractiveTarget = (target: EventTarget | null) => {
+      const element = target instanceof HTMLElement ? target : null;
+      if (!element) return null;
+
+      return element.closest(
+        'button, [role="button"], [role="tab"], a[href], input[type="button"], input[type="submit"]',
+      ) as HTMLElement | null;
+    };
+
+    const shouldIgnoreInteractiveTarget = (element: HTMLElement | null) => {
+      if (!element) return true;
+
+      if (
+        element instanceof HTMLButtonElement ||
+        element instanceof HTMLInputElement
+      ) {
+        if (element.disabled) return true;
       }
+
+      return element.getAttribute("aria-disabled") === "true";
+    };
+
+    const playInteractionSound = (event: Event) => {
+      const interactive = resolveInteractiveTarget(event.target);
+      if (shouldIgnoreInteractiveTarget(interactive)) return;
+
+      // Touch/pointer interactions can also emit a follow-up click.
+      // Debounce them so one user action produces one soft tone.
+      const now = performance.now();
+      if (now - lastInteractionSoundAt < 180) return;
+      lastInteractionSoundAt = now;
+
       playPracticeReadyButtonTone();
     };
 
-    document.addEventListener("click", handleButtonSound);
+    document.addEventListener("pointerdown", playInteractionSound, true);
+    document.addEventListener("touchstart", playInteractionSound, {
+      capture: true,
+      passive: true,
+    });
+    document.addEventListener("click", playInteractionSound, true);
+
     return () => {
-      document.removeEventListener("click", handleButtonSound);
+      document.removeEventListener("pointerdown", playInteractionSound, true);
+      document.removeEventListener("touchstart", playInteractionSound, true);
+      document.removeEventListener("click", playInteractionSound, true);
     };
   }, []);
 
