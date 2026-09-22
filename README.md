@@ -44,10 +44,11 @@ Users can:
 
 - Select a date, MPR, time period and consecutive 30-minute time slots, with a maximum booking duration of three hours.
 - Switch between time periods while viewing detailed room availability.
-- Change the selected MPR directly from the time-slot screen while preserving the chosen time period and rechecking room-specific availability.
+- Change the selected MPR from the time-period or time-slot flow without losing the current selection when the same MPR is retained.
+- Preserve selected time periods and selected time-slot ranges when reviewing the same MPR, while clearing room-specific slot selections when a genuinely different MPR is chosen.
 - Review an MPR's equipment readiness before continuing with a reservation.
 - View currently available equipment assigned to an MPR and search that list by equipment name or ID.
-- Search the Equipment Directory by equipment name or ID.
+- Search the Equipment Directory by equipment name, type, ID or common descriptive terms.
 - Browse equipment by TSM location.
 - Compare Available and Unavailable equipment states.
 - View default location, current location and working condition where relevant.
@@ -55,9 +56,38 @@ Users can:
 - Recover from equipment-availability issues without implying that equipment can be borrowed or relocated.
 - Experience a simulated simultaneous-booking conflict through the dedicated **Booking Conflict Demo** and recover by adjusting the selected time or choosing another MPR.
 
-Equipment search supports meaningful partial terms, word prefixes and equipment-specific combinations across the Equipment Directory, MPR equipment lists, location browsing and contextual alternative searches. Results prioritize the actual requested equipment type before related label matches, preserve the established location order, avoid unintended substring matches and automatically open the Unavailable tab when no available matches exist but unavailable matches do.
+Equipment search supports meaningful partial terms, word prefixes, common aliases and equipment-specific combinations across the Equipment Directory, MPR equipment lists, location browsing and contextual alternative searches. Results prioritize the actual requested equipment type before related accessories or label matches, preserve the established location order, avoid unintended substring matches and automatically open the Unavailable tab when no available matches exist but unavailable matches do.
 
-The interface includes responsive light and dark themes, animated ambient backgrounds, written equipment-status labels, consistent interaction states and mobile-safe sticky actions.
+For broad equipment queries, results are also contextually ranked. For example, a search for **guitar** prioritizes acoustic, electric and bass guitars before related amplifiers, instrument cables and stands.
+
+The prototype also includes an expanded illustrative equipment inventory across practice rooms and performance spaces, including wired and wireless microphones, PA speakers, guitar stands and racks, amplifiers, cables and other rehearsal equipment.
+
+## Audio Experience
+
+Practice Ready includes a subtle music-focused audio layer designed to support the atmosphere of the prototype without interfering with task completion.
+
+- Smooth-jazz background music plays on the Home screen at the main listening level.
+- The same track continues at a lower volume on internal task-focused screens.
+- The background level rises again on the reservation-confirmation screen.
+- A short synthesized success chime provides additional confirmation feedback when a booking is completed.
+- A music mute/unmute control is available on the Home screen on mobile and remains accessible in the desktop experience.
+- On supported mobile browsers, Web Audio gain control is used so the volume transition between Home and internal screens remains reliable.
+
+The audio is supplementary and does not affect the booking workflow when muted or unavailable.
+
+## Interface
+
+The interface includes:
+
+- Responsive desktop and mobile layouts
+- Light and dark themes
+- Animated ambient backgrounds
+- Written equipment-status labels
+- Consistent selected and disabled states
+- Mobile-safe sticky actions
+- Contextual booking-state preservation
+- Equipment image/detail views
+- Search behavior shared across equipment-related flows
 
 ## Technology
 
@@ -66,6 +96,7 @@ The interface includes responsive light and dark themes, animated ambient backgr
 - Vinext
 - Vite
 - Tailwind CSS
+- Web Audio API
 - Cloudflare tooling
 
 ## Local Setup
@@ -88,14 +119,18 @@ Start the production build locally:
 npx vinext start
 ```
 
-If the server reports `http://0.0.0.0:3000`, open `http://localhost:3000` in the browser.
+If the server reports `http://0.0.0.0:3000`, open:
 
-> Note: for this project, the production-preview workflow above is the recommended way to preview the actual app locally.
+```text
+http://localhost:3000
+```
+
+For this project, the production-preview workflow above is the recommended way to preview the actual app locally.
 
 ## Project Status
 
 Practice Ready is a functional interactive prototype developed for HCI/UI-UX evaluation and formal usability testing.
 
-The current version includes the complete booking happy path with explicit time-period selection, consecutive 30-minute slot booking, contextual MPR changes, equipment-readiness and alternative-search flows, equipment-directory search and location browsing, responsive desktop/mobile layouts, light and dark themes, and a deterministic Booking Conflict Demo.
+The current version includes the complete booking happy path with explicit time-period selection, consecutive 30-minute slot booking, contextual MPR editing with state preservation, equipment-readiness and alternative-search flows, semantic equipment search and location browsing, responsive desktop/mobile layouts, light and dark themes, background audio with confirmation feedback, and a deterministic Booking Conflict Demo.
 
 Equipment, room availability, scheduling information, equipment IDs, quantities, locations and condition states used in the prototype are illustrative prototype data and should not be treated as an authoritative live inventory or booking system for the True School of Music.

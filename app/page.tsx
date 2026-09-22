@@ -28,9 +28,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const PRACTICE_READY_MUSIC_SRC = "/practice-ready-smooth-jazz.mp3";
 const PRACTICE_READY_HOME_VOLUME = 0.23;
-const PRACTICE_READY_INTERNAL_VOLUME = 0.07;
+const PRACTICE_READY_INTERNAL_VOLUME = 0.13;
 
 let practiceReadyMusic: HTMLAudioElement | null = null;
+let practiceReadyAudioContext: AudioContext | null = null;
+let practiceReadyMediaSource: MediaElementAudioSourceNode | null = null;
+let practiceReadyGainNode: GainNode | null = null;
 let practiceReadyMusicMuted = false;
 let practiceReadyMusicTargetVolume = PRACTICE_READY_HOME_VOLUME;
 const practiceReadyMusicSubscribers = new Set<(muted: boolean) => void>();
@@ -41,6 +44,8 @@ function getPracticeReadyMusic() {
     practiceReadyMusic = new Audio(PRACTICE_READY_MUSIC_SRC);
     practiceReadyMusic.loop = true;
     practiceReadyMusic.preload = "auto";
+    // Desktop fallback. iOS may ignore HTMLMediaElement.volume, so the
+    // Web Audio gain node below is the authoritative volume control there.
     practiceReadyMusic.volume = practiceReadyMusicMuted
       ? 0
       : practiceReadyMusicTargetVolume;
@@ -48,20 +53,89 @@ function getPracticeReadyMusic() {
   return practiceReadyMusic;
 }
 
+function ensurePracticeReadyAudioGraph() {
+  if (typeof window === "undefined") return null;
+
+  const audio = getPracticeReadyMusic();
+  if (!audio) return null;
+
+  const AudioContextCtor =
+    window.AudioContext ??
+    (window as typeof window & { webkitAudioContext?: typeof AudioContext })
+      .webkitAudioContext;
+
+  if (!AudioContextCtor) return null;
+
+  if (!practiceReadyAudioContext) {
+    practiceReadyAudioContext = new AudioContextCtor();
+  }
+
+  if (!practiceReadyMediaSource) {
+    practiceReadyMediaSource =
+      practiceReadyAudioContext.createMediaElementSource(audio);
+  }
+
+  if (!practiceReadyGainNode) {
+    practiceReadyGainNode = practiceReadyAudioContext.createGain();
+    practiceReadyMediaSource.connect(practiceReadyGainNode);
+    practiceReadyGainNode.connect(practiceReadyAudioContext.destination);
+  }
+
+  practiceReadyGainNode.gain.value = practiceReadyMusicMuted
+    ? 0
+    : practiceReadyMusicTargetVolume;
+
+  return practiceReadyAudioContext;
+}
+
 function setPracticeReadyMusicVolume(volume: number) {
   practiceReadyMusicTargetVolume = volume;
+
   const audio = getPracticeReadyMusic();
-  if (audio) audio.volume = practiceReadyMusicMuted ? 0 : volume;
+  if (audio) {
+    // Keep this as a desktop fallback. iOS can ignore this value.
+    audio.volume = practiceReadyMusicMuted ? 0 : volume;
+  }
+
+  if (practiceReadyGainNode) {
+    const context = practiceReadyAudioContext;
+    const now = context?.currentTime ?? 0;
+    practiceReadyGainNode.gain.cancelScheduledValues(now);
+    practiceReadyGainNode.gain.setTargetAtTime(
+      practiceReadyMusicMuted ? 0 : volume,
+      now,
+      0.08,
+    );
+  }
 }
 
 function setPracticeReadyMusicMuted(muted: boolean) {
   practiceReadyMusicMuted = muted;
   const audio = getPracticeReadyMusic();
+
   if (audio) {
     audio.muted = muted;
     audio.volume = muted ? 0 : practiceReadyMusicTargetVolume;
-    if (!muted) void audio.play().catch(() => undefined);
   }
+
+  const context = ensurePracticeReadyAudioGraph();
+  if (practiceReadyGainNode) {
+    const now = context?.currentTime ?? 0;
+    practiceReadyGainNode.gain.cancelScheduledValues(now);
+    practiceReadyGainNode.gain.setTargetAtTime(
+      muted ? 0 : practiceReadyMusicTargetVolume,
+      now,
+      0.05,
+    );
+  }
+
+  if (!muted) {
+    if (context?.state === "suspended") {
+      void context.resume().catch(() => undefined);
+    }
+    if (audio) void audio.play().catch(() => undefined);
+  }
+
   practiceReadyMusicSubscribers.forEach((subscriber) => subscriber(muted));
 }
 
@@ -2634,7 +2708,15 @@ export default function Home() {
     void audio.play().catch(() => undefined);
 
     const unlockAudio = () => {
-      if (!practiceReadyMusicMuted) void audio.play().catch(() => undefined);
+      const context = ensurePracticeReadyAudioGraph();
+
+      if (context?.state === "suspended") {
+        void context.resume().catch(() => undefined);
+      }
+
+      if (!practiceReadyMusicMuted) {
+        void audio.play().catch(() => undefined);
+      }
     };
 
     window.addEventListener("pointerdown", unlockAudio, { once: true });
@@ -2648,11 +2730,19 @@ export default function Home() {
 
   useEffect(() => {
     const elevatedVolume = screen === "home" || screen === "success";
-    setPracticeReadyMusicVolume(
-      elevatedVolume
-        ? PRACTICE_READY_HOME_VOLUME
-        : PRACTICE_READY_INTERNAL_VOLUME,
-    );
+    const targetVolume = elevatedVolume
+      ? PRACTICE_READY_HOME_VOLUME
+      : PRACTICE_READY_INTERNAL_VOLUME;
+
+    setPracticeReadyMusicVolume(targetVolume);
+
+    // Once the browser has allowed Web Audio, this gain node controls the
+    // perceived volume reliably on iPhone/iOS as well as desktop.
+    const context = ensurePracticeReadyAudioGraph();
+    if (context?.state === "suspended") {
+      // resume() will succeed after the user's interaction; harmless otherwise.
+      void context.resume().catch(() => undefined);
+    }
 
     if (screen === "success") {
       playPracticeReadySuccessChime();
