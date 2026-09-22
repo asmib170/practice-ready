@@ -29,6 +29,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const PRACTICE_READY_MUSIC_SRC = "/practice-ready-smooth-jazz.mp3";
 const PRACTICE_READY_UI_TONE_SRC = "/practice-ready-ui-tone.wav";
 const PRACTICE_READY_SUCCESS_CHIME_SRC = "/practice-ready-success-chime.wav";
+const PRACTICE_READY_PERIOD_TONE_SRCS = [
+  "/practice-ready-period-early-morning.wav",
+  "/practice-ready-period-morning.wav",
+  "/practice-ready-period-afternoon.wav",
+  "/practice-ready-period-evening.wav",
+  "/practice-ready-period-night.wav",
+  "/practice-ready-period-late-night.wav",
+] as const;
 const PRACTICE_READY_HOME_VOLUME = 0.23;
 const PRACTICE_READY_INTERNAL_VOLUME_DESKTOP = 0.15;
 const PRACTICE_READY_INTERNAL_VOLUME_MOBILE = 0.13;
@@ -36,6 +44,7 @@ const PRACTICE_READY_INTERNAL_VOLUME_MOBILE = 0.13;
 let practiceReadyMusic: HTMLAudioElement | null = null;
 let practiceReadyUiTone: HTMLAudioElement | null = null;
 let practiceReadySuccessChime: HTMLAudioElement | null = null;
+let practiceReadyPeriodTones: HTMLAudioElement[] | null = null;
 let practiceReadyAudioContext: AudioContext | null = null;
 let practiceReadyMediaSource: MediaElementAudioSourceNode | null = null;
 let practiceReadyGainNode: GainNode | null = null;
@@ -185,6 +194,34 @@ function playPracticeReadySuccessChime() {
     audio.currentTime = 0;
   } catch {
     // Safe fallback for mobile media elements before metadata is ready.
+  }
+
+  void audio.play().catch(() => undefined);
+}
+
+function getPracticeReadyPeriodTones() {
+  if (typeof window === "undefined") return [];
+  if (!practiceReadyPeriodTones) {
+    practiceReadyPeriodTones = PRACTICE_READY_PERIOD_TONE_SRCS.map((src) => {
+      const audio = new Audio(src);
+      audio.preload = "auto";
+      // Deliberately quieter than the standard selection tone: these belong
+      // to the visual period-intro wave, not to ordinary button feedback.
+      audio.volume = 0.18;
+      return audio;
+    });
+  }
+  return practiceReadyPeriodTones;
+}
+
+function playPracticeReadyPeriodTone(index: number) {
+  const audio = getPracticeReadyPeriodTones()[index];
+  if (!audio) return;
+
+  try {
+    audio.currentTime = 0;
+  } catch {
+    // Safe fallback before metadata is ready on mobile browsers.
   }
 
   void audio.play().catch(() => undefined);
@@ -2801,8 +2838,10 @@ export default function Home() {
         // treats them as normal media playback later in the session.
         const uiTone = getPracticeReadyUiTone();
         const successChime = getPracticeReadySuccessChime();
+        const periodTones = getPracticeReadyPeriodTones();
         uiTone?.load();
         successChime?.load();
+        periodTones.forEach((tone) => tone.load());
       };
 
       if (context?.state === "suspended") {
@@ -5331,12 +5370,28 @@ function Slots({
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
     setPeriodIntroActive(false);
-    const start = window.setTimeout(() => setPeriodIntroActive(true), 80);
+
+    const chimeTimers: number[] = [];
+    const start = window.setTimeout(() => {
+      setPeriodIntroActive(true);
+
+      // Match the existing visual cascade: each tab starts 90 ms after the
+      // previous one. These sounds occur only during this intro animation.
+      periods.forEach((_, index) => {
+        chimeTimers.push(
+          window.setTimeout(() => playPracticeReadyPeriodTone(index), index * 90),
+        );
+      });
+    }, 80);
+
     const stop = window.setTimeout(() => setPeriodIntroActive(false), 1180);
+
     return () => {
       window.clearTimeout(start);
       window.clearTimeout(stop);
+      chimeTimers.forEach((timer) => window.clearTimeout(timer));
     };
   }, [room]);
 
