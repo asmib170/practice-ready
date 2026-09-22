@@ -28,7 +28,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const PRACTICE_READY_MUSIC_SRC = "/practice-ready-smooth-jazz.mp3";
 const PRACTICE_READY_HOME_VOLUME = 0.23;
-const PRACTICE_READY_INTERNAL_VOLUME = 0.13;
+const PRACTICE_READY_INTERNAL_VOLUME = 0.07;
 
 let practiceReadyMusic: HTMLAudioElement | null = null;
 let practiceReadyMusicMuted = false;
@@ -1884,7 +1884,9 @@ function Shell({
       <div className="hidden sm:block">
         <ThemeToggle />
       </div>
-      <MusicToggle />
+      <div className="hidden sm:block">
+        <MusicToggle />
+      </div>
       <style>{`
         button, [role="button"] { touch-action: manipulation; }
         @keyframes practice-ready-shell-wave-drift-a {
