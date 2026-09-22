@@ -29,6 +29,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const PRACTICE_READY_MUSIC_SRC = "/practice-ready-smooth-jazz.mp3";
 const PRACTICE_READY_UI_TONE_SRC = "/practice-ready-ui-tone.wav";
 const PRACTICE_READY_SUCCESS_CHIME_SRC = "/practice-ready-success-chime.wav";
+const PRACTICE_READY_CONFLICT_TONE_SRC = "/practice-ready-conflict-soft-descending.mp3";
 const PRACTICE_READY_PERIOD_TONE_SRCS = [
   "/practice-ready-period-early-morning.wav",
   "/practice-ready-period-morning.wav",
@@ -44,6 +45,7 @@ const PRACTICE_READY_INTERNAL_VOLUME_MOBILE = 0.13;
 let practiceReadyMusic: HTMLAudioElement | null = null;
 let practiceReadyUiTone: HTMLAudioElement | null = null;
 let practiceReadySuccessChime: HTMLAudioElement | null = null;
+let practiceReadyConflictTone: HTMLAudioElement | null = null;
 let practiceReadyPeriodTones: HTMLAudioElement[] | null = null;
 let practiceReadyAudioContext: AudioContext | null = null;
 let practiceReadyMediaSource: MediaElementAudioSourceNode | null = null;
@@ -194,6 +196,29 @@ function playPracticeReadySuccessChime() {
     audio.currentTime = 0;
   } catch {
     // Safe fallback for mobile media elements before metadata is ready.
+  }
+
+  void audio.play().catch(() => undefined);
+}
+
+function getPracticeReadyConflictTone() {
+  if (typeof window === "undefined") return null;
+  if (!practiceReadyConflictTone) {
+    practiceReadyConflictTone = new Audio(PRACTICE_READY_CONFLICT_TONE_SRC);
+    practiceReadyConflictTone.preload = "auto";
+    practiceReadyConflictTone.volume = 0.52;
+  }
+  return practiceReadyConflictTone;
+}
+
+function playPracticeReadyConflictTone() {
+  const audio = getPracticeReadyConflictTone();
+  if (!audio) return;
+
+  try {
+    audio.currentTime = 0;
+  } catch {
+    // Safe fallback before metadata is ready on mobile browsers.
   }
 
   void audio.play().catch(() => undefined);
@@ -2838,9 +2863,11 @@ export default function Home() {
         // treats them as normal media playback later in the session.
         const uiTone = getPracticeReadyUiTone();
         const successChime = getPracticeReadySuccessChime();
+        const conflictTone = getPracticeReadyConflictTone();
         const periodTones = getPracticeReadyPeriodTones();
         uiTone?.load();
         successChime?.load();
+        conflictTone?.load();
         periodTones.forEach((tone) => tone.load());
       };
 
@@ -2894,6 +2921,10 @@ export default function Home() {
 
     if (screen === "success") {
       playPracticeReadySuccessChime();
+    }
+
+    if (screen === "conflict") {
+      playPracticeReadyConflictTone();
     }
   }, [screen]);
 
