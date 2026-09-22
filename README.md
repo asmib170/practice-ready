@@ -71,12 +71,14 @@ Practice Ready includes a subtle music-focused audio layer designed to support t
 - On desktop/laptop, the Home music level is approximately **23%** and internal pages are approximately **15%**.
 - On mobile, the Home music level is approximately **23%** and internal pages are approximately **13%**.
 - Successful-booking and conflict/error final screens remain at the same lower internal-page music level rather than increasing back to the Home level.
-- A short synthesized success chime provides additional confirmation feedback when a booking is completed.
+- A short three-note success chime provides additional confirmation feedback when a booking is completed.
 - Enabled buttons throughout the interface use a very subtle rounded interaction tone rather than a conventional click sound.
-- The music control mutes and unmutes the **background jazz only**. Interface feedback sounds, including the subtle button tone and booking-success chime, remain available when the background music is muted.
+- The animated time-period intro on the **Choose Your Time Slots** screen uses a quiet six-note ascending bar-chime sequence synchronized with the existing cascading tab animation.
+- The bar-chime sequence plays only during that intro animation. Manually switching between Early Morning, Morning, Afternoon, Evening, Night and Late Night continues to use the standard subtle button-interaction tone instead.
+- The music control mutes and unmutes the **background jazz only**. Interface feedback sounds—including the rounded button tone, booking-success chime and animated time-period bar chimes—remain available when the background music is muted.
 - On mobile, the music control is shown on the Home screen only.
 - On desktop/laptop, the music control remains accessible throughout the interface.
-- Web Audio gain control is used to support reliable background-volume changes and interface sounds across supported mobile and desktop browsers.
+- Web Audio gain control is used for reliable background-music volume changes, while the short UI feedback sounds are preloaded audio assets for more consistent playback across supported mobile and desktop browsers, including iPhone.
 
 The audio layer is supplementary and does not affect the booking workflow if background music is muted or unavailable.
 
