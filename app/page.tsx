@@ -27,11 +27,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 
 const PRACTICE_READY_MUSIC_SRC = "/practice-ready-smooth-jazz.mp3";
+const PRACTICE_READY_UI_TONE_SRC = "/practice-ready-ui-tone.wav";
+const PRACTICE_READY_SUCCESS_CHIME_SRC = "/practice-ready-success-chime.wav";
 const PRACTICE_READY_HOME_VOLUME = 0.23;
 const PRACTICE_READY_INTERNAL_VOLUME_DESKTOP = 0.15;
 const PRACTICE_READY_INTERNAL_VOLUME_MOBILE = 0.13;
 
 let practiceReadyMusic: HTMLAudioElement | null = null;
+let practiceReadyUiTone: HTMLAudioElement | null = null;
+let practiceReadySuccessChime: HTMLAudioElement | null = null;
 let practiceReadyAudioContext: AudioContext | null = null;
 let practiceReadyMediaSource: MediaElementAudioSourceNode | null = null;
 let practiceReadyGainNode: GainNode | null = null;
@@ -140,71 +144,50 @@ function setPracticeReadyMusicMuted(muted: boolean) {
   practiceReadyMusicSubscribers.forEach((subscriber) => subscriber(muted));
 }
 
-function playPracticeReadyButtonTone() {
-  if (typeof window === "undefined") return;
-
-  const context = ensurePracticeReadyAudioGraph();
-  if (!context) return;
-
-  const play = () => {
-    const now = context.currentTime;
-    const oscillator = context.createOscillator();
-    const gain = context.createGain();
-
-    oscillator.type = "sine";
-    oscillator.frequency.setValueAtTime(430, now);
-    oscillator.frequency.exponentialRampToValueAtTime(520, now + 0.075);
-
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(0.028, now + 0.012);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.11);
-
-    oscillator.connect(gain);
-    gain.connect(context.destination);
-
-    oscillator.start(now);
-    oscillator.stop(now + 0.12);
-  };
-
-  if (context.state === "suspended") {
-    void context.resume().then(play).catch(() => undefined);
-  } else {
-    play();
+function getPracticeReadyUiTone() {
+  if (typeof window === "undefined") return null;
+  if (!practiceReadyUiTone) {
+    practiceReadyUiTone = new Audio(PRACTICE_READY_UI_TONE_SRC);
+    practiceReadyUiTone.preload = "auto";
+    practiceReadyUiTone.volume = 0.42;
   }
+  return practiceReadyUiTone;
+}
+
+function playPracticeReadyButtonTone() {
+  const audio = getPracticeReadyUiTone();
+  if (!audio) return;
+
+  try {
+    audio.currentTime = 0;
+  } catch {
+    // Some mobile browsers may not allow seeking before metadata is ready.
+  }
+
+  void audio.play().catch(() => undefined);
+}
+
+function getPracticeReadySuccessChime() {
+  if (typeof window === "undefined") return null;
+  if (!practiceReadySuccessChime) {
+    practiceReadySuccessChime = new Audio(PRACTICE_READY_SUCCESS_CHIME_SRC);
+    practiceReadySuccessChime.preload = "auto";
+    practiceReadySuccessChime.volume = 0.58;
+  }
+  return practiceReadySuccessChime;
 }
 
 function playPracticeReadySuccessChime() {
-  if (typeof window === "undefined") return;
+  const audio = getPracticeReadySuccessChime();
+  if (!audio) return;
 
-  const context = ensurePracticeReadyAudioGraph();
-  if (!context) return;
-
-  const play = () => {
-    const gain = context.createGain();
-    gain.connect(context.destination);
-    gain.gain.setValueAtTime(0.0001, context.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.12, context.currentTime + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.72);
-
-    [
-      { frequency: 523.25, start: 0 },
-      { frequency: 659.25, start: 0.13 },
-      { frequency: 783.99, start: 0.28 },
-    ].forEach(({ frequency, start }) => {
-      const oscillator = context.createOscillator();
-      oscillator.type = "sine";
-      oscillator.frequency.value = frequency;
-      oscillator.connect(gain);
-      oscillator.start(context.currentTime + start);
-      oscillator.stop(context.currentTime + start + 0.34);
-    });
-  };
-
-  if (context.state === "suspended") {
-    void context.resume().then(play).catch(() => undefined);
-  } else {
-    play();
+  try {
+    audio.currentTime = 0;
+  } catch {
+    // Safe fallback for mobile media elements before metadata is ready.
   }
+
+  void audio.play().catch(() => undefined);
 }
 
 function MusicToggle({ inline = false }: { inline?: boolean }) {
@@ -2813,6 +2796,13 @@ export default function Home() {
         if (!practiceReadyMusicMuted) {
           void audio.play().catch(() => undefined);
         }
+
+        // Prepare the short UI sounds from the same user gesture so iPhone
+        // treats them as normal media playback later in the session.
+        const uiTone = getPracticeReadyUiTone();
+        const successChime = getPracticeReadySuccessChime();
+        uiTone?.load();
+        successChime?.load();
       };
 
       if (context?.state === "suspended") {
