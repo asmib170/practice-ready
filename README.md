@@ -58,7 +58,7 @@ Users can:
 
 Equipment search supports meaningful partial terms, word prefixes, common aliases and equipment-specific combinations across the Equipment Directory, MPR equipment lists, location browsing and contextual alternative searches. Results prioritize the actual requested equipment type before related accessories or label matches, preserve the established location order, avoid unintended substring matches and automatically open the Unavailable tab when no available matches exist but unavailable matches do.
 
-For broad equipment queries, results are also contextually ranked. For example, a search for **guitar** prioritizes acoustic, electric and bass guitars before related amplifiers, instrument cables and stands.
+For broad equipment queries, results are also contextually ranked. For example, a search for **guitar** prioritizes acoustic, electric and bass guitars before related amplifiers, instrument cables, individual stands and floor racks.
 
 The prototype also includes an expanded illustrative equipment inventory across practice rooms and performance spaces, including wired and wireless microphones, PA speakers, guitar stands and racks, amplifiers, cables and other rehearsal equipment.
 
@@ -68,12 +68,17 @@ Practice Ready includes a subtle music-focused audio layer designed to support t
 
 - Smooth-jazz background music plays on the Home screen at the main listening level.
 - The same track continues at a lower volume on internal task-focused screens.
-- The background level rises again on the reservation-confirmation screen.
+- On desktop/laptop, the Home music level is approximately **23%** and internal pages are approximately **15%**.
+- On mobile, the Home music level is approximately **23%** and internal pages are approximately **13%**.
+- Successful-booking and conflict/error final screens remain at the same lower internal-page music level rather than increasing back to the Home level.
 - A short synthesized success chime provides additional confirmation feedback when a booking is completed.
-- A music mute/unmute control is available on the Home screen on mobile and remains accessible in the desktop experience.
-- On supported mobile browsers, Web Audio gain control is used so the volume transition between Home and internal screens remains reliable.
+- Enabled buttons throughout the interface use a very subtle rounded interaction tone rather than a conventional click sound.
+- The music control mutes and unmutes the **background jazz only**. Interface feedback sounds, including the subtle button tone and booking-success chime, remain available when the background music is muted.
+- On mobile, the music control is shown on the Home screen only.
+- On desktop/laptop, the music control remains accessible throughout the interface.
+- Web Audio gain control is used to support reliable background-volume changes and interface sounds across supported mobile and desktop browsers.
 
-The audio is supplementary and does not affect the booking workflow when muted or unavailable.
+The audio layer is supplementary and does not affect the booking workflow if background music is muted or unavailable.
 
 ## Interface
 
@@ -87,7 +92,8 @@ The interface includes:
 - Mobile-safe sticky actions
 - Contextual booking-state preservation
 - Equipment image/detail views
-- Search behavior shared across equipment-related flows
+- Shared semantic search behavior across equipment-related flows
+- Background music and subtle audio interaction feedback
 
 ## Technology
 
@@ -131,6 +137,6 @@ For this project, the production-preview workflow above is the recommended way t
 
 Practice Ready is a functional interactive prototype developed for HCI/UI-UX evaluation and formal usability testing.
 
-The current version includes the complete booking happy path with explicit time-period selection, consecutive 30-minute slot booking, contextual MPR editing with state preservation, equipment-readiness and alternative-search flows, semantic equipment search and location browsing, responsive desktop/mobile layouts, light and dark themes, background audio with confirmation feedback, and a deterministic Booking Conflict Demo.
+The current version includes the complete booking happy path with explicit time-period selection, consecutive 30-minute slot booking, contextual MPR editing with state preservation, equipment-readiness and alternative-search flows, semantic equipment search and location browsing, responsive desktop/mobile layouts, light and dark themes, background music with independent interface feedback sounds, and a deterministic Booking Conflict Demo.
 
 Equipment, room availability, scheduling information, equipment IDs, quantities, locations and condition states used in the prototype are illustrative prototype data and should not be treated as an authoritative live inventory or booking system for the True School of Music.

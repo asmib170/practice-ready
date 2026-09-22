@@ -28,7 +28,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const PRACTICE_READY_MUSIC_SRC = "/practice-ready-smooth-jazz.mp3";
 const PRACTICE_READY_HOME_VOLUME = 0.23;
-const PRACTICE_READY_INTERNAL_VOLUME = 0.13;
+const PRACTICE_READY_INTERNAL_VOLUME_DESKTOP = 0.15;
+const PRACTICE_READY_INTERNAL_VOLUME_MOBILE = 0.13;
 
 let practiceReadyMusic: HTMLAudioElement | null = null;
 let practiceReadyAudioContext: AudioContext | null = null;
@@ -139,36 +140,71 @@ function setPracticeReadyMusicMuted(muted: boolean) {
   practiceReadyMusicSubscribers.forEach((subscriber) => subscriber(muted));
 }
 
-function playPracticeReadySuccessChime() {
-  if (typeof window === "undefined" || practiceReadyMusicMuted) return;
+function playPracticeReadyButtonTone() {
+  if (typeof window === "undefined") return;
 
-  const AudioContextCtor =
-    window.AudioContext ??
-    (window as typeof window & { webkitAudioContext?: typeof AudioContext })
-      .webkitAudioContext;
-  if (!AudioContextCtor) return;
+  const context = ensurePracticeReadyAudioGraph();
+  if (!context) return;
 
-  const context = new AudioContextCtor();
-  const gain = context.createGain();
-  gain.connect(context.destination);
-  gain.gain.setValueAtTime(0.0001, context.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.12, context.currentTime + 0.02);
-  gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.72);
-
-  [
-    { frequency: 523.25, start: 0 },
-    { frequency: 659.25, start: 0.13 },
-    { frequency: 783.99, start: 0.28 },
-  ].forEach(({ frequency, start }) => {
+  const play = () => {
+    const now = context.currentTime;
     const oscillator = context.createOscillator();
-    oscillator.type = "sine";
-    oscillator.frequency.value = frequency;
-    oscillator.connect(gain);
-    oscillator.start(context.currentTime + start);
-    oscillator.stop(context.currentTime + start + 0.34);
-  });
+    const gain = context.createGain();
 
-  window.setTimeout(() => void context.close(), 1000);
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(430, now);
+    oscillator.frequency.exponentialRampToValueAtTime(520, now + 0.075);
+
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.028, now + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.11);
+
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+
+    oscillator.start(now);
+    oscillator.stop(now + 0.12);
+  };
+
+  if (context.state === "suspended") {
+    void context.resume().then(play).catch(() => undefined);
+  } else {
+    play();
+  }
+}
+
+function playPracticeReadySuccessChime() {
+  if (typeof window === "undefined") return;
+
+  const context = ensurePracticeReadyAudioGraph();
+  if (!context) return;
+
+  const play = () => {
+    const gain = context.createGain();
+    gain.connect(context.destination);
+    gain.gain.setValueAtTime(0.0001, context.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.12, context.currentTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.72);
+
+    [
+      { frequency: 523.25, start: 0 },
+      { frequency: 659.25, start: 0.13 },
+      { frequency: 783.99, start: 0.28 },
+    ].forEach(({ frequency, start }) => {
+      const oscillator = context.createOscillator();
+      oscillator.type = "sine";
+      oscillator.frequency.value = frequency;
+      oscillator.connect(gain);
+      oscillator.start(context.currentTime + start);
+      oscillator.stop(context.currentTime + start + 0.34);
+    });
+  };
+
+  if (context.state === "suspended") {
+    void context.resume().then(play).catch(() => undefined);
+  } else {
+    play();
+  }
 }
 
 function MusicToggle({ inline = false }: { inline?: boolean }) {
@@ -2700,6 +2736,22 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    const handleButtonSound = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      const button = target?.closest("button");
+      if (!button || button.disabled || button.getAttribute("aria-disabled") === "true") {
+        return;
+      }
+      playPracticeReadyButtonTone();
+    };
+
+    document.addEventListener("click", handleButtonSound);
+    return () => {
+      document.removeEventListener("click", handleButtonSound);
+    };
+  }, []);
+
+  useEffect(() => {
     const audio = getPracticeReadyMusic();
     if (!audio) return;
 
@@ -2710,37 +2762,68 @@ export default function Home() {
     const unlockAudio = () => {
       const context = ensurePracticeReadyAudioGraph();
 
-      if (context?.state === "suspended") {
-        void context.resume().catch(() => undefined);
+      audio.muted = practiceReadyMusicMuted;
+      audio.volume = practiceReadyMusicMuted
+        ? 0
+        : practiceReadyMusicTargetVolume;
+
+      if (practiceReadyGainNode) {
+        practiceReadyGainNode.gain.value = practiceReadyMusicMuted
+          ? 0
+          : practiceReadyMusicTargetVolume;
       }
 
-      if (!practiceReadyMusicMuted) {
-        void audio.play().catch(() => undefined);
+      const startPlayback = () => {
+        if (!practiceReadyMusicMuted) {
+          void audio.play().catch(() => undefined);
+        }
+      };
+
+      if (context?.state === "suspended") {
+        void context
+          .resume()
+          .then(startPlayback)
+          .catch(() => undefined);
+      } else {
+        startPlayback();
       }
     };
 
+    // iPhone/iOS may only unlock media/Web Audio from a direct touch gesture.
+    window.addEventListener("touchstart", unlockAudio, {
+      once: true,
+      passive: true,
+    });
     window.addEventListener("pointerdown", unlockAudio, { once: true });
+    window.addEventListener("click", unlockAudio, { once: true });
     window.addEventListener("keydown", unlockAudio, { once: true });
 
     return () => {
+      window.removeEventListener("touchstart", unlockAudio);
       window.removeEventListener("pointerdown", unlockAudio);
+      window.removeEventListener("click", unlockAudio);
       window.removeEventListener("keydown", unlockAudio);
     };
   }, []);
 
   useEffect(() => {
-    const elevatedVolume = screen === "home" || screen === "success";
-    const targetVolume = elevatedVolume
-      ? PRACTICE_READY_HOME_VOLUME
-      : PRACTICE_READY_INTERNAL_VOLUME;
+    const isMobile =
+      typeof window !== "undefined" &&
+      window.matchMedia("(max-width: 639px)").matches;
+
+    const internalVolume = isMobile
+      ? PRACTICE_READY_INTERNAL_VOLUME_MOBILE
+      : PRACTICE_READY_INTERNAL_VOLUME_DESKTOP;
+
+    // Only Home uses the higher music level. Success and conflict-final
+    // screens remain at the same lower task-focused level as other internals.
+    const targetVolume =
+      screen === "home" ? PRACTICE_READY_HOME_VOLUME : internalVolume;
 
     setPracticeReadyMusicVolume(targetVolume);
 
-    // Once the browser has allowed Web Audio, this gain node controls the
-    // perceived volume reliably on iPhone/iOS as well as desktop.
     const context = ensurePracticeReadyAudioGraph();
     if (context?.state === "suspended") {
-      // resume() will succeed after the user's interaction; harmless otherwise.
       void context.resume().catch(() => undefined);
     }
 
