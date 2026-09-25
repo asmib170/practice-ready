@@ -2818,17 +2818,24 @@ export default function Home() {
       playPracticeReadyButtonTone();
     };
 
-    document.addEventListener("pointerdown", playInteractionSound, true);
-    document.addEventListener("touchstart", playInteractionSound, {
-      capture: true,
-      passive: true,
-    });
-    document.addEventListener("click", playInteractionSound, true);
+    const playPointerInteractionSound = (event: PointerEvent) => {
+      playInteractionSound(event);
+    };
+
+    const playKeyboardInteractionSound = (event: MouseEvent) => {
+      // Mouse, touch and pen interactions are already handled by pointerdown.
+      // Keyboard-generated clicks report detail === 0, so keyboard users still
+      // receive the same feedback without replaying the tone for one gesture.
+      if (event.detail !== 0) return;
+      playInteractionSound(event);
+    };
+
+    document.addEventListener("pointerdown", playPointerInteractionSound, true);
+    document.addEventListener("click", playKeyboardInteractionSound, true);
 
     return () => {
-      document.removeEventListener("pointerdown", playInteractionSound, true);
-      document.removeEventListener("touchstart", playInteractionSound, true);
-      document.removeEventListener("click", playInteractionSound, true);
+      document.removeEventListener("pointerdown", playPointerInteractionSound, true);
+      document.removeEventListener("click", playKeyboardInteractionSound, true);
     };
   }, []);
 
