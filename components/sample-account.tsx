@@ -6,6 +6,7 @@ import { Eye, EyeOff, LogOut, UserRound, Music2, Check } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
+import {migrateStudent,students,rememberStudent,emitAccess,ACCESS_EVENT} from "@/lib/student-access";
 import BookingGuidelines, { GUIDELINES_VERSION, GUIDELINES_AGREEMENT } from "@/components/booking-guidelines";
 import {ftsTeam} from "@/components/fts-admin";
 const sample = { name: "Asmi Battoo", phone: "", email: "asmi@example.com" };
@@ -70,30 +71,39 @@ export default function SampleAccount({ children, controls, onLogout, adminView 
 
   useEffect(() => {
     try {
+      migrateStudent();
       const stored = JSON.parse(localStorage.getItem(key) || "null");
       if (stored && typeof stored.name === "string") setProfile({ ...sample, name: stored.name, phone: typeof stored.phone === "string" ? stored.phone : "", email: typeof stored.email === "string" ? stored.email : sample.email });
       const auth = JSON.parse(localStorage.getItem(credentialKey) || "null");
       if (auth && typeof auth.salt === "string" && typeof auth.digest === "string") setCredential(auth);
       const fts=ftsTeam.find(t=>t.email===sessionStorage.getItem("practice-ready-fts-session-v1"));if(fts)setAdmin(fts);
       if (sessionStorage.getItem(sessionKey) === "sample") setProfile(sample);
-      setSignedIn(["signed-in", "sample"].includes(sessionStorage.getItem(sessionKey) || ""));
+      setSignedIn(["signed-in", "sample"].includes(sessionStorage.getItem(sessionKey) || "")&&!students().some(s=>s.email===stored?.email&&s.deletedAt));
     } catch { /* Storage is optional for the sample flow. */ }
     setReady(true);
   }, []);
 
+  useEffect(()=>{if(!signedIn)return;const check=()=>{if(students().some(s=>s.email===profile.email&&s.deletedAt)){sessionStorage.removeItem(sessionKey);setSignedIn(false);setError("This account was deleted by FTS. Contact FTS for assistance.");}};window.addEventListener(ACCESS_EVENT,check);window.addEventListener("storage",check);return()=>{window.removeEventListener(ACCESS_EVENT,check);window.removeEventListener("storage",check);};},[signedIn,profile.email]);
   async function login(e: React.FormEvent) {
     e.preventDefault(); setError(""); setBusy(true);
     try {
       const fts=ftsTeam.find(t=>t.email===email.trim().toLowerCase());
       if(fts){if(pass!=="PracticeReadyFTS123"){setError("Email or password is incorrect.");return;}sessionStorage.setItem("practice-ready-fts-session-v1",fts.email);if(document.activeElement instanceof HTMLElement)document.activeElement.blur();window.scrollTo({top:0,left:0,behavior:"instant"});setEnteringAdmin(fts);setPass("");return;}
       if (email.trim().toLowerCase() === sample.email && pass === password) {
-        sessionStorage.setItem(sessionKey, "sample"); setProfile(sample); setPass(""); setSignedIn(true); return;
+        if(students().some(s=>s.email===sample.email&&s.deletedAt)){setError("This account was deleted by FTS. Contact FTS for assistance.");return;}
+        sessionStorage.setItem(sessionKey, "sample"); setProfile(sample); setPass(""); setSignedIn(true);emitAccess(); return;
       }
-      const storedProfile = JSON.parse(localStorage.getItem(key) || "null");
+      migrateStudent();
+      const account=students().find(s=>s.email===email.trim().toLowerCase());
+      if(account?.deletedAt){setError("This account was deleted by FTS. Contact FTS for assistance.");return;}
+      const storedProfile = account || JSON.parse(localStorage.getItem(key) || "null");
       const loginProfile = storedProfile && typeof storedProfile.name === "string" && typeof storedProfile.email === "string" ? {...sample, ...storedProfile} : profile;
-      const correctPassword = credential ? await passwordDigest(pass, credential.salt) === credential.digest : pass === password;
+      const loginCredential=account?.auth||credential;
+      const correctPassword = loginCredential ? await passwordDigest(pass, loginCredential.salt) === loginCredential.digest : pass === password;
       if (email.trim().toLowerCase() !== loginProfile.email.toLowerCase() || !correctPassword) {setError("Email or password is incorrect."); return;}
-      sessionStorage.setItem(sessionKey, "signed-in"); setProfile(loginProfile); setPass(""); setSignedIn(true);
+      localStorage.setItem(key,JSON.stringify({...loginProfile,auth:undefined}));
+      if(account?.auth){localStorage.setItem(credentialKey,JSON.stringify(account.auth));setCredential(account.auth);}
+      sessionStorage.setItem(sessionKey, "signed-in"); setProfile(loginProfile); setPass(""); setSignedIn(true);emitAccess();
     } catch {setError("Could not log in. Please allow browser storage and try again.");}
     finally {setBusy(false);}
   }
@@ -104,6 +114,8 @@ export default function SampleAccount({ children, controls, onLogout, adminView 
     if (!validPhone(next.phone)) {setError("Enter a valid phone number with 10–15 digits.");return;}
     if(ftsTeam.some(t=>t.email===next.email)){setError("This email belongs to an authorised FTS account. Please log in.");return;}
     if (!/^[^\s@]+@vijaybhoomi\.edu\.in$/.test(next.email)) {setError("Use your Vijaybhoomi university email (@vijaybhoomi.edu.in).");return;}
+    migrateStudent();
+    if(students().some(s=>s.email===next.email)){setError("This email already has a local account. Sign in, or contact FTS if the account was deleted.");return;}
     if (signupStep === 1) {setSignupStep(2);return;}
     if (registration.password.length < 8) {setError("Use a password with at least 8 characters.");return;}
     if (registration.password !== registration.confirm) {setError("Passwords do not match.");return;}
@@ -112,9 +124,9 @@ export default function SampleAccount({ children, controls, onLogout, adminView 
     setBusy(true);
     try {
       const salt = crypto.randomUUID(); const auth = {salt,digest:await passwordDigest(registration.password,salt)};
-      // One local demo account; write credentials before reporting success.
+      rememberStudent({...next,auth,guidelinesAcceptance:{version:GUIDELINES_VERSION,acceptedAt:new Date().toISOString(),email:next.email}});
       localStorage.setItem(credentialKey,JSON.stringify(auth)); localStorage.setItem(key,JSON.stringify({...next,guidelinesAcceptance:{version:GUIDELINES_VERSION,acceptedAt:new Date().toISOString(),email:next.email}})); sessionStorage.setItem(sessionKey,"signed-in");
-      setCredential(auth);setProfile(next);setDraft(next);setRegistration({name:"",phone:"",email:"",password:"",confirm:""});setShow(false);setShowConfirm(false);setSignedIn(true);setView("login");
+      setCredential(auth);setProfile(next);setDraft(next);setRegistration({name:"",phone:"",email:"",password:"",confirm:""});setShow(false);setShowConfirm(false);setSignedIn(true);setView("login");emitAccess();
     } catch {setError("Could not save your demo account. Please allow browser storage and try again.");}
     finally {setBusy(false);}
   }
@@ -154,7 +166,7 @@ export default function SampleAccount({ children, controls, onLogout, adminView 
           <label className="flex cursor-pointer items-start gap-3 text-sm leading-6"><input type="checkbox" required checked={guidelinesAccepted} onChange={e=>{setGuidelinesAccepted(e.target.checked);setError("");}} className="mt-1 h-5 w-5 shrink-0 accent-violet-600"/><span>{GUIDELINES_AGREEMENT}</span></label>
           {error&&<p role="alert" className="text-sm text-red-600 dark:text-red-300">{error}</p>}
           <button type="submit" disabled={busy||!guidelinesAccepted} className={`${primary} min-h-12 disabled:cursor-not-allowed disabled:opacity-60`}>{busy?"Creating account…":"Agree & create account"}</button>
-          <p className="text-xs leading-5 text-slate-500 dark:text-slate-300">Creating an account replaces this browser’s local demo profile.</p>
+          <p className="text-xs leading-5 text-slate-500 dark:text-slate-300">Accounts and joint-practice invitations are saved in this browser only.</p>
         </section>
       </form>
     </div>
@@ -194,7 +206,7 @@ export default function SampleAccount({ children, controls, onLogout, adminView 
           {error&&<p role="alert" className="text-sm text-red-600 dark:text-red-300">{error}</p>}
 
           {signupStep===3&&<><BookingGuidelines/><label className="flex cursor-pointer items-start gap-3 rounded-xl border border-violet-200 bg-white p-4 text-sm leading-6 dark:border-violet-500/40 dark:bg-[#1B2133]"><input type="checkbox" required checked={guidelinesAccepted} onChange={e=>{setGuidelinesAccepted(e.target.checked);setError("");}} className="mt-1 h-5 w-5 shrink-0 accent-violet-600"/><span>{GUIDELINES_AGREEMENT}</span></label></>}
-          {signupStep===3&&<p className="text-xs leading-5 text-slate-500 dark:text-slate-300">Creating an account replaces the local demo profile on this browser.</p>}
+          {signupStep===3&&<p className="text-xs leading-5 text-slate-500 dark:text-slate-300">Accounts and joint-practice invitations are saved in this browser only.</p>}
           <button key={signupStep} type="submit" disabled={busy||(signupStep===3&&!guidelinesAccepted)} className={`${primary} disabled:opacity-60`}>{signupStep<3?"Continue":busy?"Creating account…":"Agree & create account"}</button>
           <p className="text-sm text-slate-600 dark:text-slate-300">Already have an account? <button type="button" className="min-h-10 font-semibold text-violet-700 hover:underline dark:text-violet-300" onClick={()=>{setView("login");setError("");setShow(false);}}>Log in</button></p>
           <details className="text-xs leading-5 text-slate-500 dark:text-slate-300"><summary className="min-h-11 cursor-pointer py-3">Demo account · saved on this device</summary><p className="pb-2">One account per browser. Email is not verified. Student and FTS demo views use local records on this browser.</p></details>
@@ -203,14 +215,14 @@ export default function SampleAccount({ children, controls, onLogout, adminView 
     </div>
   </main>;
 
-  return <AccountControlsContext.Provider value={toolbar}><span ref={pageTop} tabIndex={-1} className="block h-0 outline-none"/><style>{`@media(max-width:1023px){.account-global-controls{display:none;}}`}</style>{children}<div className="account-global-controls fixed right-4 top-4 z-40 sm:right-8 sm:top-8">{toolbar}</div>
+  return <AccountControlsContext.Provider value={toolbar}><span ref={pageTop} tabIndex={-1} className="block h-0 outline-none"/><style>{`@media(max-width:1023px){.account-global-controls{display:none;}}`}</style><div key={profile.email}>{children}</div><div className="account-global-controls fixed right-4 top-4 z-40 sm:right-8 sm:top-8">{toolbar}</div>
     <Dialog open={panel !== null} onOpenChange={open => {if (!open) {setPanel(null);setError("");}}}>
       <DialogContent className="max-h-[85dvh] overflow-y-auto rounded-3xl bg-white text-slate-900 dark:bg-[#1B2133] dark:text-white">
-        <DialogHeader><DialogTitle>Manage account</DialogTitle><DialogDescription>Update your name, phone number, and email on this device.</DialogDescription></DialogHeader>
-        {<form className="space-y-4" onSubmit={e => {e.preventDefault();const name=draft.name.trim();if (!name) {setError("Enter your full name.");return;} if (!validPhone(draft.phone.trim())) {setError("Enter a valid phone number with 10–15 digits.");return;} const next={name,phone:draft.phone.trim(),email:draft.email.trim().toLowerCase()};setProfile(next);setDraft(next);try {localStorage.setItem(key,JSON.stringify({...JSON.parse(localStorage.getItem(key)||"{}"),...next}));} catch {}setError("");setSaved(true);setPanel(null);}}>
+        <DialogHeader><DialogTitle>Manage account</DialogTitle><DialogDescription>Update your name and phone number. Your university email identifies your account.</DialogDescription></DialogHeader>
+        {<form className="space-y-4" onSubmit={e => {e.preventDefault();const name=draft.name.trim();if (!name) {setError("Enter your full name.");return;} if (!validPhone(draft.phone.trim())) {setError("Enter a valid phone number with 10–15 digits.");return;} const next={name,phone:draft.phone.trim(),email:draft.email.trim().toLowerCase()};setProfile(next);setDraft(next);try {localStorage.setItem(key,JSON.stringify({...JSON.parse(localStorage.getItem(key)||"{}"),...next}));rememberStudent({...next});} catch {}setError("");setSaved(true);setPanel(null);}}>
           <label htmlFor="profile-name" className="block text-sm font-semibold">Name<input id="profile-name" className={field} required maxLength={80} value={draft.name} onChange={e => {setDraft({...draft,name:e.target.value});setSaved(false);}}/></label>
           <label htmlFor="profile-phone" className="block text-sm font-semibold">Phone number<input id="profile-phone" className={field} required type="tel" autoComplete="tel" maxLength={30} placeholder="Enter your phone number" value={draft.phone} onChange={e => {setDraft({...draft,phone:e.target.value});setSaved(false);}}/></label>
-          <label htmlFor="profile-email" className="block text-sm font-semibold">Email<input id="profile-email" className={field} type="email" autoComplete="email" required maxLength={254} value={draft.email} onChange={e => {setDraft({...draft,email:e.target.value});setSaved(false);}}/></label>
+          <label htmlFor="profile-email" className="block text-sm font-semibold">Email<input id="profile-email" readOnly className={`${field} opacity-70`} type="email" autoComplete="email" required maxLength={254} value={draft.email} onChange={e => {setDraft({...draft,email:e.target.value});setSaved(false);}}/></label>
           {error && <p role="alert" className="text-sm text-red-600 dark:text-red-300">{error}</p>}{saved && <p role="status" className="text-sm text-emerald-700 dark:text-emerald-300">Profile saved.</p>}
           <button type="submit" className={primary}>Save changes</button>
         </form>}

@@ -1,7 +1,10 @@
 "use client";
+import {StudentAccessNotice} from "@/components/student-access";
+import {SessionInvitations} from "@/components/session-participants";
+import {accessIssue,currentStudent,belongsToStudent,canManageSession,ACCESS_EVENT} from "@/lib/student-access";
 import RoomAvailabilityCalendar from "@/components/room-availability-calendar";
 
-import { Children, isValidElement, useEffect, useMemo, useRef, useState } from "react";
+import { Children, isValidElement, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -2857,7 +2860,7 @@ function BookingApp() {
   const [directoryReservation,setDirectoryReservation]=useState<string>();
   const [bookingError, setBookingError] = useState("");
   const [reservationSaved, setReservationSaved] = useState(false);
-  useEffect(() => { setReservations(loadReservations()); }, []);
+  useEffect(() => { const refresh=()=>setReservations(loadReservations());refresh();window.addEventListener(ACCESS_EVENT,refresh);return()=>window.removeEventListener(ACCESS_EVENT,refresh); }, []);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [calendarMonth, setCalendarMonth] = useState(() =>
     startOfMonth(new Date()),
@@ -2876,7 +2879,7 @@ function BookingApp() {
   }), [relocations,adminEquipment]);
   const directoryEquipment=allEquipment.filter(item=>!item.archived);
   const equipmentForRoom = (target:string) => directoryEquipment.filter(x => x.defaultLocation === target).map(x => ({...x,status:(x.currentLocation !== target && (x.status === "ready" || x.status === "away") ? "away" : x.status === "away" && x.currentLocation === target ? "ready" : x.status) as Equipment["status"]}));
-  const activeMoveSessions=reservations.filter(r=>canRecordSessionMove(r));
+  const activeMoveSessions=reservations.filter(r=>belongsToStudent(r)&&canRecordSessionMove(r));
   const openActiveMove=(session:Reservation,editRecord?:Relocation,equipmentId="")=>{
     if(!canRecordSessionMove(session))return;
     const date=new Date(editRecord?.expectedReturn||Math.min(Date.parse(session.end),Date.now()+3*3600000));
@@ -3012,7 +3015,18 @@ function BookingApp() {
     }
   }, [screen]);
 
+  const pageScrollPositions = useRef<Partial<Record<Screen,number>>>({});
+  const pendingBackScroll = useRef<number | null>(null);
+  useLayoutEffect(() => {
+    if (pendingBackScroll.current === null) return;
+    const top = pendingBackScroll.current;
+    pendingBackScroll.current = null;
+    window.scrollTo({top, left:0, behavior:"instant"});
+    const frame=requestAnimationFrame(()=>window.scrollTo({top,left:0,behavior:"instant"}));
+    return ()=>cancelAnimationFrame(frame);
+  }, [screen]);
   const go = (next: Screen) => {
+    pageScrollPositions.current[screen] = window.scrollY;
     setHistory((h) => [...h, screen]);
     setScreen(next);
     window.scrollTo(0, 0);
@@ -3021,8 +3035,8 @@ function BookingApp() {
     const next = history.at(-1) || "home";
     setHistory((h) => h.slice(0, -1));
     if(next==="reservations"&&directoryReservation){setReservationDetail(directoryReservation);setDirectoryReservation(undefined);}
+    pendingBackScroll.current = pageScrollPositions.current[next] || 0;
     setScreen(next);
-    window.scrollTo(0, 0);
   };
   const changeMprFromTimeSlots = () => {
     // "Change" is a contextual edit action, not a one-step Back action.
@@ -3066,6 +3080,7 @@ function BookingApp() {
     setRecoveringFromConflict(false);
   };
   const confirm = () => {
+    const issue=accessIssue();if(issue){setBookingError(issue);return;}
     const shouldConflict = demoConflict && !conflictConsumed;
     const baseDate = selectedDate || new Date();
     if(!bookingDateAvailable(baseDate)){setBookingError(bookingWindowMessage());return;}
@@ -3080,17 +3095,21 @@ function BookingApp() {
     go("recheck");
     window.setTimeout(() => {
       
+      const issue=accessIssue();if(issue){setBookingError(issue);setScreen("review");return;}
       const confirmedWindow=selectedBookingWindow(baseDate,selectedSlots.map(t=>allTimeSlots.indexOf(t)));
       if(!confirmedWindow){setBookingError("That time slot has ended. Choose another available slot.");setScreen("review");return;}
       const actualStart=new Date(confirmedWindow.start);
       const current = loadReservations();
+      const personalOverlap=current.some(r=>r.id!==rescheduleId&&!r.cancelled&&belongsToStudent(r)&&Date.parse(r.start)<end.getTime()&&Date.parse(r.end)>actualStart.getTime());
+      if(personalOverlap){setBookingError("You already organise or participate in a session at this time.");setScreen("review");return;}
       const overlap = current.some(r => r.id !== rescheduleId && !r.cancelled && r.room === room && Date.parse(r.start) < end.getTime() && Date.parse(reservationBlockedEnd(r)) > actualStart.getTime());
       if (shouldConflict || overlap) { setConflictSlot(selectedSlots.at(-1) || time); setScreen("conflict"); return; }
       if (rescheduleId && !current.some(r => r.id === rescheduleId && reservationGroup(r) === "Upcoming")) {
         setBookingError("The original reservation can no longer be rescheduled. Return to My Reservations."); setScreen("review"); return;
       }
       const original = current.find(r => r.id === rescheduleId);
-      const reservation: Reservation = { id: original?.id || `PR-${Date.now().toString(36).toUpperCase()}`, room, operationalDate: dateKey(actualStart), slots: [...selectedSlots], time:actualStart.getTime()!==start.getTime()?`${clockLabel(actualStart.getHours()*60+actualStart.getMinutes())}–${clockLabel(end.getHours()*60+end.getMinutes())}`:time, start: actualStart.toISOString(), end: end.toISOString(), cancelled: false, createdAt: original?.createdAt || new Date().toISOString(), moveIds:Array.from(new Set([...(original?.moveIds||[]),...bookingMoveIds])) };
+      if(original&&!canManageSession(original)){setBookingError("Only the organiser can reschedule this session.");setScreen("review");return;}
+      const reservation: Reservation = { ...original,ownerEmail:original?.ownerEmail||currentStudent().email,ownerName:original?.ownerName||currentStudent().name, id: original?.id || `PR-${Date.now().toString(36).toUpperCase()}`, room, operationalDate: dateKey(actualStart), slots: [...selectedSlots], time:actualStart.getTime()!==start.getTime()?`${clockLabel(actualStart.getHours()*60+actualStart.getMinutes())}–${clockLabel(end.getHours()*60+end.getMinutes())}`:time, start: actualStart.toISOString(), end: end.toISOString(), cancelled: false, createdAt: original?.createdAt || new Date().toISOString(), moveIds:Array.from(new Set([...(original?.moveIds||[]),...bookingMoveIds])) };
       const updated = rescheduleId ? current.map(r => r.id === rescheduleId ? reservation : r) : [...current, reservation];
       try { storeReservations(updated); setReservations(updated); setReservationDetail(reservation.id); setReservationSaved(true); setScreen("success"); }
       catch { setBookingError("Could not save your reservation on this device. Please try again. Your existing reservation has not changed."); setScreen("review"); }
@@ -3366,14 +3385,14 @@ function BookingApp() {
     return { all: matches, available, unavailable };
   }, [query, directoryEquipment]);
 
-  const reservationPanel = (<Reservations dialogOnly={screen === "home"} onDetailClose={()=>setReservationDetail(undefined)} onEndSession={id=>{const current=loadReservations();const original=current.find(r=>r.id===id);const ended=original?endActiveReservation(original):null;if(!ended){setReservations(current);return false;}try{const next=current.map(r=>r.id===id?ended:r);storeReservations(next);setReservations(next);return true;}catch{return false;}}} onAddMove={session=>{if(session.cancelled||session.sample||Date.parse(session.end)<=Date.now())return;setReservationDetail(undefined);setDirectoryReservation(session.id);setQuery("");setSearched(true);setLocation("");setLocationQuery("");setDirectoryTab("available");setAlternativeFromDirectory(false);go("directory-search");}} onEditMove={(record,session)=>{setReservationDetail(undefined);openActiveMove(session,record);}} items={reservations} moves={relocations} equipment={allEquipment} onRecordReturn={item=>setRelocationForm({id:item.id,destination:item.defaultLocation||"",due:""})} initialId={reservationDetail} onBook={() => { home(); setScreen("date"); setHistory(["home"]); }}
-      onCancel={(id) => { const current = loadReservations(); if (!current.some(r=>r.id===id && reservationGroup(r)==="Upcoming")) { setReservations(current); return false; } const updated=current.map(r=>r.id===id?{...r,cancelled:true}:r); try {storeReservations(updated);setReservations(updated);return true;}catch{return false;} }}
-      onReschedule={(r) => { home(); setRescheduleId(r.id); setSelectedDate(new Date(`${r.operationalDate}T00:00:00`)); setCalendarMonth(startOfMonth(new Date(`${r.operationalDate}T00:00:00`))); setRoom(r.room); setMprSelected(r.room); setScreen("date"); setHistory(["home","reservations"]); }} />);
+  const reservationPanel = (<Reservations dialogOnly={screen === "home"} onDetailClose={()=>setReservationDetail(undefined)} onEndSession={id=>{const current=loadReservations();const original=current.find(r=>r.id===id);if(original&&!canManageSession(original))return false;const ended=original?endActiveReservation(original):null;if(!ended){setReservations(current);return false;}try{const next=current.map(r=>r.id===id?ended:r);storeReservations(next);setReservations(next);return true;}catch{return false;}}} onAddMove={session=>{if(session.cancelled||session.sample||Date.parse(session.end)<=Date.now())return;setReservationDetail(undefined);setDirectoryReservation(session.id);setQuery("");setSearched(true);setLocation("");setLocationQuery("");setDirectoryTab("available");setAlternativeFromDirectory(false);go("directory-search");}} onEditMove={(record,session)=>{setReservationDetail(undefined);openActiveMove(session,record);}} items={reservations.filter(r=>belongsToStudent(r))} moves={relocations} equipment={allEquipment} onRecordReturn={item=>setRelocationForm({id:item.id,destination:item.defaultLocation||"",due:""})} initialId={reservationDetail} onBook={() => { home(); setScreen("date"); setHistory(["home"]); }}
+      onCancel={(id) => { const current = loadReservations(); if (!current.some(r=>r.id===id && canManageSession(r) && reservationGroup(r)==="Upcoming")) { setReservations(current); return false; } const updated=current.map(r=>r.id===id?{...r,cancelled:true}:r); try {storeReservations(updated);setReservations(updated);return true;}catch{return false;} }}
+      onReschedule={(r) => { if(!canManageSession(r)||accessIssue())return;home(); setRescheduleId(r.id); setSelectedDate(new Date(`${r.operationalDate}T00:00:00`)); setCalendarMonth(startOfMonth(new Date(`${r.operationalDate}T00:00:00`))); setRoom(r.room); setMprSelected(r.room); setScreen("date"); setHistory(["home","reservations"]); }} />);
 
   const renderScreen = () => {
   if (screen === "home")
     return (
-      <> <HomeScreen
+      <> <div className="mx-auto max-w-[760px] space-y-3 px-5"><StudentAccessNotice/><SessionInvitations/></div><HomeScreen
         onBook={() => {
           setDemoConflict(false);
           setConflictConsumed(false);
@@ -3397,7 +3416,7 @@ function BookingApp() {
         onReservations={(id) => { setReservationDetail(id); if(!id)go("reservations"); }}
         onSupport={() => go("support")}
         onAvailability={() => go("availability-calendar")}
-        next={nextReservation(reservations)}
+        next={nextReservation(reservations.filter(r=>belongsToStudent(r)))}
         conflict={demoConflict}
         greeting={greeting}
       />
@@ -4293,6 +4312,7 @@ function BookingApp() {
         </div>
         <ActionBar>
           {rescheduleId && <p className="mb-3 text-sm text-violet-700 dark:text-violet-200">Your original reservation stays booked until this change is confirmed.</p>}
+          <p className="mb-3 text-sm text-slate-600 dark:text-slate-300">Booking under {currentStudent().name}. You must attend; invite other participants from reservation details after booking.</p>
           {bookingError && <p role="alert" className="mb-3 text-sm text-red-600 dark:text-red-300">{bookingError}</p>}
           <Primary onClick={confirm}>{rescheduleId ? "Confirm Reschedule" : "Confirm Reservation"}</Primary>
           <Button

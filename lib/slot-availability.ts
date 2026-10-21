@@ -27,3 +27,19 @@ export function selectedBookingWindow(date:Date,indices:number[],now=Date.now())
  const first=slotWindow(date,indices[0]);
  return {start:Math.max(first.start,now),end:slotWindow(date,indices[indices.length-1]).end};
 }
+
+// Calendar preview only: later free slots can extend an eligible start, but
+// cannot start a new booking. Keep the preview within three hours from now.
+export function calendarExtensionAvailable(date:Date,index:number,now=Date.now(),occupied:{start:number;end:number}[]=[]){
+ if(!Number.isInteger(index)||index<0||index>=48)return false;
+ const target=slotWindow(date,index);
+ if(target.end<=now||target.end>now+MAX_BOOKING_SLOTS*30*60000||slotBookable(date,index,now))return false;
+ const today=new Date(now);today.setHours(0,0,0,0);
+ const currentIndex=Math.floor((now-today.getTime())/(30*60000));
+ for(let first=currentIndex;first<=currentIndex+2;first++){
+  const start=slotWindow(today,first);
+  if(!slotBookable(today,first,now)||start.start>=target.start||target.end>start.start+MAX_BOOKING_SLOTS*30*60000)continue;
+  if(!occupied.some(record=>record.start<target.end&&record.end>Math.max(start.start,now)))return true;
+ }
+ return false;
+}

@@ -1,6 +1,6 @@
 "use client";
 
-export const GUIDELINES_VERSION = "2026-10-20";
+export const GUIDELINES_VERSION = "2026-10-21";
 export const GUIDELINES_TITLE = "Booking & equipment guidelines";
 export const GUIDELINES_AGREEMENT = "I have read and agree to follow the booking and equipment guidelines.";
 
@@ -9,12 +9,24 @@ const sections = [
     "Sign up with your university email (@vijaybhoomi.edu.in). Email verification is not enabled in this demo.",
     "Choose an available start within the next hour, or the remaining time in the current half-hour.",
     "Book a maximum of 3 hours in consecutive half-hour slots. The one-hour rule applies to your start, not your end, including across midnight and 6 AM.",
-    "‘Not open’ periods have no eligible start. Slots show when booking opens. Booked slots are unavailable; availability is checked again at confirmation."
+    "Slots show when a new start becomes bookable. Later free times may be available to extend an eligible start. Booked slots are unavailable; availability is checked again at confirmation.",
+    "Book only for a session you will attend. You may not reserve a room solely for a friend. For joint practice, invite registered students to your session; they must accept using their own accounts. The organiser remains responsible and must attend."
   ]},
   {title:"Managing your reservation",items:[
     "Check the room, date and time before confirming. Find upcoming, active and past sessions in My Reservations.",
     "Cancel or reschedule upcoming sessions if plans change. Your original booking stays reserved until a reschedule is confirmed. The replacement must meet the booking rules.",
     "You can end an active session early. Ending or cancelling a session does not record equipment returns."
+  ]},
+  {title:"Attendance and misconduct reviews",items:[
+    "Attend your booking or cancel it if you cannot come. FTS reviews a reported no-show and the student’s explanation before deciding whether it counts.",
+    "Report equipment damage or breakage promptly to FTS. Promptly reported accidental damage does not count as unreported damage. FTS reviews the facts and the student’s explanation before confirming an unreported-damage incident.",
+    "No-shows and unreported equipment damage have separate warning counts. In each category, the first two confirmed, unjustified incidents receive warnings. A third confirmed incident in that category triggers a temporary restriction from all TSM facilities, with the start and end set by FTS. Other categories do not add to that count.",
+    "FTS records the reference, student explanation, decision, reviewer and restriction dates. You can view your warnings and restriction period and contact FTS in Reports & Support to discuss a decision. Restrictions expire automatically; FTS can lift one early with a recorded reason. Historical warnings remain recorded.",
+    "A restricted student cannot make or reschedule bookings, accept joint-practice invitations or record new equipment moves. Signing in, reading decisions, contacting FTS, cancelling a booking and recording equipment returns remain available. Existing bookings are not silently cancelled; FTS must review them and communicate any changes."
+  ]},
+  {title:"Joint practice sessions",items:[
+    "The organiser books under their own account and invites other registered students. An invitation must be accepted before the student is a participant. Invited students may decline; accepted participants may leave without cancelling the organiser’s reservation.",
+    "Only the organiser can reschedule, cancel or end the session. Review the date and time after an organiser or FTS change. Participation does not create a second room booking or allow bookings on behalf of an absent organiser."
   ]},
   {title:"Equipment locations and moves",items:[
     "Check current location and working condition before practice. Reference photos may differ from the actual equipment.",
@@ -41,11 +53,12 @@ const sections = [
     "FTS can view schedules, reschedule or cancel reservations, and end active sessions. FTS rescheduling has a 3-hour limit but can reschedule starts beyond the next hour.",
     "FTS can record moves and returns on your behalf and correct movement records with a reason. Records distinguish who moved equipment from who recorded its return.",
     "FTS can add or edit equipment details, locations, photos and working condition, and archive or restore equipment.",
-    "FTS can respond to reports and mark them Open, In progress or Resolved. FTS actions are attributed in records or update history. Review changes affecting your session."
+    "FTS can respond to reports and mark them Open, In progress or Resolved. FTS actions are attributed in records or update history. Review changes affecting your session.",
+    "FTS can review misconduct, issue warnings, set temporary facility restrictions and lift restrictions with a reason. It can delete student sign-in access after outstanding sessions and equipment moves are resolved. Reservations, movements and misconduct records are retained for accountability; deletion is separate from a temporary restriction."
   ]},
   {title:"Privacy and this demo",items:[
     "The FTS interface does not show your password or personal practice-journal notes and photos.",
-    "This demo saves your account, agreement, reservations, reports and moves in this browser. Its student and FTS views use those local records. Nothing syncs across devices or reaches the real team automatically.",
+    "This demo saves your account, agreement, reservations, reports and moves in this browser. Its student and FTS views use those local records. Joint-practice invitations work only between accounts registered in this browser; no invitation email is sent. Nothing syncs across devices or reaches the real team automatically. Browser-only restrictions do not enforce access to physical facilities; shared authentication and enforcement require the backend.",
     "To contact the real team, use Email or Call in Reports & Support. This demo does not send verification or password-reset emails."
   ]}
 ];
