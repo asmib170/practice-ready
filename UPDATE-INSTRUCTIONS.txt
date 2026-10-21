@@ -835,3 +835,24 @@ FTS student list: two equal-width cards per row on desktop (1024px and above), w
 - Student reservation popup heading, status/reference and close control remain visible while scrolling, for all reservation statuses on phone/laptop.
 - Existing invitation permissions, history wording and reservation actions retained.
 - Includes previous changes. Source/archive checks passed; full build and browser/device verification remain.
+
+21 October 2026 - Participant identity spacing
+- Groups participant name and muted email in one left column with a 4px gap.
+- Status and Remove/Leave actions stack independently at the right; 44px action targets retained.
+- Applies on phone/laptop; sticky reservation header and previous updates retained.
+- Source/archive checks passed; browser/device verification remains.
+
+21 October 2026 - Mobile invitation button
+- Send invitation fills the email-field width below the laptop breakpoint; laptop width unchanged.
+- Includes preceding changes. Source/archive checks passed; device verification remains.
+
+21 October 2026 - Compact student card buttons
+- Mobile Reservations and Equipment moves buttons use explicit 14px text and 4px horizontal padding, with single-line labels.
+- Equal-width columns and minimum 44px tap height retained; laptop styling unchanged.
+- Includes previous updates. Source/archive checks passed; device verification remains.
+
+21 October 2026 - Student reservation opening tab
+- Opening Reservations from a student card chooses Active first, then Upcoming, then History based on that exact student identity.
+- With no reservations, opens Upcoming empty state. Opens List view, retains name in search and identity filter, and clears room/date filters.
+- Automatic choice runs only on entry; manual tab switching remains available. Shared phone/laptop route.
+- Includes previous changes. Source/archive checks passed; full build/device verification remains.
