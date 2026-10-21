@@ -786,3 +786,21 @@ FTS student list: two equal-width cards per row on desktop (1024px and above), w
 - Invitation input uses violet focus border/ring in light and dark themes.
 - Removed demo note stays removed; includes all prior changes.
 - Source/archive checks passed; full build and device testing remain.
+
+
+21 October 2026 - Collapsible Joint practice
+- Reservation details show a keyboard-accessible Joint practice disclosure row, closed initially.
+- People icon and right-aligned rotating chevron; accepted participant/pending invitation counts appear when relevant.
+- Organiser, participant list and invitation form expand within the same popup.
+- Both phone/laptop use the compact row; existing permissions, form styling and invitation behavior retained.
+- Includes preceding changes. Archive/source checks passed; local build/device testing remains.
+
+
+21 October 2026 - Joint practice historical records
+- Completed/cancelled records retain collapsible organiser/participant details without live attendance/rescheduling guidance.
+- Empty history says No participants were invited.
+- Unanswered invitations show Not accepted before the session ended, or Not accepted before cancellation.
+- Collapsed history summary no longer describes unanswered invitations as pending.
+- Accepted invitations are labelled as invitation acceptance, not proof of attendance.
+- Phone/laptop share behavior; invitation data and active-session actions retained.
+- Includes previous updates. Source/archive checks passed; local build/device tests remain.
