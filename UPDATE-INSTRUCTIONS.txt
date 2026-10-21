@@ -862,3 +862,8 @@ FTS student list: two equal-width cards per row on desktop (1024px and above), w
 - Review footer contains only confirmation and cancel buttons, with an opaque light/dark background. Other action panels unchanged.
 - Equipment readiness rows show muted IDs below equipment names. Shared phone/laptop review layout.
 - Includes previous changes. Source/archive checks passed; full build and device verification remain.
+
+21 October 2026 - Invitation divider spacing
+- Removes the extra 16px action-footer margin after expanded Joint practice, retaining the existing dialog gap before the divider.
+- Collapsed spacing and spacing below the divider remain unchanged. Applies on phone/laptop.
+- Includes prior updates. Source/archive checks passed; browser verification remains.
