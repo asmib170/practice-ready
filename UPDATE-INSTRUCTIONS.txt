@@ -688,3 +688,14 @@ Validation: TypeScript passed, production build passed, and 31 targeted access/i
 FTS Back placement: shared Back now sits directly above each page heading, aligned to the content left edge on phone and laptop. Global brand header returns to its previous compact height. The 44px target and navigation behavior are preserved.
 
 FTS student-card refinement: account status now uses a subtle state-coloured pill, count label is Confirmed no-shows, and Delete account is in an accessible top-right three-dot menu. Existing deletion confirmation and safeguards, card spacing and incident-history disclosure are preserved. Applies to phone/laptop and light/dark.
+
+FTS student list: two equal-width cards per row on desktop (1024px and above), with a single-column mobile/tablet layout. Review/deletion forms stay full-width below the grid.
+
+
+21 October 2026 - Misconduct review form
+- Explicit required review decision; no disciplinary outcome is preselected.
+- Live consequence summary shows separate category counts, warnings, or required restriction dates.
+- Category/reference share a desktop row; phone fields stay stacked.
+- Shorter placeholders, persistent explanation guidance, and a primary purple Save decision action.
+- Existing incident validation, student card grid and other flows preserved.
+- Validation: archive integrity and source wiring checked; full app build/device testing not available in this workspace.
