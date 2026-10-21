@@ -686,3 +686,5 @@ Shared Back navigation: FTS now has a top-left Back action for section navigatio
 Validation: TypeScript passed, production build passed, and 31 targeted access/incident/invitation assertions passed. Physical-device and cross-account end-to-end browser testing still required.
 
 FTS Back placement: shared Back now sits directly above each page heading, aligned to the content left edge on phone and laptop. Global brand header returns to its previous compact height. The 44px target and navigation behavior are preserved.
+
+FTS student-card refinement: account status now uses a subtle state-coloured pill, count label is Confirmed no-shows, and Delete account is in an accessible top-right three-dot menu. Existing deletion confirmation and safeguards, card spacing and incident-history disclosure are preserved. Applies to phone/laptop and light/dark.
