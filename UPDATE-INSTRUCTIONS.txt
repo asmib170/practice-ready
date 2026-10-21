@@ -758,3 +758,31 @@ FTS student list: two equal-width cards per row on desktop (1024px and above), w
 21 October 2026 - Students page wording cleanup
 - Removed the browser-only account/review sync note from the Students page on all screen sizes.
 - Includes all preceding updates; no account or restriction behavior changed.
+
+
+21 October 2026 - Student reservation search
+- Student-card View reservations prefills the student name, while filtering by their account email internally.
+- Account scope persists across reservation status/calendar views and Back navigation.
+- Editing search, clearing filters or leaving the section releases account scope.
+- Reservation tab counts follow the same filtered dataset. Applies to phone and laptop.
+- Includes previous changes. Archive/source checks passed; local build/device tests remain.
+
+
+21 October 2026 - Reservation review reminder
+- Split organiser/attendance reminder and participant invitation guidance into separate lines.
+- Secondary invitation guidance is smaller and muted, above confirmation on phone/laptop.
+- Includes all preceding updates. Exact replacement and archive integrity checked.
+
+
+21 October 2026 - Joint practice note cleanup
+- Removed the local-demo invitation note from the shared Joint practice form on phone/laptop.
+- Invitation behavior unchanged; includes all preceding updates. Exact removal and archive integrity checked.
+
+
+21 October 2026 - Joint practice hierarchy/layout
+- Organiser name and muted email separated from the attendance reminder.
+- Empty state says No participants invited yet.
+- Laptop invitation input/button share a row; smaller screens remain stacked.
+- Invitation input uses violet focus border/ring in light and dark themes.
+- Removed demo note stays removed; includes all prior changes.
+- Source/archive checks passed; full build and device testing remain.

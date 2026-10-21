@@ -4312,7 +4312,7 @@ function BookingApp() {
         </div>
         <ActionBar>
           {rescheduleId && <p className="mb-3 text-sm text-violet-700 dark:text-violet-200">Your original reservation stays booked until this change is confirmed.</p>}
-          <p className="mb-3 text-sm text-slate-600 dark:text-slate-300">Booking under {currentStudent().name}. You must attend; invite other participants from reservation details after booking.</p>
+          <div className="mb-3 space-y-1"><p className="text-sm font-medium text-slate-900 dark:text-slate-100">Booked by {currentStudent().name} · You must attend this session.</p><p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">After confirming, you can invite participants from Reservation details.</p></div>
           {bookingError && <p role="alert" className="mb-3 text-sm text-red-600 dark:text-red-300">{bookingError}</p>}
           <Primary onClick={confirm}>{rescheduleId ? "Confirm Reschedule" : "Confirm Reservation"}</Primary>
           <Button
