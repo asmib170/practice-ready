@@ -829,3 +829,9 @@ FTS student list: two equal-width cards per row on desktop (1024px and above), w
 - Adds a contextual FTS reasoning placeholder.
 - Mobile review footer uses equal-width buttons with a 12px gap; desktop remains right aligned.
 - Review rules and fixed header/footer retained. Source/archive checks passed; build/device checks remain.
+
+21 October 2026 - Joint practice participant layout
+- Participant name and muted email are separated, with a right-aligned status pill and quieter Remove/Leave actions retaining 44px tap targets.
+- Student reservation popup heading, status/reference and close control remain visible while scrolling, for all reservation statuses on phone/laptop.
+- Existing invitation permissions, history wording and reservation actions retained.
+- Includes previous changes. Source/archive checks passed; full build and browser/device verification remain.
