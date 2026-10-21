@@ -732,3 +732,29 @@ FTS student list: two equal-width cards per row on desktop (1024px and above), w
 - Report content, filters and View report interactions retained.
 - Includes all preceding student card and misconduct popup/dropdown changes.
 - Archive/source checks passed; build and device testing required locally.
+
+
+21 October 2026 - Equal-height desktop report cards
+- Cards stretch to the tallest report in their desktop row.
+- Flexible content row and bottom-aligned footer keep View report buttons aligned.
+- No fixed card heights or placeholder content; smaller-screen layouts retained.
+- Applies to Open, In progress and Resolved. Archive/source checks passed; build/device checks remain.
+
+
+21 October 2026 - Student account action menu
+- Three-dot menu opens a compact rectangular panel with rounded corners, subtle border and shadow.
+- Delete account is an inset red-text menu row with soft red hover/focus, without pill styling.
+- Light/dark styling and existing deletion confirmation retained.
+- Includes preceding changes. Archive/source checks passed; local build/device testing remains.
+
+
+21 October 2026 - Movement tab counts follow filters
+- Current and History counts use the same search/location-filtered entries as the visible list.
+- Equipment display IDs searchable alongside internal IDs and existing movement fields.
+- Applies to phone and desktop. Includes preceding changes.
+- Archive/source checks passed; local build/device checks remain.
+
+
+21 October 2026 - Students page wording cleanup
+- Removed the browser-only account/review sync note from the Students page on all screen sizes.
+- Includes all preceding updates; no account or restriction behavior changed.
