@@ -856,3 +856,9 @@ FTS student list: two equal-width cards per row on desktop (1024px and above), w
 - With no reservations, opens Upcoming empty state. Opens List view, retains name in search and identity filter, and clears room/date filters.
 - Automatic choice runs only on entry; manual tab switching remains available. Shared phone/laptop route.
 - Includes previous changes. Source/archive checks passed; full build/device verification remains.
+
+21 October 2026 - Review reservation action panel
+- Moves organiser attendance, invitation guidance, reschedule notice and booking errors into scrolling content above the review footer.
+- Review footer contains only confirmation and cancel buttons, with an opaque light/dark background. Other action panels unchanged.
+- Equipment readiness rows show muted IDs below equipment names. Shared phone/laptop review layout.
+- Includes previous changes. Source/archive checks passed; full build and device verification remain.

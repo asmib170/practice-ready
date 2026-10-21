@@ -2394,9 +2394,9 @@ function Primary({
     </Button>
   );
 }
-function ActionBar({ children }: { children: React.ReactNode }) {
+function ActionBar({ children, opaque=false }: { children: React.ReactNode; opaque?: boolean }) {
   return (
-    <div data-practice-ready-action-bar className="fixed bottom-0 left-1/2 z-30 w-full min-w-0 max-w-[760px] -translate-x-1/2 overflow-x-hidden border-t border-slate-200/80 dark:border-[#30384D]/80 bg-[#f8f9fd]/95 dark:bg-[#151A2B]/95 px-5 pb-[max(.75rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-10px_30px_rgba(21,26,49,.08)] sm:px-8 sm:pb-[max(1rem,env(safe-area-inset-bottom))] sm:pt-3">
+    <div data-practice-ready-action-bar style={opaque?{backgroundColor:"var(--review-action-bg)"}:undefined} className={`${opaque?"[--review-action-bg:#f8f9fd] dark:[--review-action-bg:#151A2B]":""} fixed bottom-0 left-1/2 z-30 w-full min-w-0 max-w-[760px] -translate-x-1/2 overflow-x-hidden border-t border-slate-200/80 dark:border-[#30384D]/80 bg-[#f8f9fd]/95 dark:bg-[#151A2B]/95 px-5 pb-[max(.75rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-10px_30px_rgba(21,26,49,.08)] sm:px-8 sm:pb-[max(1rem,env(safe-area-inset-bottom))] sm:pt-3`}>
       <div className="space-y-3">{children}</div>
     </div>
   );
@@ -4303,17 +4303,20 @@ function BookingApp() {
               key={x.id}
               className="mt-2.5 flex items-center justify-between gap-3 border-t border-slate-100 dark:border-[#252C3E] pt-2.5 text-sm sm:mt-3 sm:pt-3"
             >
-              <span>
-                {x.name} · {x.id}
+              <span className="min-w-0 space-y-1">
+                <span className="block break-words">{x.name}</span>
+                <span className="block break-words text-xs text-slate-500 dark:text-slate-400">{x.id}</span>
               </span>
               <StatusPill status={x.status} condition={x.condition} />
             </div>
           ))}
         </div>
-        <ActionBar>
-          {rescheduleId && <p className="mb-3 text-sm text-violet-700 dark:text-violet-200">Your original reservation stays booked until this change is confirmed.</p>}
-          <div className="mb-3 space-y-1"><p className="text-sm font-medium text-slate-900 dark:text-slate-100">Booked by {currentStudent().name} · You must attend this session.</p><p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">After confirming, you can invite participants from Reservation details.</p></div>
-          {bookingError && <p role="alert" className="mb-3 text-sm text-red-600 dark:text-red-300">{bookingError}</p>}
+        <div className="mt-4 space-y-3">
+          {rescheduleId && <p className="text-sm text-violet-700 dark:text-violet-200">Your original reservation stays booked until this change is confirmed.</p>}
+          <div className="space-y-1"><p className="text-sm font-medium text-slate-900 dark:text-slate-100">Booked by {currentStudent().name} · You must attend this session.</p><p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">After confirming, you can invite participants from Reservation details.</p></div>
+          {bookingError && <p role="alert" className="text-sm text-red-600 dark:text-red-300">{bookingError}</p>}
+        </div>
+        <ActionBar opaque>
           <Primary onClick={confirm}>{rescheduleId ? "Confirm Reschedule" : "Confirm Reservation"}</Primary>
           <Button
             variant="outline"
