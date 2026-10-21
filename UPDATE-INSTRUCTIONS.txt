@@ -699,3 +699,36 @@ FTS student list: two equal-width cards per row on desktop (1024px and above), w
 - Shorter placeholders, persistent explanation guidance, and a primary purple Save decision action.
 - Existing incident validation, student card grid and other flows preserved.
 - Validation: archive integrity and source wiring checked; full app build/device testing not available in this workspace.
+
+
+21 October 2026 - Misconduct review popup
+- Review opens in an accessible native modal dialog with fixed header/footer and internal scrolling.
+- Medium-width desktop modal, nearly full-screen mobile modal; 16px form inputs retained.
+- Background scroll is locked and original scroll/focus restored after saving or closing.
+- Cancel, close and Escape ask before discarding entered review details; backdrop does not dismiss.
+- Delete/lift forms and incident validation remain unchanged.
+- Archive/source checks completed; full build and device verification still required locally.
+
+
+21 October 2026 - Misconduct category dropdown
+- Reuses the app dropdown with rounded options, violet hover/focus and selected checkmark in light/dark mode.
+- Category menu renders within the native review dialog top layer. Other admin dropdowns retain their existing portal behavior.
+- Includes all preceding popup and student-card updates. Archive/source checks passed; local build/device testing required.
+
+
+21 October 2026 - Student card hierarchy and spacing
+- Muted email and phone on separate lines.
+- Confirmed incidents grouped into two aligned category columns.
+- Equal-width reservation/movement buttons share a row.
+- Review misconduct and expandable incident history use quieter actions below a divider, with 44px minimum targets.
+- Empty incident history explicitly says no incidents recorded.
+- Two-card desktop grid, misconduct popup/dropdown, deletion and lift-restriction actions preserved.
+- Archive and source wiring checks passed; full local build/device checks remain.
+
+
+21 October 2026 - FTS report list desktop grid
+- Open, In progress and Resolved report lists show two cards per row on desktop (1024px and above).
+- Smaller screens retain one column; empty states span the list width.
+- Report content, filters and View report interactions retained.
+- Includes all preceding student card and misconduct popup/dropdown changes.
+- Archive/source checks passed; build and device testing required locally.
