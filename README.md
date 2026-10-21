@@ -20,7 +20,7 @@ The original HCI/UI-UX MVP prioritised four Must-Have features:
 3. **View MPR setups and TSM equipment locations**, including default and current locations
 4. **View equipment working condition**
 
-Later development expanded the prototype with student reservation management, equipment movements and returns, reports, FTS administration and a room-availability calendar. These additions do not change the original MVP prioritisation.
+Later development expanded the prototype with student reservation management, equipment movements and returns, reports, FTS administration, student access reviews, joint practice and a room-availability calendar. These additions do not change the original MVP prioritisation.
 
 ## Design Process
 
@@ -61,6 +61,8 @@ Users can:
 - Open the equipment directory from an upcoming or active reservation to record a linked equipment movement. Before the 30-minute eligibility window, Record a move remains visible but locked. Contextual reservation and booking routes show lock feedback; the first eligible visit plays an unlock animation once for that context in the browser session. Direct Equipment Directory visits do not play these lock animations.
 - Review current and historical movements, record returns and distinguish Returned from Returned late.
 - Submit room or equipment reports and review their updates.
+- Invite registered students to joint practice from reservation details. The organiser must attend; booking a room for an absent friend is not permitted.
+- Accept or decline session invitations and view accepted joint sessions alongside personal reservations.
 - Add practice-journal notes and optional photos to completed sessions.
 - Experience a simulated simultaneous-booking conflict through the dedicated **Booking Conflict Demo** and recover by adjusting the selected time or choosing another MPR.
 
@@ -74,7 +76,7 @@ The prototype also includes an expanded illustrative equipment inventory across 
 
 - Each availability-calendar date shows its actual **12:00 AM–midnight** timeline in 30-minute slots. The final slot is 11:30 PM–12:00 AM.
 - Students can start a reservation **within the next hour**, including the unfinished part of the current available half-hour. A start exactly one hour ahead is eligible. This rolling window replaces the earlier daily 6:00 AM release rule and applies throughout the day and night.
-- The **three-hour maximum** remains unchanged. Later consecutive slots can extend an eligible start beyond the one-hour start window, subject to availability and the duration limit.
+- The **three-hour maximum** remains unchanged. Later consecutive slots can extend an eligible start beyond the one-hour start window, subject to availability and the duration limit. The calendar marks eligible continuation slots **Available to extend**; these cannot be selected as a new booking’s start time.
 - Future free slots outside the start window show **Opens at [time]**; they cannot start a booking yet. Actual bookings retain their booked state. The earlier separate time-period page and its **Not open** period cards have been removed.
 - The calendar keeps each date separate. Tomorrow can be inspected without making all of its slots bookable. The booking selector includes a separately dated next-day late-night section for continuous overnight selection.
 - A booking can cross midnight, for example 11:00 PM today–2:00 AM tomorrow, when its start is eligible and all selected slots are available.
@@ -99,7 +101,7 @@ Students can select an eligible available half-hour slot to continue into the ex
 
 The date button displays the selected date with a calendar icon and opens an app-styled picker. Students can browse dates from **16 September 2026** through tomorrow; later dates are disabled. FTS can browse from the same launch date into future dates. Browsing a date does not make its slots bookable.
 
-The legend uses outlined circular swatches and written labels for Available, Booked and Your booking, with hatching for elapsed slots. In the student view, free slots whose starts are not yet eligible use muted text, show their opening time and have no booking hover action. FTS retains its purple availability styling. The Now line remains at the actual current time, with label backgrounds keeping text readable where the line crosses a booking or availability label.
+The legend uses outlined circular swatches and written labels for Available, Booked and Your booking, with hatching for elapsed slots. In the student view, free slots eligible only as a continuation show **Available to extend**. Other free slots whose starts are not yet eligible use muted text, show their opening time and have no booking hover action. FTS retains its purple availability styling. The Now line remains at the actual current time, with label backgrounds keeping text readable where the line crosses a booking or availability label.
 
 Both student and FTS calendars have a compact fullscreen control. Fullscreen fills the viewport with the timetable, retaining room headings, the mobile room selector and an exit control. Page headings, date/search controls, the legend and global sound/theme/account controls are hidden in this view. Exiting restores the normal calendar layout and timetable scroll position; Escape also exits fullscreen.
 
@@ -120,14 +122,42 @@ The Facilities and Technical Support interface includes:
 - Action-led recent updates with relevant record details, the FTS member, and a timestamp. Identifiers remain available in detail views. Opening a linked record and closing its details returns to Overview at the same scroll position.
 - Updated mobile form text sizing to avoid input-focus zoom on supported iPhone browsers; physical-device verification remains necessary.
 - Responsive navigation: a sidebar on desktop and a section selector in the page heading on mobile.
+- Shared Back navigation restores the previous section, relevant filters and scroll position, including routes opened from Overview.
+- Student cards with contact details, separate misconduct counts, links to that student’s reservations and equipment movements, incident history and account actions.
+- Responsive report lists: two equal-height cards per row on laptop, with footer actions aligned; one card per row on mobile. Equipment-specific history tabs count the filtered movements rather than all equipment movements.
 
 Equipment movement cards emphasise return deadlines, use the correct overdue/late-return status, and keep status beside the equipment name. Student equipment moves retain their separate three-hour return limit. Ending or cancelling a reservation does not automatically record a physical equipment return.
+
+## Student Access and Misconduct Reviews
+
+FTS can review two categories independently: **no-shows** and **unreported equipment damage**. Each category has its own confirmed-incident count.
+
+- A review records the reservation/incident reference, what happened, the student’s explanation and FTS reasoning. When no response has been received, FTS records its contact attempt and the absence of a response.
+- FTS must explicitly confirm an incident or accept the student’s explanation. An accepted explanation does not add a warning.
+- The first two confirmed incidents in a category receive warnings. The third and later confirmed incidents require a restriction period with start and end times set by FTS. Promptly reported accidental damage is distinct from failing to report damage.
+- During an active restriction, the prototype blocks new reservations and equipment moves. Students can still report problems and return outstanding equipment. Restrictions expire at their end time; FTS can also lift one with a reason.
+- Misconduct reviews open in a scrollable modal with a fixed header and action footer. The form displays the decision’s consequence before saving and requests confirmation before discarding an unsaved review.
+- Student cards show two per row on laptop and one per row on mobile. Mobile actions use the shorter **Reservations** and **Equipment moves** labels; incident history expands within the card. Delete account remains in the three-dot menu.
+- Account deletion removes sign-in access while retaining reservation, movement and incident records. Active/upcoming owned reservations and outstanding equipment movements must be resolved first. No account-restoration control is provided.
+- Opening reservations from a student card displays the student’s name in search while retaining an exact email-based identity filter, so matching names do not mix records.
+
+These controls operate on local demo records. They require authenticated, server-enforced permissions and shared storage before use as real disciplinary or account-management controls.
+
+## Joint Practice
+
+A reservation remains under its organiser’s name, and the organiser must attend. Other registered students can join through invitations rather than booking through an absent friend’s account.
+
+- The organiser can invite or remove participants; invitees can accept or decline, and accepted participants can leave a live session.
+- Invitation acceptance checks account restrictions and overlapping personal or accepted joint sessions. Reservation changes remain under the organiser’s control.
+- **Joint practice** is a collapsed disclosure in reservation details, with participant/invitation counts where relevant. Expanding it reveals the organiser, participants and permitted actions. The invitation field and button share a row on laptop and stack on mobile.
+- Completed and cancelled sessions retain read-only participant information without live invitation actions or attendance reminders. Unanswered invitations are identified as not accepted before the session ended or was cancelled. Acceptance records an invitation response, not proof of attendance.
+- Invitations appear for the invited account in the same local browser environment; email delivery and cross-device invitation syncing are not implemented.
 
 ## Signup and Booking & Equipment Guidelines
 
 - Student signup accepts only an email ending in **@vijaybhoomi.edu.in**. Other domains cannot proceed. This is format/domain validation, not proof of university email ownership; verification email delivery is not implemented.
 - Signup has three steps: personal details, password, then **Booking & equipment guidelines**. Account creation requires the agreement checkbox and the **Agree & create account** action.
-- The guidelines cover booking and reservation changes, equipment movements and return deadlines, equipment care, reporting problems, what FTS can see and do, and the demo’s privacy/storage limits.
+- The guidelines cover booking and reservation changes, equipment movements and return deadlines, equipment care, reporting problems, what FTS can see and do, and the demo’s privacy/storage limits. They also explain organiser attendance, joint practice, separate misconduct warnings, FTS-set restriction periods and account deletion.
 - Agreement metadata records the guidelines version, acceptance timestamp and email in the local profile. Existing accounts are not forced through signup again.
 - The same guidelines remain accessible in **Reports & Support**, using an open-book/check icon. Reopening them does not require another agreement.
 - The signup reading page omits the hero strip, retains the authentication wave background and places Back and the step indicator on one row. Mobile uses a shorter introduction and tighter bullet spacing in both signup and Reports & Support; desktop retains its reading layout.
@@ -135,7 +165,7 @@ Equipment movement cards emphasise return deadlines, use the correct overdue/lat
 
 ## Local Records and Sample Data
 
-Reservations, equipment movements, report updates, FTS activity and practice journals currently use **local browser storage**. Student and FTS flows can read the same records in that local environment. They do **not** share live records across different devices or browser profiles.
+Reservations, joint-practice invitations, registered student profiles, misconduct reviews, restrictions, equipment movements, report updates, FTS activity and practice journals currently use **local browser storage**. Student and FTS flows can read the same records in that local environment. They do **not** share live records across different devices or browser profiles.
 
 The normal student calendar and booking selector no longer add automatic illustrative bookings. Their occupied times come from saved local reservations; the explicit Booking Conflict Demo remains separate.
 
@@ -266,13 +296,13 @@ Apply the latest source updates to this project before building. Keep its existi
 
 Practice Ready is a functional interactive prototype developed for HCI/UI-UX evaluation and formal usability testing.
 
-The current version includes the booking and equipment-readiness paths, a rolling one-hour student start window, a three-hour reservation limit with overnight selection, university-email domain validation, signup agreement and shared booking/equipment guidelines, student session management, equipment movement/return records, reports, a practice journal, FTS administration, and the seven-room day calendar with date limits and a calendar-only fullscreen view. It supports desktop/mobile layouts, direct room-to-slot navigation with automatic initial slot positioning, light/dark themes, semantic equipment search, audio feedback and a deterministic Booking Conflict Demo.
+The current version includes the booking and equipment-readiness paths, a rolling one-hour student start window, a three-hour reservation limit with overnight selection, university-email domain validation, signup agreement and shared booking/equipment guidelines, student session management, equipment movement/return records, reports, a practice journal, FTS student access reviews and restrictions, account deletion, joint-practice invitations, and the seven-room day calendar with date limits and a calendar-only fullscreen view. It supports desktop/mobile layouts, direct room-to-slot navigation with automatic initial slot positioning, light/dark themes, semantic equipment search, audio feedback and a deterministic Booking Conflict Demo.
 
-Development checks have covered TypeScript syntax and types, production building, booking-window boundaries, midnight/year rollover, reservation overlap and sample records. Screenshot reviews informed the layout refinements. These checks do not replace a full end-to-end usability study of the expanded app or prove production readiness.
+Development checks have covered TypeScript syntax and types, production building, booking-window boundaries, midnight/year rollover, reservation overlap and sample records. Screenshot reviews informed the layout refinements. The latest student-card, misconduct-review, joint-practice and calendar-guidance refinements received source/archive checks; a fresh full-project build and physical-device verification are still required for those updates. These checks do not replace a full end-to-end usability study of the expanded app or prove production readiness.
 
 The earlier research included three user interviews, a ten-participant card sort, a two-person V1 tree-test pilot and five V2 participants completing seven tasks each. The reported 35 direct successes belong to the V2 information-architecture test, not to the later expanded app.
 
 Equipment, room availability, scheduling information, equipment IDs, quantities, locations and condition states used in the prototype are illustrative prototype data and should not be treated as an authoritative live inventory or booking system for the True School of Music.
 
 
-Last documented update: **20 October 2026**.
+Last documented update: **21 October 2026**.

@@ -804,3 +804,28 @@ FTS student list: two equal-width cards per row on desktop (1024px and above), w
 - Accepted invitations are labelled as invitation acceptance, not proof of attendance.
 - Phone/laptop share behavior; invitation data and active-session actions retained.
 - Includes previous updates. Source/archive checks passed; local build/device tests remain.
+
+
+21 October 2026 - Calendar booking guidance
+- Student calendar instruction split into a main booking rule and smaller muted extension explanation.
+- Explicitly states extension slots cannot start a session.
+- Applies to phone/laptop; Home placement, booking behavior and FTS calendar retained.
+- Includes previous changes. Text replacement/archive checks passed; build/device checks remain.
+
+
+21 October 2026 - Collapsed Joint practice spacing
+- Removes the extra top margin from the action footer immediately after a collapsed Joint practice section, retaining the dialog grid gap.
+- Expanded form spacing and disclosure click area unchanged; applies to phone/laptop.
+- Includes preceding changes. Exact source replacement and archive integrity checked; build/device checks remain.
+
+21 October 2026 - Compact mobile student actions
+- Student cards use Reservations and Equipment moves labels below the laptop breakpoint, retaining full labels on laptop.
+- Equal-width buttons and minimum 44px tap height retained.
+- Includes preceding changes. Source/archive integrity checked; build/device checks remain.
+
+21 October 2026 - Mobile misconduct review refinements
+- Groups student-explanation helper text with its field using an 8px gap.
+- Compacts consequence wording and gives the shorter per-category policy smaller muted text.
+- Adds a contextual FTS reasoning placeholder.
+- Mobile review footer uses equal-width buttons with a 12px gap; desktop remains right aligned.
+- Review rules and fixed header/footer retained. Source/archive checks passed; build/device checks remain.
