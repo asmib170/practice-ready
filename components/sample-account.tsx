@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 
 import {migrateStudent,students,rememberStudent,emitAccess,ACCESS_EVENT} from "@/lib/student-access";
 import BookingGuidelines, { GUIDELINES_VERSION, GUIDELINES_AGREEMENT } from "@/components/booking-guidelines";
-import {ftsTeam} from "@/components/fts-admin";
+import {ftsTeam,ftsMembers,verifyFtsPassword} from "@/lib/fts-members";
 const sample = { name: "Asmi Battoo", phone: "", email: "asmi@example.com" };
 const password = "PracticeReady123";
 const key = "practice-ready-sample-profile-v1";
@@ -76,7 +76,7 @@ export default function SampleAccount({ children, controls, onLogout, adminView 
       if (stored && typeof stored.name === "string") setProfile({ ...sample, name: stored.name, phone: typeof stored.phone === "string" ? stored.phone : "", email: typeof stored.email === "string" ? stored.email : sample.email });
       const auth = JSON.parse(localStorage.getItem(credentialKey) || "null");
       if (auth && typeof auth.salt === "string" && typeof auth.digest === "string") setCredential(auth);
-      const fts=ftsTeam.find(t=>t.email===sessionStorage.getItem("practice-ready-fts-session-v1"));if(fts)setAdmin(fts);
+      const fts=ftsMembers().find(t=>t.email===sessionStorage.getItem("practice-ready-fts-session-v1"));if(fts)setAdmin(fts);
       if (sessionStorage.getItem(sessionKey) === "sample") setProfile(sample);
       setSignedIn(["signed-in", "sample"].includes(sessionStorage.getItem(sessionKey) || "")&&!students().some(s=>s.email===stored?.email&&s.deletedAt));
     } catch { /* Storage is optional for the sample flow. */ }
@@ -87,8 +87,8 @@ export default function SampleAccount({ children, controls, onLogout, adminView 
   async function login(e: React.FormEvent) {
     e.preventDefault(); setError(""); setBusy(true);
     try {
-      const fts=ftsTeam.find(t=>t.email===email.trim().toLowerCase());
-      if(fts){if(pass!=="PracticeReadyFTS123"){setError("Email or password is incorrect.");return;}sessionStorage.setItem("practice-ready-fts-session-v1",fts.email);if(document.activeElement instanceof HTMLElement)document.activeElement.blur();window.scrollTo({top:0,left:0,behavior:"instant"});setEnteringAdmin(fts);setPass("");return;}
+      const fts=ftsMembers().find(t=>t.email===email.trim().toLowerCase());
+      if(fts){if(!await verifyFtsPassword(fts.email,pass)){setError("Email or password is incorrect.");return;}sessionStorage.setItem("practice-ready-fts-session-v1",fts.email);if(document.activeElement instanceof HTMLElement)document.activeElement.blur();window.scrollTo({top:0,left:0,behavior:"instant"});setEnteringAdmin(fts);setPass("");return;}
       if (email.trim().toLowerCase() === sample.email && pass === password) {
         if(students().some(s=>s.email===sample.email&&s.deletedAt)){setError("This account was deleted by FTS. Contact FTS for assistance.");return;}
         sessionStorage.setItem(sessionKey, "sample"); setProfile(sample); setPass(""); setSignedIn(true);emitAccess(); return;
@@ -112,7 +112,7 @@ export default function SampleAccount({ children, controls, onLogout, adminView 
     const next = {name:registration.name.trim(),phone:registration.phone.trim(),email:registration.email.trim().toLowerCase()};
     if (!next.name) {setError("Enter your full name.");return;}
     if (!validPhone(next.phone)) {setError("Enter a valid phone number with 10–15 digits.");return;}
-    if(ftsTeam.some(t=>t.email===next.email)){setError("This email belongs to an authorised FTS account. Please log in.");return;}
+    if(ftsMembers().some(t=>t.email===next.email)){setError("This email belongs to an authorised FTS account. Please log in.");return;}
     if (!/^[^\s@]+@vijaybhoomi\.edu\.in$/.test(next.email)) {setError("Use your Vijaybhoomi university email (@vijaybhoomi.edu.in).");return;}
     migrateStudent();
     if(students().some(s=>s.email===next.email)){setError("This email already has a local account. Sign in, or contact FTS if the account was deleted.");return;}
