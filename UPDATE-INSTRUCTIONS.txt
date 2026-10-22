@@ -874,3 +874,9 @@ FTS student list: two equal-width cards per row on desktop (1024px and above), w
 - New local accounts can sign in and restore their session with full FTS access. New passwords stored as salted PBKDF2 hashes; original demo shortcuts preserved.
 - Member creation disabled in sample preview. Account controls remain browser-local until authenticated shared backend is added; no invitation email is sent.
 - Includes previous updates. Targeted account behavior and source/archive checks passed; full build/device verification remains.
+
+22 October 2026 - FTS member form layout
+- Current members list collapsed by default into an accessible disclosure.
+- Heading, close control and equal-width footer buttons remain outside the scrolling form body on phone/laptop.
+- Independent show/hide controls for both password fields, with 44px targets and accessible labels; visibility resets on close and successful addition.
+- Existing validation and account creation retained. Source/archive checks passed; build/device verification remains.
