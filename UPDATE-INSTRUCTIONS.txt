@@ -943,3 +943,7 @@ Student cards show only the latest three incidents, newest first. For larger his
 
 23 October 2026 - Incident review decision validation
 Confirmed decisions now use clear ordinal headings, such as Third confirmed no-show. Save decision stays disabled until a decision and all required text fields are complete (5 non-whitespace characters minimum). Third and later confirmed incidents also require valid restriction dates matching existing save validation. Applies to phone and laptop; existing save-time checks retained.
+
+
+23 October 2026 - Restriction date/time controls
+Replaced native restriction datetime picker with app-styled calendar and hour/minute/AM-PM selectors. Starts and ends remain side by side on laptop and stack on phone. Picker content stays inside the incident dialog. Existing restriction validation retained. Shared reservation date-filter defaults unchanged.
