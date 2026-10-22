@@ -911,3 +911,15 @@ FTS student list: two equal-width cards per row on desktop (1024px and above), w
 - Name and phone sit side by side on laptop and stack on mobile.
 - Email displayed as a muted read-only value, with lock icon and explanation; removed editable-looking input.
 - Full-width save action retained. Includes prior updates. Source/archive checks passed; device verification remains.
+
+
+22 October 2026 - Review incident field alignment
+Category and the reservation/equipment reference input now share an explicit 48px height and matching vertical padding on phone and laptop.
+
+
+22 October 2026 - FTS account heading
+Removed redundant FTS administrator pill from the shared phone/laptop account popup. Includes prior incident-field alignment update.
+
+
+23 October 2026 - FTS member list spacing
+Reduced the inset above Current members while preserving its 44px click target. Removed extra expanded-section bottom padding so the final email-to-divider gap matches the other rows. Phone and laptop share this layout.
