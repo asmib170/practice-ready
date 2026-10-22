@@ -123,7 +123,9 @@ The Facilities and Technical Support interface includes:
 - Updated mobile form text sizing to avoid input-focus zoom on supported iPhone browsers; physical-device verification remains necessary.
 - Responsive navigation: a sidebar on desktop and a section selector in the page heading on mobile.
 - Shared Back navigation restores the previous section, relevant filters and scroll position, including routes opened from Overview.
-- Student cards with contact details, separate misconduct counts, links to that student’s reservations and equipment movements, incident history and account actions.
+- Student cards with contact details, separate confirmed-incident counts, links to that student’s reservations and equipment movements, incident history and account actions.
+- FTS account details with Name and Phone side by side on laptop and university email below; the layout stacks on mobile.
+- **Manage FTS members** from the profile menu: inspect a collapsible current-member list and add a member with name, phone, university email and a confirmed password. New members receive the same FTS access as the current team in this local prototype.
 - Responsive report lists: two equal-height cards per row on laptop, with footer actions aligned; one card per row on mobile. Equipment-specific history tabs count the filtered movements rather than all equipment movements.
 
 Equipment movement cards emphasise return deadlines, use the correct overdue/late-return status, and keep status beside the equipment name. Student equipment moves retain their separate three-hour return limit. Ending or cancelling a reservation does not automatically record a physical equipment return.
@@ -132,16 +134,30 @@ Equipment movement cards emphasise return deadlines, use the correct overdue/lat
 
 FTS can review two categories independently: **no-shows** and **unreported equipment damage**. Each category has its own confirmed-incident count.
 
-- A review records the reservation/incident reference, what happened, the student’s explanation and FTS reasoning. When no response has been received, FTS records its contact attempt and the absence of a response.
+- **Review incident** records a category-specific reference: **Reservation ID** for a no-show, or **Equipment ID and incident date** for unreported damage. It also records what happened, the student’s explanation and FTS reasoning. When no response has been received, FTS records its contact attempt and the absence of a response.
 - FTS must explicitly confirm an incident or accept the student’s explanation. An accepted explanation does not add a warning.
-- The first two confirmed incidents in a category receive warnings. The third and later confirmed incidents require a restriction period with start and end times set by FTS. Promptly reported accidental damage is distinct from failing to report damage.
+- The first two confirmed incidents in a category receive warnings. The third and later confirmed incidents require a restriction period set by FTS. Clear consequence headings, such as **Third confirmed no-show**, explain the result before saving. Promptly reported accidental damage is distinct from failing to report damage.
+- Restrictions default to **Start immediately**: the start timestamp is set when the decision is saved, so time spent completing the form does not invalidate the start. **Schedule start** reveals a future start date and time. An end date and time is required in either mode.
+- Restriction controls use an app-styled calendar and separate hour, minute and AM/PM selectors. Invalid periods show inline messages, including **Choose a future start time** and **End must be after the start**. Date validity is refreshed while the form is open and checked again when saving.
+- **Save decision** remains disabled until a decision and all required text fields are complete (at least five characters after trimming surrounding whitespace), with a valid period whenever a restriction is required.
 - During an active restriction, the prototype blocks new reservations and equipment moves. Students can still report problems and return outstanding equipment. Restrictions expire at their end time; FTS can also lift one with a reason.
-- Misconduct reviews open in a scrollable modal with a fixed header and action footer. The form displays the decision’s consequence before saving and requests confirmation before discarding an unsaved review.
-- Student cards show two per row on laptop and one per row on mobile. Mobile actions use the shorter **Reservations** and **Equipment moves** labels; incident history expands within the card. Delete account remains in the three-dot menu.
+- Incident reviews open in a scrollable modal with a fixed header and action footer. The form displays the decision’s consequence before saving and requests confirmation before discarding an unsaved review.
+- **Lift restriction** opens a compact popup showing the active restriction’s reason and readable end date/time. FTS must complete **Reason for lifting restriction** before the violet confirmation button enables. The action rechecks that a restriction remains active; closing restores the prior page scroll and focus. Unsaved input requires discard confirmation.
+- Student cards show two per row on laptop and one per row on mobile. Mobile actions use the shorter **Reservations** and **Equipment moves** labels. Expanded incident history shows the **three newest incidents**, newest first; larger histories offer **View all incidents (N)** in a separate scrollable popup. Entries have subtle dividers, labelled references, what happened, student explanation, FTS reasoning and a **Reviewed by** footer without seconds. Delete account remains in the three-dot menu.
 - Account deletion removes sign-in access while retaining reservation, movement and incident records. Active/upcoming owned reservations and outstanding equipment movements must be resolved first. No account-restoration control is provided.
 - Opening reservations from a student card displays the student’s name in search while retaining an exact email-based identity filter, so matching names do not mix records.
 
 These controls operate on local demo records. They require authenticated, server-enforced permissions and shared storage before use as real disciplinary or account-management controls.
+
+## FTS Member Accounts and Account Details
+
+Current FTS members can add another FTS member from **Manage FTS members**. The form requires a name, valid phone number, university email, password of at least eight characters and matching confirmation. Each password field has its own visibility control. Duplicate FTS emails and emails already registered as student accounts are rejected; adding a member does not convert a student account into an FTS role.
+
+On laptop, Full name and Phone share a row, University email fills the row below, and Password and Confirm password share a row. Mobile stacks the fields. The member list is collapsed by default; Close and Add member remain in the fixed footer while the form scrolls.
+
+Added members sign in using the email and password set for them. The public FTS sample shortcuts continue to list only the original sample team; they do not expose newly added members or their credentials. Added-member passwords are stored as salted PBKDF2 digests in this local prototype. This does not provide production authentication or secure server-enforced administration; the original sample access remains demonstrative.
+
+The student **Manage account** popup allows name and phone changes. Email is shown as muted read-only information with a lock icon and **Email can’t be changed**, rather than an editable-looking field. Name and Phone share a row on laptop and stack on mobile, with email below and a full-width Save changes action.
 
 ## Joint Practice
 
@@ -165,7 +181,7 @@ A reservation remains under its organiser’s name, and the organiser must atten
 
 ## Local Records and Sample Data
 
-Reservations, joint-practice invitations, registered student profiles, misconduct reviews, restrictions, equipment movements, report updates, FTS activity and practice journals currently use **local browser storage**. Student and FTS flows can read the same records in that local environment. They do **not** share live records across different devices or browser profiles.
+Reservations, joint-practice invitations, registered student profiles, added FTS member accounts, incident reviews, restrictions, equipment movements, report updates, FTS activity and practice journals currently use **local browser storage**. Student and FTS flows can read the same records in that local environment. They do **not** share live records across different devices or browser profiles.
 
 The normal student calendar and booking selector no longer add automatic illustrative bookings. Their occupied times come from saved local reservations; the explicit Booking Conflict Demo remains separate.
 
@@ -296,13 +312,13 @@ Apply the latest source updates to this project before building. Keep its existi
 
 Practice Ready is a functional interactive prototype developed for HCI/UI-UX evaluation and formal usability testing.
 
-The current version includes the booking and equipment-readiness paths, a rolling one-hour student start window, a three-hour reservation limit with overnight selection, university-email domain validation, signup agreement and shared booking/equipment guidelines, student session management, equipment movement/return records, reports, a practice journal, FTS student access reviews and restrictions, account deletion, joint-practice invitations, and the seven-room day calendar with date limits and a calendar-only fullscreen view. It supports desktop/mobile layouts, direct room-to-slot navigation with automatic initial slot positioning, light/dark themes, semantic equipment search, audio feedback and a deterministic Booking Conflict Demo.
+The current version includes the booking and equipment-readiness paths, a rolling one-hour student start window, a three-hour reservation limit with overnight selection, university-email domain validation, signup agreement and shared booking/equipment guidelines, student session management, equipment movement/return records, reports, a practice journal, FTS member creation, student access reviews, immediate/scheduled restrictions and a lift-restriction popup, compact incident histories, account deletion, joint-practice invitations, and the seven-room day calendar with date limits and a calendar-only fullscreen view. It supports desktop/mobile layouts, direct room-to-slot navigation with automatic initial slot positioning, light/dark themes, semantic equipment search, audio feedback and a deterministic Booking Conflict Demo.
 
-Development checks have covered TypeScript syntax and types, production building, booking-window boundaries, midnight/year rollover, reservation overlap and sample records. Screenshot reviews informed the layout refinements. The latest student-card, misconduct-review, joint-practice and calendar-guidance refinements received source/archive checks; a fresh full-project build and physical-device verification are still required for those updates. These checks do not replace a full end-to-end usability study of the expanded app or prove production readiness.
+Development checks have covered TypeScript syntax and types, production building, booking-window boundaries, midnight/year rollover, reservation overlap and sample records. Screenshot reviews informed the layout refinements. Recent incident validation checks covered incomplete fields, accepted explanations, warning-only decisions, immediate starts, scheduled starts, past starts and invalid end times. The latest account layouts, FTS member spacing, history popup, themed date/time controls and lift-restriction popup received source/archive checks. These packages were not verified with a fresh full-project build or a complete desktop/mobile browser test in this workspace; run the build and verify the flows after applying them. These checks do not replace a full end-to-end usability study of the expanded app or prove production readiness.
 
 The earlier research included three user interviews, a ten-participant card sort, a two-person V1 tree-test pilot and five V2 participants completing seven tasks each. The reported 35 direct successes belong to the V2 information-architecture test, not to the later expanded app.
 
 Equipment, room availability, scheduling information, equipment IDs, quantities, locations and condition states used in the prototype are illustrative prototype data and should not be treated as an authoritative live inventory or booking system for the True School of Music.
 
 
-Last documented update: **21 October 2026**.
+Last documented update: **23 October 2026**.

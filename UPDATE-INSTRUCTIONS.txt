@@ -947,3 +947,11 @@ Confirmed decisions now use clear ordinal headings, such as Third confirmed no-s
 
 23 October 2026 - Restriction date/time controls
 Replaced native restriction datetime picker with app-styled calendar and hour/minute/AM-PM selectors. Starts and ends remain side by side on laptop and stack on phone. Picker content stays inside the incident dialog. Existing restriction validation retained. Shared reservation date-filter defaults unchanged.
+
+
+23 October 2026 - Immediate or scheduled restrictions
+Restriction start defaults to Start immediately and is resolved at save time. Schedule start reveals a future start date/time. End date/time is always required for restrictions. Inline date errors and periodic validation prevent silent invalid periods; save-time validation rechecks the current clock. Phone/laptop supported.
+
+
+23 October 2026 - Lift restriction popup
+Moved Lift restriction into a compact dialog with current restriction reason/deadline, explicit reason label and violet confirmation. Requires at least 5 non-whitespace characters and an active restriction. Restores prior scroll/focus on close and confirms discarding unsaved input. Student-card deadline uses readable date/time without seconds. Phone/laptop supported.
