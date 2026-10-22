@@ -935,3 +935,11 @@ Reduced spacing above expanded incident history. Added category-specific referen
 
 23 October 2026 - Incident history dividers
 Added subtle theme-aware dividers between incident entries on phone and laptop, with balanced spacing. Preserves prior labels and readable reviewer timestamps.
+
+
+23 October 2026 - Compact incident history
+Student cards show only the latest three incidents, newest first. For larger histories, View all incidents (N) opens a scrollable popup with the full history and fixed heading. Shared entry rendering preserves labels, dividers and reviewer timestamps on phone and laptop.
+
+
+23 October 2026 - Incident review decision validation
+Confirmed decisions now use clear ordinal headings, such as Third confirmed no-show. Save decision stays disabled until a decision and all required text fields are complete (5 non-whitespace characters minimum). Third and later confirmed incidents also require valid restriction dates matching existing save validation. Applies to phone and laptop; existing save-time checks retained.
