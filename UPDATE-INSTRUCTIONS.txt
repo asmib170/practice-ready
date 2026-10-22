@@ -923,3 +923,15 @@ Removed redundant FTS administrator pill from the shared phone/laptop account po
 
 23 October 2026 - FTS member list spacing
 Reduced the inset above Current members while preserving its 44px click target. Removed extra expanded-section bottom padding so the final email-to-divider gap matches the other rows. Phone and laptop share this layout.
+
+
+23 October 2026 - Collapsed member row spacing
+Matched collapsed Current members bottom padding to its top inset (4px each), preserving the 44px summary click area and expanded member-row spacing on phone and laptop.
+
+
+23 October 2026 - Incident history clarity
+Reduced spacing above expanded incident history. Added category-specific reference labels, What happened, Student explanation and FTS reasoning. Reviewer footer uses a readable date and 12-hour time without seconds. Applies to phone and laptop; saved records unchanged.
+
+
+23 October 2026 - Incident history dividers
+Added subtle theme-aware dividers between incident entries on phone and laptop, with balanced spacing. Preserves prior labels and readable reviewer timestamps.
