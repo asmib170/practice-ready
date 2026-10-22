@@ -880,3 +880,34 @@ FTS student list: two equal-width cards per row on desktop (1024px and above), w
 - Heading, close control and equal-width footer buttons remain outside the scrolling form body on phone/laptop.
 - Independent show/hide controls for both password fields, with 44px targets and accessible labels; visibility resets on close and successful addition.
 - Existing validation and account creation retained. Source/archive checks passed; build/device verification remains.
+
+22 October 2026 - FTS member field order
+- Full name and phone share the first laptop form row; university email fills the row below. Mobile order is name, phone, email.
+- Removes the final member row border, retaining the single section divider above Add FTS member.
+- Includes previous updates. Source/archive checks passed; device verification remains.
+
+22 October 2026 - Compact FTS account details
+- Name and phone share a laptop row; university email spans the row below. Details stay stacked on mobile.
+- FTS administrator access appears as a compact pill beside the heading instead of a separate Access row.
+- Long names/emails wrap within the popup. Includes previous updates. Source/archive checks passed; device verification remains.
+
+22 October 2026 - Neutral incident review wording
+- Student card action and popup heading renamed Review incident; close/discard wording updated consistently.
+- Incident history and review rules retained. Applies on phone/laptop. Includes previous changes.
+- Source/archive checks passed.
+
+22 October 2026 - Incident reference wording
+- No-show reference label is Reservation ID with Enter reservation ID placeholder.
+- Unreported damage label is Equipment ID and incident date with e.g. MIC-01 / 22 Oct 2026 example; removes ambiguous report ID wording.
+- Shared phone/laptop form. Includes previous changes. Source/archive checks passed.
+
+22 October 2026 - No-show form guidance
+- Adds a helper beneath Reservation ID explaining where FTS can find it, linked accessibly to the input.
+- No-show description prompt asks how FTS confirmed the student did not attend.
+- Category-specific reference labels retained. Shared phone/laptop form; includes all preceding changes.
+- Source/archive checks passed.
+
+22 October 2026 - Student account popup layout
+- Name and phone sit side by side on laptop and stack on mobile.
+- Email displayed as a muted read-only value, with lock icon and explanation; removed editable-looking input.
+- Full-width save action retained. Includes prior updates. Source/archive checks passed; device verification remains.

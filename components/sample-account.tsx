@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { LoginAtmosphere, LoginEqualizer } from "@/components/login-atmosphere";
-import { Eye, EyeOff, LogOut, UserRound, Music2, Check } from "lucide-react";
+import { Eye, EyeOff, LogOut, UserRound, Music2, Check, LockKeyhole } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
@@ -220,9 +220,11 @@ export default function SampleAccount({ children, controls, onLogout, adminView 
       <DialogContent className="max-h-[85dvh] overflow-y-auto rounded-3xl bg-white text-slate-900 dark:bg-[#1B2133] dark:text-white">
         <DialogHeader><DialogTitle>Manage account</DialogTitle><DialogDescription>Update your name and phone number. Your university email identifies your account.</DialogDescription></DialogHeader>
         {<form className="space-y-4" onSubmit={e => {e.preventDefault();const name=draft.name.trim();if (!name) {setError("Enter your full name.");return;} if (!validPhone(draft.phone.trim())) {setError("Enter a valid phone number with 10–15 digits.");return;} const next={name,phone:draft.phone.trim(),email:draft.email.trim().toLowerCase()};setProfile(next);setDraft(next);try {localStorage.setItem(key,JSON.stringify({...JSON.parse(localStorage.getItem(key)||"{}"),...next}));rememberStudent({...next});} catch {}setError("");setSaved(true);setPanel(null);}}>
+          <div className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-2">
           <label htmlFor="profile-name" className="block text-sm font-semibold">Name<input id="profile-name" className={field} required maxLength={80} value={draft.name} onChange={e => {setDraft({...draft,name:e.target.value});setSaved(false);}}/></label>
           <label htmlFor="profile-phone" className="block text-sm font-semibold">Phone number<input id="profile-phone" className={field} required type="tel" autoComplete="tel" maxLength={30} placeholder="Enter your phone number" value={draft.phone} onChange={e => {setDraft({...draft,phone:e.target.value});setSaved(false);}}/></label>
-          <label htmlFor="profile-email" className="block text-sm font-semibold">Email<input id="profile-email" readOnly className={`${field} opacity-70`} type="email" autoComplete="email" required maxLength={254} value={draft.email} onChange={e => {setDraft({...draft,email:e.target.value});setSaved(false);}}/></label>
+          </div>
+          <div className="space-y-1 text-sm"><p className="font-semibold">Email</p><p className="break-all text-slate-500 dark:text-slate-300">{profile.email}</p><p className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400"><LockKeyhole size={14} aria-hidden="true"/>Email can’t be changed.</p></div>
           {error && <p role="alert" className="text-sm text-red-600 dark:text-red-300">{error}</p>}{saved && <p role="status" className="text-sm text-emerald-700 dark:text-emerald-300">Profile saved.</p>}
           <button type="submit" className={primary}>Save changes</button>
         </form>}
