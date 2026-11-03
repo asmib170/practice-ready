@@ -955,3 +955,19 @@ Restriction start defaults to Start immediately and is resolved at save time. Sc
 
 23 October 2026 - Lift restriction popup
 Moved Lift restriction into a compact dialog with current restriction reason/deadline, explicit reason label and violet confirmation. Requires at least 5 non-whitespace characters and an active restriction. Restores prior scroll/focus on close and confirms discarding unsaved input. Student-card deadline uses readable date/time without seconds. Phone/laptop supported.
+
+
+3 November 2026 - Direct FTS update records
+Recent and all FTS updates now open the linked report, reservation, equipment or movement directly. Closing restores the originating page scroll position. Missing records retain the audit summary. Shared phone and laptop behavior.
+
+
+3 November 2026 - Review incident refinements
+Three-line text areas grow with content. Start later and matching start/end labels; desktop date/time share a row, mobile stacks. Missing fields and invalid restriction periods explain the disabled Save decision action in its footer. Existing validation and fixed header/footer retained.
+
+
+3 November 2026 - FTS reservation card alignment
+The reservation summary fills spare card height so the student details, divider and View details action sit at the bottom of each card. Shared across Upcoming, Active and History. Existing time wrapping and button column alignment are preserved.
+
+
+3 November 2026 - Overdue deadline emphasis
+Needs attention now shows overdue Return by deadlines in amber, matching Return overdue in light and dark themes, on phone and laptop.
