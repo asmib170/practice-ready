@@ -25,6 +25,7 @@ export function AccountControls() { return <div className="shrink-0 max-[379px]:
 
 export default function SampleAccount({ children, controls, onLogout, adminView }: { children: ReactNode; controls: ReactNode; onLogout?: () => void; adminView?: (admin:typeof ftsTeam[number],logout:()=>void)=>ReactNode }) {
   const [admin,setAdmin]=useState<typeof ftsTeam[number]|null>(null);
+  useEffect(()=>{const refresh=()=>{const email=sessionStorage.getItem("practice-ready-fts-session-v1");if(!email)return;try{const member=ftsMembers().find(m=>m.email===email);if(member)setAdmin(member);}catch{}};window.addEventListener("practice-ready-fts-members-changed",refresh);window.addEventListener("storage",refresh);return()=>{window.removeEventListener("practice-ready-fts-members-changed",refresh);window.removeEventListener("storage",refresh);};},[]);
   const [enteringAdmin,setEnteringAdmin]=useState<typeof ftsTeam[number]|null>(null);
   const [ready, setReady] = useState(false);
   const [signedIn, setSignedIn] = useState(false);

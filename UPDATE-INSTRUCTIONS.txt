@@ -983,3 +983,19 @@ In All FTS updates, increased the gap between Search updates and its input from 
 
 3 November 2026 - Incident review footer wording
 Replaced the technical Complete list with natural instructions for missing fields. Minimum-character guidance appears only for non-empty entries shorter than five characters. Validation rules unchanged.
+
+
+3 November 2026 - Reservation summary spacing
+When Joint practice directly follows the room/date/time summary, its divider now uses the same gap as the summary has above it. Scoped to student reservation details on phone and laptop.
+
+
+3 November 2026 - Student reservation history filters
+History has an optional exact date (with month/year jumps), room and Completed/Cancelled status filters. Clear filters resets all three. Results stay newest first and show matching/total counts, with a useful filtered empty state. Laptop uses one control row; mobile uses a Filters disclosure and active count. Other tabs ignore history filters.
+
+
+3 November 2026 - Student equipment move history filters
+Returned move history supports equipment name/ID search, exact return date with month/year navigation, and on-time/late status. Newest returns first, matching/total count and Clear filters. Responsive Filters disclosure on mobile. Controls hidden when no history exists; zero matches retain controls and show a filtered empty state. Current moves remain unaffected.
+
+
+3 November 2026 - Editable FTS account and linked contacts
+Manage account edits the signed-in FTS member name, phone and year of study (or Staff / Not applicable); email remains fixed. Contact FTS cards use the same membership/profile store and update Call links. Manage FTS members includes year when adding accounts. Existing custom-member credentials and audit history are retained. Profile changes refresh the portal identity. Storage remains browser-local until backend integration.
