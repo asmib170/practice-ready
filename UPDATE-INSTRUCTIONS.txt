@@ -1029,3 +1029,9 @@ My Reservations desktop: four History filters share one row; compact Clear filte
 ATS responsibility areas: Manage account and Add ATS member now support Studio & MP Labs and Live Sound & MPRs checkboxes; choose one or both. Contact ATS shows chosen areas beside year. Existing members retain an unset area until edited. ATS permissions remain unchanged.
 
 Renamed visible FTS wording to ATS (Audio Technical Support) across the app. Existing internal filenames, identifiers and browser storage keys are retained for compatibility. README.md is included with the new team name.
+
+ATS Manage account closes automatically after a successful save. Validation/storage failures keep the popup open with the error.
+
+ATS responsibility helper text now reads "Select at least one area." in both account and member forms.
+
+Contact ATS: responsibility phrases wrap as whole groups, avoiding a stranded MPRs word. Email and Call retain their bottom-left placement and shared card-row baseline.
