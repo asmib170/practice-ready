@@ -2648,7 +2648,7 @@ function EquipmentMoveInfo({move}:{move:Relocation}) {
   const day=sameDay(due,now)?"Today":sameDay(due,tomorrow)?"Tomorrow":due.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"});
   const time=due.toLocaleTimeString("en-GB",{hour:"numeric",minute:"2-digit",hour12:true}).toUpperCase();
   const overdue=due.getTime()<now.getTime();
-  return <div className={`mt-2 rounded-lg p-2 text-xs leading-5 ${overdue?"bg-amber-50 text-amber-800 dark:bg-amber-950/30 dark:text-amber-200":"bg-violet-50 text-violet-700 dark:bg-[#211A38] dark:text-violet-200"}`}><p className="font-semibold">{overdue?"Return overdue":"In use"} · Temporarily moved by {move.actorRole==="fts"?"FTS · ":""}{move.by}</p><p>{overdue?"Due back":"Return by"} <span className="font-semibold">{day}, {time}</span></p></div>;
+  return <div className={`mt-2 rounded-lg p-2 text-xs leading-5 ${overdue?"bg-amber-50 text-amber-800 dark:bg-amber-950/30 dark:text-amber-200":"bg-violet-50 text-violet-700 dark:bg-[#211A38] dark:text-violet-200"}`}><p className="font-semibold">{overdue?"Return overdue":"In use"} · Temporarily moved by {move.actorRole==="fts"?"ATS · ":""}{move.by}</p><p>{overdue?"Due back":"Return by"} <span className="font-semibold">{day}, {time}</span></p></div>;
 }
 
 function EquipmentRow({
@@ -5071,7 +5071,7 @@ function HomeScreen({
                 text="Check locations and working conditions."
                 onClick={onEquipment}
               />
-              <HomeCard icon={<ShieldCheck />} title="Reports & Support" text="Report an issue or contact FTS." onClick={onSupport} />
+              <HomeCard icon={<ShieldCheck />} title="Reports & Support" text="Report an issue or contact ATS." onClick={onSupport} />
             </div>
             
             <button className="practice-ready-home-demo mt-4 inline-flex min-h-11 items-center text-left text-sm text-slate-500 underline-offset-4 hover:text-violet-700 hover:underline dark:text-slate-400 dark:hover:text-violet-300" onClick={onConflict}>Try the booking conflict demo →</button>

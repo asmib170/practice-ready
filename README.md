@@ -20,7 +20,7 @@ The original HCI/UI-UX MVP prioritised four Must-Have features:
 3. **View MPR setups and TSM equipment locations**, including default and current locations
 4. **View equipment working condition**
 
-Later development expanded the prototype with student reservation management, equipment movements and returns, reports, FTS administration, student access reviews, joint practice and a room-availability calendar. These additions do not change the original MVP prioritisation.
+Later development expanded the prototype with student reservation management, equipment movements and returns, reports, ATS administration, student access reviews, joint practice and a room-availability calendar. These additions do not change the original MVP prioritisation.
 
 ## Design Process
 
@@ -84,7 +84,7 @@ The prototype also includes an expanded illustrative equipment inventory across 
 - Overnight summaries identify the end date below the time range. Matching AM/PM markers appear once; ranges crossing AM/PM retain both markers.
 - Elapsed slots cannot be booked. An ongoing available half-hour slot starts at the current time when confirmed and ends at the selected boundary.
 - Confirmation rechecks start eligibility, consecutive slots, the duration limit and overlapping local reservations using actual timestamps.
-- FTS rescheduling can select starts beyond the student one-hour window, within its existing window through **6:00 AM tomorrow**. It retains the **three-hour maximum**, and booked times are disabled in its selectors.
+- ATS rescheduling can select starts beyond the student one-hour window, within its existing window through **6:00 AM tomorrow**. It retains the **three-hour maximum**, and booked times are disabled in its selectors.
 
 ## Time-Slot Page Opening and Navigation
 
@@ -98,67 +98,67 @@ TypeScript and targeted source checks passed for this change. Physical-iPhone ve
 
 The day calendar covers **MPR 2, MPR 3, MPR 4, MPR 5, MP Lab 2, Live Room and Studio**. Desktop compares all seven rooms; mobile shows one selected room at a time. The current version has a day view only.
 
-Students can select an eligible available half-hour slot to continue into the existing booking and setup flow. FTS can switch between List and Calendar in Reservations and open booking details from a calendar block. FTS search highlights matching bookings while retaining the other bookings for context.
+Students can select an eligible available half-hour slot to continue into the existing booking and setup flow. ATS can switch between List and Calendar in Reservations and open booking details from a calendar block. ATS search highlights matching bookings while retaining the other bookings for context.
 
-The date button displays the selected date with a calendar icon and opens an app-styled picker. Students can browse dates from **16 September 2026** through tomorrow; later dates are disabled. FTS can browse from the same launch date into future dates. Browsing a date does not make its slots bookable.
+The date button displays the selected date with a calendar icon and opens an app-styled picker. Students can browse dates from **16 September 2026** through tomorrow; later dates are disabled. ATS can browse from the same launch date into future dates. Browsing a date does not make its slots bookable.
 
-The legend uses outlined circular swatches and written labels for Available, Booked and Your booking, with hatching for elapsed slots. In the student view, free slots eligible only as a continuation show **Available to extend**. Other free slots whose starts are not yet eligible use muted text, show their opening time and have no booking hover action. FTS retains its purple availability styling. The Now line remains at the actual current time, with label backgrounds keeping text readable where the line crosses a booking or availability label.
+The legend uses outlined circular swatches and written labels for Available, Booked and Your booking, with hatching for elapsed slots. In the student view, free slots eligible only as a continuation show **Available to extend**. Other free slots whose starts are not yet eligible use muted text, show their opening time and have no booking hover action. ATS retains its purple availability styling. The Now line remains at the actual current time, with label backgrounds keeping text readable where the line crosses a booking or availability label.
 
-Both student and FTS calendars have a compact fullscreen control. Fullscreen fills the viewport with the timetable, retaining room headings, the mobile room selector and an exit control. Page headings, date/search controls, the legend and global sound/theme/account controls are hidden in this view. Exiting restores the normal calendar layout and timetable scroll position; Escape also exits fullscreen.
+Both student and ATS calendars have a compact fullscreen control. Fullscreen fills the viewport with the timetable, retaining room headings, the mobile room selector and an exit control. Page headings, date/search controls, the legend and global sound/theme/account controls are hidden in this view. Exiting restores the normal calendar layout and timetable scroll position; Escape also exits fullscreen.
 
-The timetable opens near the current time on today’s date and at the early hours on tomorrow’s date. A Now marker identifies the current time, and booking labels remain visible while their blocks scroll. In the normal student and FTS calendar layouts, the timetable uses the remaining viewport height, with vertical scrolling inside the timetable rather than an extra blank area below the page.
+The timetable opens near the current time on today’s date and at the early hours on tomorrow’s date. A Now marker identifies the current time, and booking labels remain visible while their blocks scroll. In the normal student and ATS calendar layouts, the timetable uses the remaining viewport height, with vertical scrolling inside the timetable rather than an extra blank area below the page.
 
-FTS uses a compact heading/view toggle and guidance that reflects the selected room. Student Back and Home share a row on mobile. Both views have compact date controls.
+ATS uses a compact heading/view toggle and guidance that reflects the selected room. Student Back and Home share a row on mobile. Both views have compact date controls.
 
-## FTS Flow
+## ATS Flow
 
-The Facilities and Technical Support interface includes:
+The Audio Technical Support interface includes:
 
 - Overview, Reservations, Equipment, Equipment moves, Reports & Support, and Students.
 - Reservation details, rescheduling, cancellation and ending an active session with a reason.
 - Equipment creation, editing and archiving, with default/current locations and working-condition updates.
 - Recording equipment movements for a student’s linked reservation or another purpose, and recording returns.
-- Separate attribution for the original mover and the FTS member who recorded a return.
+- Separate attribution for the original mover and the ATS member who recorded a return.
 - Report updates and history. Resolved reports are read-only; in-progress reports allow a further update through an explicit action.
-- Action-led recent updates with relevant record details, the FTS member, and a timestamp. Identifiers remain available in detail views. Updates open their linked record directly, skipping the intermediate update-summary popup; an unavailable record retains its update summary as a fallback. Closing record details returns to Overview at the same scroll position.
+- Action-led recent updates with relevant record details, the ATS member, and a timestamp. Identifiers remain available in detail views. Updates open their linked record directly, skipping the intermediate update-summary popup; an unavailable record retains its update summary as a fallback. Closing record details returns to Overview at the same scroll position.
 - Updated mobile form text sizing to avoid input-focus zoom on supported iPhone browsers; physical-device verification remains necessary.
 - Responsive navigation: a sidebar on desktop and a section selector in the page heading on mobile.
 - Shared Back navigation restores the previous section, relevant filters and scroll position, including routes opened from Overview.
 - Student cards with contact details, separate confirmed-incident counts, links to that student’s reservations and equipment movements, incident history and account actions.
-- **Manage account** lets FTS members edit their full name, phone number and year of study. Saved details update their student-facing Contact FTS card in the same browser environment. University email remains read-only.
-- **Manage FTS members** from the profile menu: inspect a collapsible current-member list and add a member with name, phone, year of study, university email and a confirmed password. New members receive the same FTS access as the current team in this local prototype.
+- **Manage account** lets ATS members edit their full name, phone number and year of study. Saved details update their student-facing Contact ATS card in the same browser environment. University email remains read-only.
+- **Manage ATS members** from the profile menu: inspect a collapsible current-member list and add a member with name, phone, year of study, university email and a confirmed password. New members receive the same ATS access as the current team in this local prototype.
 - Responsive report lists: two equal-height cards per row on laptop, with footer actions aligned; one card per row on mobile. Equipment-specific history tabs count the filtered movements rather than all equipment movements.
 
 Equipment movement cards emphasise return deadlines, use the correct overdue/late-return status, and keep status beside the equipment name. Student equipment moves retain their separate three-hour return limit. Ending or cancelling a reservation does not automatically record a physical equipment return.
 
 ## Student Access and Misconduct Reviews
 
-FTS can review two categories independently: **no-shows** and **unreported equipment damage**. Each category has its own confirmed-incident count.
+ATS can review two categories independently: **no-shows** and **unreported equipment damage**. Each category has its own confirmed-incident count.
 
-- **Review incident** records a category-specific reference: **Reservation ID** for a no-show, or **Equipment ID and incident date** for unreported damage. It also records what happened, the student’s explanation and FTS reasoning. When no response has been received, FTS records its contact attempt and the absence of a response.
-- FTS must explicitly confirm an incident or accept the student’s explanation. An accepted explanation does not add a warning.
-- The first two confirmed incidents in a category receive warnings. The third and later confirmed incidents require a restriction period set by FTS. Clear consequence headings, such as **Third confirmed no-show**, explain the result before saving. Promptly reported accidental damage is distinct from failing to report damage.
+- **Review incident** records a category-specific reference: **Reservation ID** for a no-show, or **Equipment ID and incident date** for unreported damage. It also records what happened, the student’s explanation and ATS reasoning. When no response has been received, ATS records its contact attempt and the absence of a response.
+- ATS must explicitly confirm an incident or accept the student’s explanation. An accepted explanation does not add a warning.
+- The first two confirmed incidents in a category receive warnings. The third and later confirmed incidents require a restriction period set by ATS. Clear consequence headings, such as **Third confirmed no-show**, explain the result before saving. Promptly reported accidental damage is distinct from failing to report damage.
 - Restrictions default to **Start immediately**: the start timestamp is set when the decision is saved, so time spent completing the form does not invalidate the start. **Start later** reveals a future start date and time. An end date and time is required in either mode.
 - Restriction controls use an app-styled calendar and separate hour, minute and AM/PM selectors. Invalid periods show inline messages, including **Choose a future start time** and **End must be after the start**. Date validity is refreshed while the form is open and checked again when saving.
 - **Save decision** remains disabled until a decision and all required text fields are complete (at least five characters after trimming surrounding whitespace), with a valid period whenever a restriction is required.
-- During an active restriction, the prototype blocks new reservations and equipment moves. Students can still report problems and return outstanding equipment. Restrictions expire at their end time; FTS can also lift one with a reason.
+- During an active restriction, the prototype blocks new reservations and equipment moves. Students can still report problems and return outstanding equipment. Restrictions expire at their end time; ATS can also lift one with a reason.
 - Incident reviews open in a scrollable modal with a fixed header and action footer. Text boxes begin at three lines and grow for longer entries. Date and time controls share a row on laptop and stack on mobile; scheduled start and end use separate rows. Clear feedback beside Save decision identifies missing fields or invalid dates. The form displays the decision’s consequence before saving and requests confirmation before discarding an unsaved review.
-- **Lift restriction** opens a compact popup showing the active restriction’s reason and readable end date/time. FTS must complete **Reason for lifting restriction** before the violet confirmation button enables. The action rechecks that a restriction remains active; closing restores the prior page scroll and focus. Unsaved input requires discard confirmation.
-- Student cards show two per row on laptop and one per row on mobile. Mobile actions use the shorter **Reservations** and **Equipment moves** labels. Expanded incident history shows the **three newest incidents**, newest first; larger histories offer **View all incidents (N)** in a separate scrollable popup. Entries have subtle dividers, labelled references, what happened, student explanation, FTS reasoning and a **Reviewed by** footer without seconds. Delete account remains in the three-dot menu.
+- **Lift restriction** opens a compact popup showing the active restriction’s reason and readable end date/time. ATS must complete **Reason for lifting restriction** before the violet confirmation button enables. The action rechecks that a restriction remains active; closing restores the prior page scroll and focus. Unsaved input requires discard confirmation.
+- Student cards show two per row on laptop and one per row on mobile. Mobile actions use the shorter **Reservations** and **Equipment moves** labels. Expanded incident history shows the **three newest incidents**, newest first; larger histories offer **View all incidents (N)** in a separate scrollable popup. Entries have subtle dividers, labelled references, what happened, student explanation, ATS reasoning and a **Reviewed by** footer without seconds. Delete account remains in the three-dot menu.
 - Account deletion removes sign-in access while retaining reservation, movement and incident records. Active/upcoming owned reservations and outstanding equipment movements must be resolved first. No account-restoration control is provided.
 - Opening reservations from a student card displays the student’s name in search while retaining an exact email-based identity filter, so matching names do not mix records.
 
 These controls operate on local demo records. They require authenticated, server-enforced permissions and shared storage before use as real disciplinary or account-management controls.
 
-## FTS Member Accounts and Account Details
+## ATS Member Accounts and Account Details
 
-Current FTS members can add another FTS member from **Manage FTS members**. The form requires a name, valid phone number, year of study, university email, password of at least eight characters and matching confirmation. Each password field has its own visibility control. Duplicate FTS emails and emails already registered as student accounts are rejected; adding a member does not convert a student account into an FTS role.
+Current ATS members can add another ATS member from **Manage ATS members**. The form requires a name, valid phone number, year of study, university email, password of at least eight characters and matching confirmation. Each password field has its own visibility control. Duplicate ATS emails and emails already registered as student accounts are rejected; adding a member does not convert a student account into an ATS role.
 
 On laptop, Full name fills a row, followed by Phone number and the narrower Year of study control together, then full-width University email. Password and Confirm password share a row. Mobile stacks the fields in that order. Phone number and Year of study use matching control heights, with the compact placeholder **Choose year**. The member list is collapsed by default; Close and Add member remain in the fixed footer while the form scrolls.
 
-Added members sign in using the email and password set for them. The public FTS sample shortcuts continue to list only the original sample team; they do not expose newly added members or their credentials. Added-member passwords are stored as salted PBKDF2 digests in this local prototype. This does not provide production authentication or secure server-enforced administration; the original sample access remains demonstrative.
+Added members sign in using the email and password set for them. The public ATS sample shortcuts continue to list only the original sample team; they do not expose newly added members or their credentials. Added-member passwords are stored as salted PBKDF2 digests in this local prototype. This does not provide production authentication or secure server-enforced administration; the original sample access remains demonstrative.
 
-The FTS **Manage account** popup uses the same full-width name and paired phone/year layout. Changes to name, phone and year appear in Contact FTS; the signed-in header also reflects the updated name. These profile changes remain local to the browser and do not provide cross-device syncing.
+The ATS **Manage account** popup uses the same full-width name and paired phone/year layout. Changes to name, phone and year appear in Contact ATS; the signed-in header also reflects the updated name. These profile changes remain local to the browser and do not provide cross-device syncing.
 
 The student **Manage account** popup allows name and phone changes. Email is shown as muted read-only information with a lock icon and **Email can’t be changed**, rather than an editable-looking field. Name and Phone share a row on laptop and stack on mobile, with email below and a full-width Save changes action.
 
@@ -176,23 +176,23 @@ A reservation remains under its organiser’s name, and the organiser must atten
 
 - Student signup accepts only an email ending in **@vijaybhoomi.edu.in**. Other domains cannot proceed. This is format/domain validation, not proof of university email ownership; verification email delivery is not implemented.
 - Signup has three steps: personal details, password, then **Booking & equipment guidelines**. Account creation requires the agreement checkbox and the **Agree & create account** action.
-- The guidelines cover booking and reservation changes, equipment movements and return deadlines, equipment care, reporting problems, what FTS can see and do, and the demo’s privacy/storage limits. They also explain organiser attendance, joint practice, separate misconduct warnings, FTS-set restriction periods and account deletion.
+- The guidelines cover booking and reservation changes, equipment movements and return deadlines, equipment care, reporting problems, what ATS can see and do, and the demo’s privacy/storage limits. They also explain organiser attendance, joint practice, separate misconduct warnings, ATS-set restriction periods and account deletion.
 - Agreement metadata records the guidelines version, acceptance timestamp and email in the local profile. Existing accounts are not forced through signup again.
 - The same guidelines remain accessible in **Reports & Support**, using an open-book/check icon. Reopening them does not require another agreement.
 - The signup reading page omits the hero strip, retains the authentication wave background and places Back and the step indicator on one row. Mobile uses a shorter introduction and tighter bullet spacing in both signup and Reports & Support; desktop retains its reading layout.
-- FTS can access student contact details, reservations, movement/return records and submitted reports, including relevant descriptions and photos. Its interface does not show passwords or personal practice-journal notes/photos. This describes the prototype interface, not server-enforced access controls.
+- ATS can access student contact details, reservations, movement/return records and submitted reports, including relevant descriptions and photos. Its interface does not show passwords or personal practice-journal notes/photos. This describes the prototype interface, not server-enforced access controls.
 
 ## Local Records and Sample Data
 
-Reservations, joint-practice invitations, registered student profiles, added FTS member accounts, incident reviews, restrictions, equipment movements, report updates, FTS activity and practice journals currently use **local browser storage**. Student and FTS flows can read the same records in that local environment. They do **not** share live records across different devices or browser profiles.
+Reservations, joint-practice invitations, registered student profiles, added ATS member accounts, incident reviews, restrictions, equipment movements, report updates, ATS activity and practice journals currently use **local browser storage**. Student and ATS flows can read the same records in that local environment. They do **not** share live records across different devices or browser profiles.
 
 The normal student calendar and booking selector no longer add automatic illustrative bookings. Their occupied times come from saved local reservations; the explicit Booking Conflict Demo remains separate.
 
-Sample modes use illustrative, view-only records. FTS calendar samples include bookings across all seven rooms, and mobile guidance reflects the selected room rather than bookings elsewhere. These samples are not saved as real reservations.
+Sample modes use illustrative, view-only records. ATS calendar samples include bookings across all seven rooms, and mobile guidance reflects the selected room rather than bookings elsewhere. These samples are not saved as real reservations.
 
 A one-time migration cleans up completed/cancelled reservation history and returned movement history from the older date model, while retaining active/upcoming reservations and outstanding movements. The interface improvements continue to apply to future records.
 
-Sample sign-in, profiles and role screens demonstrate the intended experience. They are not production authentication or server-enforced permissions. A shared backend, authenticated student/FTS roles and an atomic booking check are still required for a multi-user deployment. Publishing the prototype does not add these capabilities.
+Sample sign-in, profiles and role screens demonstrate the intended experience. They are not production authentication or server-enforced permissions. A shared backend, authenticated student/ATS roles and an atomic booking check are still required for a multi-user deployment. Publishing the prototype does not add these capabilities.
 
 ## Audio Experience
 
@@ -212,7 +212,7 @@ Practice Ready includes a subtle music-focused audio layer designed to support t
 - The animated time-period intro on the **Choose Your Time Slots** screen uses a quiet ascending bar-chime sequence synchronized with the existing cascading tab animation.
 - The bar-chime sequence plays only during that intro animation. Manually switching between time periods continues to use the standard subtle button-interaction tone instead.
 - The music control mutes and unmutes the **background jazz only**. Interface feedback sounds—including the rounded button tone, booking-success chime, booking-conflict/error tone and animated time-period bar chimes—remain available when the background music is muted.
-- In the student mobile flow, the music control is shown on the Home screen. FTS exposes its controls in the header.
+- In the student mobile flow, the music control is shown on the Home screen. ATS exposes its controls in the header.
 - On desktop/laptop, the music control remains accessible throughout the interface.
 - Web Audio gain control is used for reliable background-music volume changes, while the short UI feedback sounds are preloaded audio assets for more consistent playback across supported mobile and desktop browsers, including iPhone.
 
@@ -229,7 +229,7 @@ The interface includes:
 - Consistent selected and disabled states
 - Mobile-safe sticky actions
 - Home reservation details that close back to Home
-- Sample student and FTS sign-in shortcuts without displayed passwords
+- Sample student and ATS sign-in shortcuts without displayed passwords
 - Contextual booking-state preservation
 - Equipment image/detail views
 - Shared semantic search behavior across equipment-related flows
@@ -293,7 +293,7 @@ Apply the latest source updates to this project before building. Keep its existi
    git status
    git diff
    git add app components lib README.md UPDATE-INSTRUCTIONS.txt
-   git commit -m "Update Practice Ready student and FTS flows"
+   git commit -m "Update Practice Ready student and ATS flows"
    git push origin main
    ```
 
@@ -307,7 +307,7 @@ Apply the latest source updates to this project before building. Keep its existi
 
    The explicit Worker name is important: the generated configuration may contain the starter name `site-creator-vinext-starter`. Authenticate with the Cloudflare account that owns the existing Worker if Wrangler requests sign-in. The existing `workers.dev` URL stays the same when the deployment targets this Worker in that account.
 
-4. Confirm the terminal reports a successful deployment, then open the live URL and check the updated student and FTS flows. A failed build or deploy is not a successful publication.
+4. Confirm the terminal reports a successful deployment, then open the live URL and check the updated student and ATS flows. A failed build or deploy is not a successful publication.
 
 `dist/server/wrangler.json` is generated by the build. The `.wrangler/deploy/config.json` file is only a pointer to that generated configuration. Rebuild after source changes instead of deploying stale output.
 
@@ -315,9 +315,9 @@ Apply the latest source updates to this project before building. Keep its existi
 
 Practice Ready is a functional interactive prototype developed for HCI/UI-UX evaluation and formal usability testing.
 
-The current version includes the booking and equipment-readiness paths, a rolling one-hour student start window, a three-hour reservation limit with overnight selection, university-email domain validation, signup agreement and shared booking/equipment guidelines, student session management, equipment movement/return records, reports, a practice journal, FTS member creation and editable contact profiles, reservation and equipment-move history filters, student access reviews, immediate/scheduled restrictions and a lift-restriction popup, compact incident histories, account deletion, joint-practice invitations, and the seven-room day calendar with date limits and a calendar-only fullscreen view. It supports desktop/mobile layouts, direct room-to-slot navigation with automatic initial slot positioning, light/dark themes, semantic equipment search, audio feedback and a deterministic Booking Conflict Demo.
+The current version includes the booking and equipment-readiness paths, a rolling one-hour student start window, a three-hour reservation limit with overnight selection, university-email domain validation, signup agreement and shared booking/equipment guidelines, student session management, equipment movement/return records, reports, a practice journal, ATS member creation and editable contact profiles, reservation and equipment-move history filters, student access reviews, immediate/scheduled restrictions and a lift-restriction popup, compact incident histories, account deletion, joint-practice invitations, and the seven-room day calendar with date limits and a calendar-only fullscreen view. It supports desktop/mobile layouts, direct room-to-slot navigation with automatic initial slot positioning, light/dark themes, semantic equipment search, audio feedback and a deterministic Booking Conflict Demo.
 
-Development checks have covered TypeScript syntax and types, production building, booking-window boundaries, midnight/year rollover, reservation overlap and sample records. Screenshot reviews informed the layout refinements. Recent incident validation checks covered incomplete fields, accepted explanations, warning-only decisions, immediate starts, scheduled starts, past starts and invalid end times. Recent checks covered direct update-to-record routing, history filtering and date-grid generation, FTS profile updates, incident-form feedback, and source/archive integrity. The latest FTS form layouts, matching control heights and shortened year placeholder received source/archive checks. These packages were not verified with a fresh full-project build or a complete desktop/mobile browser test in this workspace; run the build and verify the flows after applying them. These checks do not replace a full end-to-end usability study of the expanded app or prove production readiness.
+Development checks have covered TypeScript syntax and types, production building, booking-window boundaries, midnight/year rollover, reservation overlap and sample records. Screenshot reviews informed the layout refinements. Recent incident validation checks covered incomplete fields, accepted explanations, warning-only decisions, immediate starts, scheduled starts, past starts and invalid end times. Recent checks covered direct update-to-record routing, history filtering and date-grid generation, ATS profile updates, incident-form feedback, and source/archive integrity. The latest ATS form layouts, matching control heights and shortened year placeholder received source/archive checks. These packages were not verified with a fresh full-project build or a complete desktop/mobile browser test in this workspace; run the build and verify the flows after applying them. These checks do not replace a full end-to-end usability study of the expanded app or prove production readiness.
 
 The earlier research included three user interviews, a ten-participant card sort, a two-person V1 tree-test pilot and five V2 participants completing seven tasks each. The reported 35 direct successes belong to the V2 information-architecture test, not to the later expanded app.
 

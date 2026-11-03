@@ -84,19 +84,19 @@ export default function SampleAccount({ children, controls, onLogout, adminView 
     setReady(true);
   }, []);
 
-  useEffect(()=>{if(!signedIn)return;const check=()=>{if(students().some(s=>s.email===profile.email&&s.deletedAt)){sessionStorage.removeItem(sessionKey);setSignedIn(false);setError("This account was deleted by FTS. Contact FTS for assistance.");}};window.addEventListener(ACCESS_EVENT,check);window.addEventListener("storage",check);return()=>{window.removeEventListener(ACCESS_EVENT,check);window.removeEventListener("storage",check);};},[signedIn,profile.email]);
+  useEffect(()=>{if(!signedIn)return;const check=()=>{if(students().some(s=>s.email===profile.email&&s.deletedAt)){sessionStorage.removeItem(sessionKey);setSignedIn(false);setError("This account was deleted by ATS. Contact ATS for assistance.");}};window.addEventListener(ACCESS_EVENT,check);window.addEventListener("storage",check);return()=>{window.removeEventListener(ACCESS_EVENT,check);window.removeEventListener("storage",check);};},[signedIn,profile.email]);
   async function login(e: React.FormEvent) {
     e.preventDefault(); setError(""); setBusy(true);
     try {
       const fts=ftsMembers().find(t=>t.email===email.trim().toLowerCase());
       if(fts){if(!await verifyFtsPassword(fts.email,pass)){setError("Email or password is incorrect.");return;}sessionStorage.setItem("practice-ready-fts-session-v1",fts.email);if(document.activeElement instanceof HTMLElement)document.activeElement.blur();window.scrollTo({top:0,left:0,behavior:"instant"});setEnteringAdmin(fts);setPass("");return;}
       if (email.trim().toLowerCase() === sample.email && pass === password) {
-        if(students().some(s=>s.email===sample.email&&s.deletedAt)){setError("This account was deleted by FTS. Contact FTS for assistance.");return;}
+        if(students().some(s=>s.email===sample.email&&s.deletedAt)){setError("This account was deleted by ATS. Contact ATS for assistance.");return;}
         sessionStorage.setItem(sessionKey, "sample"); setProfile(sample); setPass(""); setSignedIn(true);emitAccess(); return;
       }
       migrateStudent();
       const account=students().find(s=>s.email===email.trim().toLowerCase());
-      if(account?.deletedAt){setError("This account was deleted by FTS. Contact FTS for assistance.");return;}
+      if(account?.deletedAt){setError("This account was deleted by ATS. Contact ATS for assistance.");return;}
       const storedProfile = account || JSON.parse(localStorage.getItem(key) || "null");
       const loginProfile = storedProfile && typeof storedProfile.name === "string" && typeof storedProfile.email === "string" ? {...sample, ...storedProfile} : profile;
       const loginCredential=account?.auth||credential;
@@ -113,10 +113,10 @@ export default function SampleAccount({ children, controls, onLogout, adminView 
     const next = {name:registration.name.trim(),phone:registration.phone.trim(),email:registration.email.trim().toLowerCase()};
     if (!next.name) {setError("Enter your full name.");return;}
     if (!validPhone(next.phone)) {setError("Enter a valid phone number with 10–15 digits.");return;}
-    if(ftsMembers().some(t=>t.email===next.email)){setError("This email belongs to an authorised FTS account. Please log in.");return;}
+    if(ftsMembers().some(t=>t.email===next.email)){setError("This email belongs to an authorised ATS account. Please log in.");return;}
     if (!/^[^\s@]+@vijaybhoomi\.edu\.in$/.test(next.email)) {setError("Use your Vijaybhoomi university email (@vijaybhoomi.edu.in).");return;}
     migrateStudent();
-    if(students().some(s=>s.email===next.email)){setError("This email already has a local account. Sign in, or contact FTS if the account was deleted.");return;}
+    if(students().some(s=>s.email===next.email)){setError("This email already has a local account. Sign in, or contact ATS if the account was deleted.");return;}
     if (signupStep === 1) {setSignupStep(2);return;}
     if (registration.password.length < 8) {setError("Use a password with at least 8 characters.");return;}
     if (registration.password !== registration.confirm) {setError("Passwords do not match.");return;}
@@ -150,7 +150,7 @@ export default function SampleAccount({ children, controls, onLogout, adminView 
 
   if (!ready) return <main className="grid min-h-screen place-items-center bg-[#f7f8fc] text-violet-700 dark:bg-[#171D2D] dark:text-violet-300" aria-busy="true">Loading Practice Ready…</main>;
 
-  if(enteringAdmin)return <main aria-busy="true" aria-label="Opening FTS Overview" className="h-[100dvh] overflow-hidden bg-[#f3efff] dark:bg-[#171D2D]" style={{overflowAnchor:"none"}}/>;
+  if(enteringAdmin)return <main aria-busy="true" aria-label="Opening ATS Overview" className="h-[100dvh] overflow-hidden bg-[#f3efff] dark:bg-[#171D2D]" style={{overflowAnchor:"none"}}/>;
 
   if(admin&&adminView)return <><span ref={pageTop} tabIndex={-1} className="block h-0 outline-none"/>{adminView(admin,logout)}</>;
   if(!signedIn&&view==="signup"&&signupStep===3)return <main className="relative isolate min-h-[100dvh] overflow-x-clip bg-[#f3efff] text-[#151a31] dark:bg-[#171D2D] dark:text-white">
@@ -197,12 +197,12 @@ export default function SampleAccount({ children, controls, onLogout, adminView 
           <p className="text-sm text-slate-600 dark:text-slate-300">Don’t have an account? <button type="button" className="min-h-10 font-semibold text-violet-700 hover:underline dark:text-violet-300" onClick={()=>{setView("signup");setSignupStep(1);setError("");setShow(false);}}>Create account</button></p>
           <div className="space-y-1">
             <details className="text-sm leading-6 text-slate-600 dark:text-slate-300"><summary className="min-h-11 cursor-pointer py-2 font-semibold">Try the sample account</summary><div className="pb-1"><button type="button" className="min-h-10 text-violet-700 hover:underline dark:text-violet-300" onClick={() => {setEmail(sample.email);setPass(password);setError("");}}>Fill sample details</button></div></details>
-            <details className="text-sm text-slate-500 dark:text-slate-300"><summary className="min-h-11 cursor-pointer py-2 sm:min-h-9 sm:pb-1">Try FTS admin access</summary>{ftsTeam.map(t=><button key={t.email} type="button" className="block min-h-11 py-1 text-violet-700 dark:text-violet-300 sm:min-h-8 sm:py-0.5" onClick={()=>{setEmail(t.email);setPass("PracticeReadyFTS123");}}>{t.name}</button>)}</details>
+            <details className="text-sm text-slate-500 dark:text-slate-300"><summary className="min-h-11 cursor-pointer py-2 sm:min-h-9 sm:pb-1">Try ATS admin access</summary>{ftsTeam.map(t=><button key={t.email} type="button" className="block min-h-11 py-1 text-violet-700 dark:text-violet-300 sm:min-h-8 sm:py-0.5" onClick={()=>{setEmail(t.email);setPass("PracticeReadyFTS123");}}>{t.name}</button>)}</details>
           </div>
         </form> : view === "signup" ? <form onSubmit={signup} className="space-y-3 sm:space-y-4">
           {signupStep>1&&<button type="button" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-violet-700 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500 dark:text-violet-300" onClick={()=>{setSignupStep(signupStep-1);setGuidelinesAccepted(false);setError("");}}><span aria-hidden="true">←</span>{signupStep===2?"Your details":"Your password"}</button>}
           <p ref={signupHeading} tabIndex={-1} className="text-sm font-semibold text-violet-700 outline-none dark:text-violet-300" aria-live="polite">Step {signupStep} of 3 · {signupStep===1?"Your details":signupStep===2?"Set your password":"Booking & equipment guidelines"}</p>
-          {signupStep===1&&([ ["name","Full name","text","name",80], ["email","University email","email","email",254], ["phone","Phone number","tel","tel",30] ] as const).map(([name,label,type,autocomplete,max])=><div key={name}><label htmlFor={`signup-${name}`} className="block text-sm font-semibold">{label}<input id={`signup-${name}`} type={type} autoComplete={autocomplete} required maxLength={max} className={field} value={registration[name]} onChange={e=>{setRegistration({...registration,[name]:e.target.value});setError("");}} aria-describedby={name==="phone"?"signup-phone-help":undefined}/></label>{name==="phone"&&<p id="signup-phone-help" className="mt-2 text-xs leading-5 text-slate-500 dark:text-slate-300">FTS may contact you about bookings or reported issues.</p>}</div>)}
+          {signupStep===1&&([ ["name","Full name","text","name",80], ["email","University email","email","email",254], ["phone","Phone number","tel","tel",30] ] as const).map(([name,label,type,autocomplete,max])=><div key={name}><label htmlFor={`signup-${name}`} className="block text-sm font-semibold">{label}<input id={`signup-${name}`} type={type} autoComplete={autocomplete} required maxLength={max} className={field} value={registration[name]} onChange={e=>{setRegistration({...registration,[name]:e.target.value});setError("");}} aria-describedby={name==="phone"?"signup-phone-help":undefined}/></label>{name==="phone"&&<p id="signup-phone-help" className="mt-2 text-xs leading-5 text-slate-500 dark:text-slate-300">ATS may contact you about bookings or reported issues.</p>}</div>)}
           {signupStep===2&&(["password","confirm"] as const).map(name=><div key={name}><label htmlFor={`signup-${name}`} className="block text-sm font-semibold">{name==="password"?"Password":"Confirm password"}</label><div className="relative"><input id={`signup-${name}`} type={(name==="password"?show:showConfirm)?"text":"password"} autoComplete="new-password" required minLength={8} maxLength={128} className={`${field} pr-14`} value={registration[name]} onChange={e=>{setRegistration({...registration,[name]:e.target.value});setError("");}}/><button type="button" className="absolute bottom-1 right-1 grid h-11 w-11 place-items-center text-slate-500 dark:text-slate-300" aria-label={`${(name==="password"?show:showConfirm)?"Hide":"Show"} ${name==="confirm"?"confirmed password":"new password"}`} onClick={()=>name==="password"?setShow(!show):setShowConfirm(!showConfirm)}>{(name==="password"?show:showConfirm)?<EyeOff size={20}/>:<Eye size={20}/>}</button></div>{name==="password"&&<p className="mt-1 text-xs text-slate-500 dark:text-slate-300">At least 8 characters.</p>}</div>)}
           {error&&<p role="alert" className="text-sm text-red-600 dark:text-red-300">{error}</p>}
 
@@ -210,7 +210,7 @@ export default function SampleAccount({ children, controls, onLogout, adminView 
           {signupStep===3&&<p className="text-xs leading-5 text-slate-500 dark:text-slate-300">Accounts and joint-practice invitations are saved in this browser only.</p>}
           <button key={signupStep} type="submit" disabled={busy||(signupStep===3&&!guidelinesAccepted)} className={`${primary} disabled:opacity-60`}>{signupStep<3?"Continue":busy?"Creating account…":"Agree & create account"}</button>
           <p className="text-sm text-slate-600 dark:text-slate-300">Already have an account? <button type="button" className="min-h-10 font-semibold text-violet-700 hover:underline dark:text-violet-300" onClick={()=>{setView("login");setError("");setShow(false);}}>Log in</button></p>
-          <details className="text-xs leading-5 text-slate-500 dark:text-slate-300"><summary className="min-h-11 cursor-pointer py-3">Demo account · saved on this device</summary><p className="pb-2">One account per browser. Email is not verified. Student and FTS demo views use local records on this browser.</p></details>
+          <details className="text-xs leading-5 text-slate-500 dark:text-slate-300"><summary className="min-h-11 cursor-pointer py-3">Demo account · saved on this device</summary><p className="pb-2">One account per browser. Email is not verified. Student and ATS demo views use local records on this browser.</p></details>
         </form> : view === "forgot" ? <form onSubmit={e => {e.preventDefault();setView("sent");}} className="space-y-5"><label htmlFor="reset-email" className="block text-sm font-semibold">Email<input id="reset-email" type="email" required autoComplete="email" className={field} value={email} onChange={e => setEmail(e.target.value)}/></label><button type="submit" className={primary}>Request password reset</button><p className="text-sm text-slate-500 dark:text-slate-300">Demo only. No email will be sent.</p><button type="button" onClick={() => setView("login")} className="min-h-11 text-sm font-medium text-violet-700 dark:text-violet-300">Back to login</button></form> : <div><Check className="mb-6 text-violet-600" size={32}/><button className={primary} onClick={() => {setView("login");setPass("");}}>Back to login</button></div>}
       </div></section>
     </div>
