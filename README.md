@@ -73,6 +73,14 @@ For broad equipment queries, results are also contextually ranked. For example, 
 
 The prototype also includes an expanded illustrative equipment inventory across practice rooms and performance spaces, including wired and wireless microphones, PA speakers, guitar stands and racks, amplifiers, cables and other rehearsal equipment.
 
+## Reservation Filters and Card Layout
+
+My Reservations includes a **Session type** filter across Upcoming, Active and History: All sessions, Individual practice and Joint practice. Sessions with retained participant invitations count as joint practice, including pending invitations and historical responses. Removing every participant invitation leaves no joint-practice record for this filter.
+
+History also provides Date, Room and Status filters. On laptop, its four filters share one row, with a compact Clear filters action beside the result count. Mobile retains the collapsible Filters panel. Clear filters is disabled when no filters are applied; empty filtered results explain how to recover.
+
+On laptop reservation cards, the Time group sits at the inner right edge while the clock/Time label and value share the same left edge. Mobile and detail-popup alignment remain unchanged.
+
 ## Booking Dates and Overnight Sessions
 
 - Each availability-calendar date shows its actual **12:00 AM–midnight** timeline in 30-minute slots. The final slot is 11:30 PM–12:00 AM.
@@ -125,7 +133,7 @@ The Audio Technical Support interface includes:
 - Responsive navigation: a sidebar on desktop and a section selector in the page heading on mobile.
 - Shared Back navigation restores the previous section, relevant filters and scroll position, including routes opened from Overview.
 - Student cards with contact details, separate confirmed-incident counts, links to that student’s reservations and equipment movements, incident history and account actions.
-- **Manage account** lets ATS members edit their full name, phone number and year of study. Saved details update their student-facing Contact ATS card in the same browser environment. University email remains read-only.
+- **Manage account** lets ATS members edit their full name, phone number and year of study. Saved details update their student-facing Contact ATS card in the same browser environment. Members also select their areas of responsibility. University email remains read-only.
 - **Manage ATS members** from the profile menu: inspect a collapsible current-member list and add a member with name, phone, year of study, university email and a confirmed password. New members receive the same ATS access as the current team in this local prototype.
 - Responsive report lists: two equal-height cards per row on laptop, with footer actions aligned; one card per row on mobile. Equipment-specific history tabs count the filtered movements rather than all equipment movements.
 
@@ -161,6 +169,18 @@ Added members sign in using the email and password set for them. The public ATS 
 The ATS **Manage account** popup uses the same full-width name and paired phone/year layout. Changes to name, phone and year appear in Contact ATS; the signed-in header also reflects the updated name. These profile changes remain local to the browser and do not provide cross-device syncing.
 
 The student **Manage account** popup allows name and phone changes. Email is shown as muted read-only information with a lock icon and **Email can’t be changed**, rather than an editable-looking field. Name and Phone share a row on laptop and stack on mobile, with email below and a full-width Save changes action.
+
+## ATS Responsibility Areas and Contact Cards
+
+Manage account and Add ATS member require at least one **Area of responsibility**. Members can select **Studio & MP Labs**, **Live Sound & MPRs**, or both through checkboxes. The helper reads Select at least one area. These selections describe responsibilities; all ATS members retain the same existing prototype permissions.
+
+Existing members have no assigned area until they edit their account; their responsibilities are not inferred. Saved profile selections and newly added members appear in Contact ATS within the same browser environment. Members without a selected area retain the ATS team member fallback.
+
+Contact cards place the name on the left and year on the right on laptop when space permits. Mobile places the year beneath the name. Responsibility areas appear below, with each phrase kept together when wrapping. Email and Call remain side by side at the bottom-left, aligned across each card row.
+
+After a successful Manage account save, the popup closes automatically. Validation or storage errors keep it open and display the error so the member can correct it.
+
+The ATS Overview Verify return action fills the mobile row with centred text beneath the overdue details; laptop retains its compact right-aligned placement.
 
 ## Joint Practice
 
