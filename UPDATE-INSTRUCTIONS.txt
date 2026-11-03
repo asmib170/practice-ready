@@ -1011,3 +1011,9 @@ Manage account now shows full-width Full name above Phone number and Year of stu
 
 3 November 2026 - Add FTS member field layout
 Full-width name, a desktop phone/year row with more room for phone, full-width university email, then paired password fields. Mobile stacks in the same order. Existing fixed header/footer and internal scrolling retained.
+
+
+3 November 2026 - Equal FTS form control heights
+Manage account and Add FTS member use the same explicit 48px height and line-height for inputs and Year of study dropdowns, aligning the phone/year row on laptop and keeping consistent tap targets on mobile.
+
+FTS year placeholder: shortened to "Choose year" in Manage account and Add FTS member. Existing equal control heights are preserved.
