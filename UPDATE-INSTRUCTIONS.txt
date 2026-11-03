@@ -1017,3 +1017,9 @@ Full-width name, a desktop phone/year row with more room for phone, full-width u
 Manage account and Add FTS member use the same explicit 48px height and line-height for inputs and Year of study dropdowns, aligning the phone/year row on laptop and keeping consistent tap targets on mobile.
 
 FTS year placeholder: shortened to "Choose year" in Manage account and Add FTS member. Existing equal control heights are preserved.
+
+FTS Overview: Verify return now fills the mobile row with centered text. Desktop retains its compact right-aligned action.
+
+My Reservations: Session type filter across Upcoming, Active and History. Any retained participant invitation marks a joint session, including pending invitations and historical responses. History date/room/status filters remain History-only.
+
+Student My Reservations: right-align Time label and value together at desktop widths across all three tabs. Mobile and detail-popup summaries retain their existing alignment.
