@@ -999,3 +999,15 @@ Returned move history supports equipment name/ID search, exact return date with 
 
 3 November 2026 - Editable FTS account and linked contacts
 Manage account edits the signed-in FTS member name, phone and year of study (or Staff / Not applicable); email remains fixed. Contact FTS cards use the same membership/profile store and update Call links. Manage FTS members includes year when adding accounts. Existing custom-member credentials and audit history are retained. Profile changes refresh the portal identity. Storage remains browser-local until backend integration.
+
+
+3 November 2026 - History filter polish
+Clear filters is disabled and muted until filters are applied in reservation and equipment move History. History date pickers hide adjacent-month dates and render only the required week rows. Other date pickers retain their existing behavior.
+
+
+3 November 2026 - FTS account field layout
+Manage account now shows full-width Full name above Phone number and Year of study in a 3:2 desktop row. Mobile retains name, phone, year, email stacking. University email remains below.
+
+
+3 November 2026 - Add FTS member field layout
+Full-width name, a desktop phone/year row with more room for phone, full-width university email, then paired password fields. Mobile stacks in the same order. Existing fixed header/footer and internal scrolling retained.
