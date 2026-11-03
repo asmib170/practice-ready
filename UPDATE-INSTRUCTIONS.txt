@@ -1037,3 +1037,7 @@ ATS responsibility helper text now reads "Select at least one area." in both acc
 Contact ATS: responsibility phrases wrap as whole groups, avoiding a stranded MPRs word. Email and Call retain their bottom-left placement and shared card-row baseline.
 
 Contact ATS cards: desktop name left and year right on one row when space permits; mobile year below name. Responsibility areas are grouped beneath without leading separators. Bottom-left Email/Call actions retained.
+
+README updated for session type filters, compact reservation controls, ATS responsibility areas, contact card layout and account save auto-close.
+
+Contact ATS responsibility areas now have a middle-dot separator, attached to the preceding phrase to avoid a leading dot on wrapped lines. All ATS updates mobile chevrons are vertically centered against the complete card; desktop action layout retained.
