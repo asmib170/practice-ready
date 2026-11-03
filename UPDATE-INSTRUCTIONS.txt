@@ -971,3 +971,15 @@ The reservation summary fills spare card height so the student details, divider 
 
 3 November 2026 - Overdue deadline emphasis
 Needs attention now shows overdue Return by deadlines in amber, matching Return overdue in light and dark themes, on phone and laptop.
+
+
+3 November 2026 - FTS reservation action alignment
+View details now aligns to the inner right edge of reservation cards on larger screens across Upcoming, Active and History. Mobile placement and bottom-row alignment are preserved.
+
+
+3 November 2026 - Update search spacing
+In All FTS updates, increased the gap between Search updates and its input from 4px to 8px on phone and laptop.
+
+
+3 November 2026 - Incident review footer wording
+Replaced the technical Complete list with natural instructions for missing fields. Minimum-character guidance appears only for non-empty entries shorter than five characters. Validation rules unchanged.
