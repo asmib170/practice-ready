@@ -365,3 +365,21 @@ Last documented update: **4 November 2026**.
 Sign in with the student sample account, open its profile menu, then choose **Preview restrictions** to open the student flow with a facility restriction or an equipment-only restriction. The preview mounts the same BookingApp, StudentAccessNotice, booking guards and equipment-move guards as normal student use. A shared storage boundary supplies temporary sample profile, restriction and outstanding-move records; preview writes are discarded on exit and do not replace saved local activity. The top banner labels the mode and provides Exit preview, which returns to the student sample flow. The launch control is not shown in ATS or normal student accounts. The sample MIC-01 move lets you check that equipment returns remain available. Full app/browser verification is still required.
 
 Restriction previews seed three matching confirmed incidents. Home shows the shared access notice inside its action column; restricted room booking opens that notice. Desktop account controls sit in the preview banner, and Exit preview restores the normal experience.
+
+Empty late-return reviews hide the unused return selector and show Category across the row, followed by one explanation and Close. Reviews with candidates retain their selector.
+
+The second confirmed incident shows an amber Final warning (2 of 2), stating that another confirmed incident in the same category requires a restriction.
+
+Accepted explanations show a neutral no-warning outcome and the unchanged category incident count. The warning-policy line is hidden for this outcome; ATS reasoning remains required. Late-return dismissals retain their own label.
+
+Final-warning copy states that saving issues the final category warning and a third confirmed incident requires a restriction. The repeated general policy line is hidden in this state.
+
+Home restriction notice is compact and amber, with resume time, View details and Contact ATS. View details and the locked booking card open the same restriction dialog containing reason, counts, period and history. Dates omit seconds. The booking-conflict demo is hidden while room booking is restricted. Shared Home behavior applies to preview and normal student accounts.
+
+Reports & Support does not repeat the Home restriction notice. Reporting, contact, updates and guidelines remain available during restrictions. Home retains its notice and restriction details; booking and equipment-move guards remain unchanged. This applies to preview and normal student flows on desktop and mobile.
+
+Room availability remains viewable during a room-booking restriction, but available slots cannot launch booking. Equipment-only restrictions do not block room booking. The calendar rechecks access on changes and before navigation; ATS calendar behavior is unchanged. Applies to mobile, desktop, expanded calendar and preview.
+
+Restricted students see the existing locked Record a move button throughout equipment search, location browsing and setup alternatives. Both restriction scopes block new moves. Owned equipment return actions remain available. Access is refreshed on changes/expiry and checked again before opening a new-move form.
+
+Guidelines version 2026-11-04 clarifies both restriction scopes, view-only calendar slots, locked new-move actions, retained returns/reporting/contact access, and Home restriction details. Signup step 3 and Reports & Support render the same shared guideline component; new acceptances record this version.

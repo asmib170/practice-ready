@@ -1,6 +1,6 @@
 "use client";
 
-export const GUIDELINES_VERSION = "2026-10-21";
+export const GUIDELINES_VERSION = "2026-11-04";
 export const GUIDELINES_TITLE = "Booking & equipment guidelines";
 export const GUIDELINES_AGREEMENT = "I have read and agree to follow the booking and equipment guidelines.";
 
@@ -20,9 +20,15 @@ const sections = [
   {title:"Attendance and misconduct reviews",items:[
     "Attend your booking or cancel it if you cannot come. ATS reviews a reported no-show and the student’s explanation before deciding whether it counts.",
     "Report equipment damage or breakage promptly to ATS. Promptly reported accidental damage does not count as unreported damage. ATS reviews the facts and the student’s explanation before confirming an unreported-damage incident.",
-    "No-shows and unreported equipment damage have separate warning counts. In each category, the first two confirmed, unjustified incidents receive warnings. A third confirmed incident in that category triggers a temporary restriction from all TSM facilities, with the start and end set by ATS. Other categories do not add to that count.",
-    "ATS records the reference, student explanation, decision, reviewer and restriction dates. You can view your warnings and restriction period and contact ATS in Reports & Support to discuss a decision. Restrictions expire automatically; ATS can lift one early with a recorded reason. Historical warnings remain recorded.",
-    "A restricted student cannot make or reschedule bookings, accept joint-practice invitations or record new equipment moves. Signing in, reading decisions, contacting ATS, cancelling a booking and recording equipment returns remain available. Existing bookings are not silently cancelled; ATS must review them and communicate any changes."
+    "No-shows and unreported equipment damage have separate warning counts. In each category, the first two confirmed, unjustified incidents receive warnings. A third or later confirmed incident in that category requires a temporary restriction on room bookings and new equipment moves, with the start and end set by ATS. Other categories do not add to that count.",
+    "ATS records the reference, student explanation, decision, reviewer and restriction dates. View your restriction reason, period, warning counts and incident history through View details on Home. Contact ATS in Reports & Support to discuss a decision. Restrictions expire automatically; ATS can lift one early with a recorded reason. Historical warnings remain recorded.",
+  ]},
+  {title:"During a temporary restriction",items:[
+    "A room-booking and equipment-move restriction blocks new and rescheduled room bookings, acceptance of joint-practice invitations and new equipment moves. Room availability remains view-only: available slots cannot open booking.",
+    "An equipment-only restriction blocks new equipment moves. Room booking, rescheduling and joint-practice participation remain available, subject to the usual rules and any other active restriction.",
+    "Record a move shows a lock while new moves are restricted, including equipment search, location browsing and setup alternatives. You can still return equipment already in your possession and record that return.",
+    "You can still sign in, browse equipment and room availability, view reservations and incident history, cancel a booking, report equipment or room problems, contact ATS and view report updates. Existing bookings are not silently cancelled; ATS must review them and communicate any changes.",
+    "Home shows the restriction scope and when access resumes. View details opens the full decision and history. Reports & Support stays available without repeating the restriction notice."
   ]},
   {title:"Joint practice sessions",items:[
     "The organiser books under their own account and invites other registered students. An invitation must be accepted before the student is a participant. Invited students may decline; accepted participants may leave without cancelling the organiser’s reservation.",
@@ -32,7 +38,7 @@ const sections = [
     "Check current location and working condition before practice. Reference photos may differ from the actual equipment.",
     "Record a move only after physically moving the equipment. Check the item, destination, purpose and return time.",
     "Linked-session moves open 30 minutes before your session and remain available during it. Return equipment by the session end or the form’s 3-hour limit, whichever is earlier.",
-    "For other moves, follow the form’s deadline. Return equipment to its default location by the recorded deadline, then record its return. Late returns stay marked in history and await ATS review. The first two confirmed late returns receive warnings; the third and later require an ATS-set restriction on new equipment moves. Returns and room bookings remain available. Late-return counts are separate from no-shows and damage.",
+    "For other moves, follow the form’s deadline. Return equipment to its default location by the recorded deadline, then record its return. Late returns stay marked in history and await ATS review. The first two confirmed late returns receive warnings; the third and later require an ATS-set restriction on new equipment moves. Returns remain available; room bookings remain available unless a separate booking restriction applies. Late-return counts are separate from no-shows and damage.",
     "After an ATS reschedule, review linked moves, destinations and return times. A reservation change does not physically move equipment."
   ]},
   {title:"Handle equipment with care",items:[

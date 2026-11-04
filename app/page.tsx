@@ -2853,6 +2853,9 @@ function EquipmentRow({
 }
 
 function BookingApp() {
+  const [moveRestriction,setMoveRestriction]=useState("");
+  useEffect(()=>{const refresh=()=>setMoveRestriction(equipmentMoveIssue());refresh();window.addEventListener(ACCESS_EVENT,refresh);window.addEventListener("storage",refresh);const timer=window.setInterval(refresh,15000);return()=>{window.removeEventListener(ACCESS_EVENT,refresh);window.removeEventListener("storage",refresh);window.clearInterval(timer);};},[]);
+
   const [supportView,setSupportView]=useState("home");
   const [screen, setScreen] = useState<Screen>("home");
   useEffect(()=>{if(screen!=="support")setSupportView("home");},[screen]);
@@ -2893,6 +2896,7 @@ function BookingApp() {
     const item=directoryEquipment.find(x=>x.id===id);
     if(item?.relocation){if(isMoveOwner(item.relocation))setRelocationForm({id,destination:item.defaultLocation||"",due:""});return;}
 
+    const restriction=equipmentMoveIssue();if(restriction){setBookingError(restriction);return;}
     if(directoryReservation&&screen.startsWith("directory")){
       const session=loadReservations().find(r=>r.id===directoryReservation);
       if(!session||!canRecordSessionMove(session)){setBookingError("This session is no longer eligible for equipment moves.");return;}
@@ -3883,7 +3887,7 @@ function BookingApp() {
               <div key={item.id} className="min-w-0 px-0 sm:px-4">
                 <EquipmentRow
                   item={item}
-                  moveLocked={!canMoveForBooking} moveAnimation={moveLockAnimation} onRecordMove={()=>openRelocation(item.id,room)}
+                  moveLocked={!!moveRestriction||!canMoveForBooking} moveAnimation={moveRestriction?undefined:moveLockAnimation} onRecordMove={()=>openRelocation(item.id,room)}
                   returnOnly
                   showStatus={false}
                   availableEquipmentLayout
@@ -4195,7 +4199,7 @@ function BookingApp() {
                   <EquipmentRow
                     key={item.id}
                     item={item}
-                    moveLocked={!alternativeFromDirectory&&!canMoveForBooking} moveAnimation={alternativeFromDirectory?undefined:moveLockAnimation} onRecordMove={()=>openRelocation(item.id,alternativeFromDirectory ? "" : sourceRoom)}
+                    moveLocked={!!moveRestriction||(!alternativeFromDirectory&&!canMoveForBooking)} moveAnimation={moveRestriction||alternativeFromDirectory?undefined:moveLockAnimation} onRecordMove={()=>openRelocation(item.id,alternativeFromDirectory ? "" : sourceRoom)}
                     showDefault
                     compactResult
                     compactAvailableMobile
@@ -4562,7 +4566,7 @@ function BookingApp() {
                     >
                       {directoryMatches.available.length ? (
                         directoryMatches.available.map((x) => (
-                          <EquipmentRow key={x.id} item={x} showDefault transparentDarkSurface compactAvailableMobile moveLocked={!!directoryReservation&&!linkedMoveEligible} moveAnimation={directoryReservation?moveLockAnimation:undefined} onRecordMove={()=>openRelocation(x.id)} />
+                          <EquipmentRow key={x.id} item={x} showDefault transparentDarkSurface compactAvailableMobile moveLocked={!!moveRestriction||(!!directoryReservation&&!linkedMoveEligible)} moveAnimation={moveRestriction?undefined:directoryReservation?moveLockAnimation:undefined} onRecordMove={()=>openRelocation(x.id)} />
                         ))
                       ) : (
                         <SearchTabEmpty
@@ -4577,7 +4581,7 @@ function BookingApp() {
                     >
                       {directoryMatches.unavailable.length ? (
                         directoryMatches.unavailable.map((x) => (
-                          <EquipmentRow key={x.id} item={x} showDefault transparentDarkSurface compactAvailableMobile moveLocked={!!directoryReservation&&!linkedMoveEligible} moveAnimation={directoryReservation?moveLockAnimation:undefined} onRecordMove={()=>openRelocation(x.id)} />
+                          <EquipmentRow key={x.id} item={x} showDefault transparentDarkSurface compactAvailableMobile moveLocked={!!moveRestriction||(!!directoryReservation&&!linkedMoveEligible)} moveAnimation={moveRestriction?undefined:directoryReservation?moveLockAnimation:undefined} onRecordMove={()=>openRelocation(x.id)} />
                         ))
                       ) : (
                         <SearchTabEmpty
@@ -4755,7 +4759,7 @@ function BookingApp() {
               )
             ) : (
               filteredAvailableItems.map((x) => (
-                <EquipmentRow key={x.id} item={x} showDefault transparentDarkSurface compactAvailableMobile moveLocked={!!directoryReservation&&!linkedMoveEligible} moveAnimation={directoryReservation?moveLockAnimation:undefined} onRecordMove={()=>openRelocation(x.id)} />
+                <EquipmentRow key={x.id} item={x} showDefault transparentDarkSurface compactAvailableMobile moveLocked={!!moveRestriction||(!!directoryReservation&&!linkedMoveEligible)} moveAnimation={moveRestriction?undefined:directoryReservation?moveLockAnimation:undefined} onRecordMove={()=>openRelocation(x.id)} />
               ))
             )}
           </TabsContent>
@@ -4785,7 +4789,7 @@ function BookingApp() {
                   <EquipmentRow
                     key={x.id}
                     item={x}
-                    moveLocked={!!directoryReservation&&!linkedMoveEligible} moveAnimation={directoryReservation?moveLockAnimation:undefined} onRecordMove={()=>openRelocation(x.id)}
+                    moveLocked={!!moveRestriction||(!!directoryReservation&&!linkedMoveEligible)} moveAnimation={moveRestriction?undefined:directoryReservation?moveLockAnimation:undefined} onRecordMove={()=>openRelocation(x.id)}
                     showDefault
                     transparentDarkSurface
                     compactAvailableMobile
@@ -4852,7 +4856,7 @@ function HomeScreen({
   conflict: boolean;
   greeting: string;
 }) {
-  const noticeRef = useRef<HTMLDivElement>(null);
+  const [restrictionDetailsOpen,setRestrictionDetailsOpen] = useState(false);
   const [bookingIssue,setBookingIssue] = useState("");
   useEffect(()=>{
     const refresh=()=>setBookingIssue(accessIssue());
@@ -4862,7 +4866,7 @@ function HomeScreen({
     const timer=window.setInterval(refresh,15000);
     return ()=>{window.removeEventListener(ACCESS_EVENT,refresh);window.removeEventListener("storage",refresh);window.clearInterval(timer);};
   },[]);
-  const showRestriction=()=>{noticeRef.current?.scrollIntoView({block:"center",behavior:"smooth"});noticeRef.current?.focus({preventScroll:true});};
+  const showRestriction=()=>setRestrictionDetailsOpen(true);
   const bars = [28, 46, 64, 38, 74, 52, 34, 68, 44, 58, 30, 50];
   return (
     <main data-account-home className="relative min-h-[100dvh] w-full max-w-full overflow-x-clip bg-[#f7f8fc] dark:bg-[#171D2D] text-[#151a31] dark:text-[#F5F7FF]">
@@ -5068,7 +5072,7 @@ function HomeScreen({
             <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-[#AAB3C7] sm:mt-3 sm:text-base sm:leading-7">
               Book your next session, manage reservations, or check equipment readiness.
             </p>
-            <div ref={noticeRef} tabIndex={-1} className="mt-4 space-y-3 rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-violet-400"><StudentAccessNotice/><SessionInvitations/></div>
+            <div className="mt-4 space-y-3"><StudentAccessNotice compact onContact={onSupport} detailsOpen={restrictionDetailsOpen} onDetailsOpenChange={setRestrictionDetailsOpen}/><SessionInvitations/></div>
             {next && <button type="button" onClick={()=>onReservations(next.id)} aria-label={`View ${reservationGroup(next)==="Active"?"current session":"next reservation"} details for ${next.room}`} className="practice-ready-home-next mt-5 grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-violet-200 bg-white/80 px-4 py-3 text-left hover:bg-violet-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500 dark:border-violet-500/40 dark:bg-[#1B2133] dark:hover:bg-[#211A38]"><span className="min-w-0"><span className="block text-xs font-semibold uppercase tracking-wide text-violet-700 dark:text-violet-300">{reservationGroup(next)==="Active" ? "Your current session" : "Your next reservation"}</span><span className="mt-1.5 block font-semibold">{next.room}</span><span className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm text-slate-500 dark:text-slate-300"><span>{reservationDate(next)}</span><span className="whitespace-nowrap">{<ReservationTime time={next.time} start={next.start} end={next.end}/>}</span></span></span><ChevronRight size={20} aria-hidden="true" className="shrink-0 text-violet-700 dark:text-violet-300"/></button>}
             <div className="practice-ready-home-cards mt-4 space-y-2.5 sm:mt-8 sm:space-y-4">
               <HomeCard
@@ -5089,7 +5093,7 @@ function HomeScreen({
               <HomeCard icon={<ShieldCheck />} title="Reports & Support" text="Report an issue or contact ATS." onClick={onSupport} />
             </div>
             
-            <button className="practice-ready-home-demo mt-4 inline-flex min-h-11 items-center text-left text-sm text-slate-500 underline-offset-4 hover:text-violet-700 hover:underline dark:text-slate-400 dark:hover:text-violet-300" onClick={onConflict}>Try the booking conflict demo →</button>
+            {!bookingIssue&&<button className="practice-ready-home-demo mt-4 inline-flex min-h-11 items-center text-left text-sm text-slate-500 underline-offset-4 hover:text-violet-700 hover:underline dark:text-slate-400 dark:hover:text-violet-300" onClick={onConflict}>Try the booking conflict demo →</button>}
           </div>
         </section>
       </div>

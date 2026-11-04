@@ -5,3 +5,21 @@ With no late returns awaiting review, the modal shrinks to its content, shows it
 All previous cumulative changes are retained. Run pnpm run build and check desktop/mobile in the complete project.
 
 Restriction preview refinement: two restricted scenarios only, matching incident history, shared Home notice and locked booking card, accessible preview account controls.
+
+Empty review refinement: hide the unused Late return selector; Category spans the row on desktop and mobile.
+
+Final warning refinement: amber consequence box and explicit same-category wording for the second confirmed incident.
+
+Accepted-explanation refinement: neutral consequence box, concise save outcome, unchanged count and no warning-policy line.
+
+Shortened final-warning message and removed its repeated general policy line; amber treatment retained.
+
+Home restriction notice is compact and amber, with resume time, View details and Contact ATS. View details and the locked booking card open the same restriction dialog containing reason, counts, period and history. Dates omit seconds. The booking-conflict demo is hidden while room booking is restricted. Shared Home behavior applies to preview and normal student accounts.
+
+Reports & Support does not repeat the Home restriction notice. Reporting, contact, updates and guidelines remain available during restrictions. Home retains its notice and restriction details; booking and equipment-move guards remain unchanged. This applies to preview and normal student flows on desktop and mobile.
+
+Room availability remains viewable during a room-booking restriction, but available slots cannot launch booking. Equipment-only restrictions do not block room booking. The calendar rechecks access on changes and before navigation; ATS calendar behavior is unchanged. Applies to mobile, desktop, expanded calendar and preview.
+
+Restricted students see the existing locked Record a move button throughout equipment search, location browsing and setup alternatives. Both restriction scopes block new moves. Owned equipment return actions remain available. Access is refreshed on changes/expiry and checked again before opening a new-move form.
+
+Guidelines version 2026-11-04 clarifies both restriction scopes, view-only calendar slots, locked new-move actions, retained returns/reporting/contact access, and Home restriction details. Signup step 3 and Reports & Support render the same shared guideline component; new acceptances record this version.
