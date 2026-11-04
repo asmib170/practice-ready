@@ -383,3 +383,27 @@ Room availability remains viewable during a room-booking restriction, but availa
 Restricted students see the existing locked Record a move button throughout equipment search, location browsing and setup alternatives. Both restriction scopes block new moves. Owned equipment return actions remain available. Access is refreshed on changes/expiry and checked again before opening a new-move form.
 
 Guidelines version 2026-11-04 clarifies both restriction scopes, view-only calendar slots, locked new-move actions, retained returns/reporting/contact access, and Home restriction details. Signup step 3 and Reports & Support render the same shared guideline component; new acceptances record this version.
+
+## Restriction experience — 4 November 2026
+
+- Signup step 3 and Reports & Support use the same Booking & equipment guidelines (version 2026-11-04). New account acceptance records that version.
+- Home shows a compact amber restriction notice with its scope, resume time, View details and Contact ATS. View details and the locked booking card open the same reason, counts, period and history dialog. Displayed restriction dates omit seconds.
+- Room-booking restrictions make room availability view-only, including the expanded calendar. Available slots cannot launch booking. Equipment-only restrictions still allow room bookings.
+- Both restriction types lock Record a move in equipment search, location browsing and setup alternatives. Existing equipment returns remain available.
+- Reports & Support does not repeat the restriction notice. Reports, report updates, guidelines and ATS contact remain available.
+- The restriction preview offers only the combined restriction and equipment-only restriction. Each scenario supplies three matching confirmed incidents in temporary records; Exit preview restores the normal student experience.
+- Incident review uses an amber final-warning message for warning 2 of 2 and a neutral accepted-explanation outcome. Repeated policy text is hidden in those states. Empty late-return reviews show Category, one explanation and Close.
+
+These changes use shared student interfaces for preview and normal accounts. Source and archive checks were completed; a full project build and browser verification are still required after applying the files. Browser-local records remain a prototype limitation, not production access enforcement.
+
+Restriction-required incident reviews use a pale red consequence box with the incident number, blocked actions and retained access. The repeated policy line is hidden. Equipment-only restrictions retain their distinct scope; scheduling controls are unchanged.
+
+The compact Home restriction notice uses an opaque dark amber background (#302416) in dark mode, keeping background waves behind the card from competing with its text. Layout and spacing are unchanged.
+
+Restriction details now keep the header and Close footer visible while only the body scrolls. The preview toolbar sits below dialog overlays. Details use labelled scope, reason, dates, counts and history without a nested bordered notice.
+
+Contact ATS in the Home restriction notice opens the ATS team Email/Call cards directly, rather than the Reports & Support menu. The general Reports & Support navigation still opens its menu. Shared by preview and normal student flows.
+
+The guideline revisit reminder appears only in signup step 3. Reports & Support and other guideline views show the version without that reminder.
+
+Account-restricted move buttons play the existing lock animation once per equipment visit, then stay static. Searching, filtering and scrolling do not replay it. Unlocking waits until restriction and session timing both permit a move. Reduced-motion users receive static state changes.

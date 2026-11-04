@@ -25,6 +25,31 @@ export function useMoveLockAnimation(scope:string,eligible:boolean,active:boolea
  },[scope,eligible,active]);
  return animation;
 }
+// One restriction animation per equipment visit; result changes do not restart it.
+export function useRestrictionMoveLockAnimation(restricted:boolean,eligible:boolean,active:boolean):MoveLockAnimation{
+ const [animation,setAnimation]=useState<MoveLockAnimation>();
+ const visit=useRef({locked:false,unlocked:false});
+ useEffect(()=>{
+  setAnimation(undefined);
+  if(!active){visit.current={locked:false,unlocked:false};return;}
+  const mode=restricted&&!visit.current.locked?"lock":!restricted&&eligible&&visit.current.locked&&!visit.current.unlocked?"unlock":undefined;
+  if(!mode)return;
+  let observer:MutationObserver|undefined;let soundTimer:number|undefined;let endTimer:number|undefined;
+  const start=()=>{
+   const visible=Array.from(document.querySelectorAll<HTMLElement>(".practice-move-action-label")).some(n=>n.textContent?.trim()==="Record a move"&&n.getClientRects().length>0);
+   if(!visible)return;
+   observer?.disconnect();
+   if(mode==="lock")visit.current.locked=true;else visit.current.unlocked=true;
+   if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+   setAnimation(mode);
+   soundTimer=window.setTimeout(()=>playMoveLockSound(mode),mode==="unlock"?900:360);
+   endTimer=window.setTimeout(()=>setAnimation(undefined),1850);
+  };
+  observer=new MutationObserver(start);observer.observe(document.body,{childList:true,subtree:true});start();
+  return()=>{observer?.disconnect();window.clearTimeout(soundTimer);window.clearTimeout(endTimer);};
+ },[restricted,eligible,active]);
+ return animation;
+}
 export function MoveActionLock({locked,animation}:{locked:boolean;animation:MoveLockAnimation}){
  const slot=useRef<HTMLSpanElement>(null);
  const [offset,setOffset]=useState(0);

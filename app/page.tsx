@@ -41,7 +41,7 @@ import EquipmentMoves from "@/components/equipment-moves";
 import EquipmentRelocation, { loadRelocations, isMoveOwner, RELOCATION_KEY, type Relocation } from "@/components/equipment-relocation";
 import ReportsSupport from "@/components/reports-support";
 import FtsAdmin, { ADMIN_EQUIPMENT_KEY } from "@/components/fts-admin";
-import {MoveActionLock,useMoveLockAnimation,type MoveLockAnimation} from "@/components/move-action-lock";
+import {MoveActionLock,useMoveLockAnimation,useRestrictionMoveLockAnimation,type MoveLockAnimation} from "@/components/move-action-lock";
 import SampleAccount, { AccountControls } from "@/components/sample-account";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -2935,7 +2935,13 @@ function BookingApp() {
   const moveLockScope=isLinkedMoveDirectory?directoryReservation!:`draft:${room}:${draftStart||""}`;
   const moveLockEligible=isLinkedMoveDirectory?linkedMoveEligible:canMoveForBooking;
   const moveLockActive=isLinkedMoveDirectory?(screen==="directory-results"||(screen==="directory-search"&&searched)):(isBookingMoveResults&&Number.isFinite(draftStart));
-  const moveLockAnimation=useMoveLockAnimation(moveLockScope,moveLockEligible,moveLockActive);
+  const equipmentView=screen.startsWith("directory")&&screen!=="directory-moves"||["available-equipment","mixer-search","stand-search","alternative-search"].includes(screen);
+  const restrictionVisit=useRef(false);
+  if(!equipmentView)restrictionVisit.current=false;else if(moveRestriction)restrictionVisit.current=true;
+  const restrictionMoveEligible=!moveRestriction&&(screen.startsWith("directory")?(!directoryReservation||linkedMoveEligible):alternativeFromDirectory||canMoveForBooking);
+  const restrictionMoveAnimation=useRestrictionMoveLockAnimation(!!moveRestriction,restrictionMoveEligible,equipmentView);
+  const moveLockAnimation=useMoveLockAnimation(moveLockScope,moveLockEligible&&!moveRestriction,moveLockActive&&!moveRestriction&&!restrictionVisit.current);
+
 
   const [location, setLocation] = useState("");
   const [locationQuery, setLocationQuery] = useState("");
@@ -3422,6 +3428,7 @@ function BookingApp() {
         }}
         onReservations={(id) => { setReservationDetail(id); if(!id)go("reservations"); }}
         onSupport={() => go("support")}
+        onContactATS={() => {setSupportView("contact");go("support");}}
         onAvailability={() => go("availability-calendar")}
         next={nextReservation(reservations.filter(r=>belongsToStudent(r)))}
         conflict={demoConflict}
@@ -3887,7 +3894,7 @@ function BookingApp() {
               <div key={item.id} className="min-w-0 px-0 sm:px-4">
                 <EquipmentRow
                   item={item}
-                  moveLocked={!!moveRestriction||!canMoveForBooking} moveAnimation={moveRestriction?undefined:moveLockAnimation} onRecordMove={()=>openRelocation(item.id,room)}
+                  moveLocked={!!moveRestriction||!canMoveForBooking} moveAnimation={restrictionMoveAnimation||(moveRestriction?undefined:moveLockAnimation)} onRecordMove={()=>openRelocation(item.id,room)}
                   returnOnly
                   showStatus={false}
                   availableEquipmentLayout
@@ -4199,7 +4206,7 @@ function BookingApp() {
                   <EquipmentRow
                     key={item.id}
                     item={item}
-                    moveLocked={!!moveRestriction||(!alternativeFromDirectory&&!canMoveForBooking)} moveAnimation={moveRestriction||alternativeFromDirectory?undefined:moveLockAnimation} onRecordMove={()=>openRelocation(item.id,alternativeFromDirectory ? "" : sourceRoom)}
+                    moveLocked={!!moveRestriction||(!alternativeFromDirectory&&!canMoveForBooking)} moveAnimation={restrictionMoveAnimation||(moveRestriction||alternativeFromDirectory?undefined:moveLockAnimation)} onRecordMove={()=>openRelocation(item.id,alternativeFromDirectory ? "" : sourceRoom)}
                     showDefault
                     compactResult
                     compactAvailableMobile
@@ -4566,7 +4573,7 @@ function BookingApp() {
                     >
                       {directoryMatches.available.length ? (
                         directoryMatches.available.map((x) => (
-                          <EquipmentRow key={x.id} item={x} showDefault transparentDarkSurface compactAvailableMobile moveLocked={!!moveRestriction||(!!directoryReservation&&!linkedMoveEligible)} moveAnimation={moveRestriction?undefined:directoryReservation?moveLockAnimation:undefined} onRecordMove={()=>openRelocation(x.id)} />
+                          <EquipmentRow key={x.id} item={x} showDefault transparentDarkSurface compactAvailableMobile moveLocked={!!moveRestriction||(!!directoryReservation&&!linkedMoveEligible)} moveAnimation={restrictionMoveAnimation||(moveRestriction?undefined:directoryReservation?moveLockAnimation:undefined)} onRecordMove={()=>openRelocation(x.id)} />
                         ))
                       ) : (
                         <SearchTabEmpty
@@ -4581,7 +4588,7 @@ function BookingApp() {
                     >
                       {directoryMatches.unavailable.length ? (
                         directoryMatches.unavailable.map((x) => (
-                          <EquipmentRow key={x.id} item={x} showDefault transparentDarkSurface compactAvailableMobile moveLocked={!!moveRestriction||(!!directoryReservation&&!linkedMoveEligible)} moveAnimation={moveRestriction?undefined:directoryReservation?moveLockAnimation:undefined} onRecordMove={()=>openRelocation(x.id)} />
+                          <EquipmentRow key={x.id} item={x} showDefault transparentDarkSurface compactAvailableMobile moveLocked={!!moveRestriction||(!!directoryReservation&&!linkedMoveEligible)} moveAnimation={restrictionMoveAnimation||(moveRestriction?undefined:directoryReservation?moveLockAnimation:undefined)} onRecordMove={()=>openRelocation(x.id)} />
                         ))
                       ) : (
                         <SearchTabEmpty
@@ -4759,7 +4766,7 @@ function BookingApp() {
               )
             ) : (
               filteredAvailableItems.map((x) => (
-                <EquipmentRow key={x.id} item={x} showDefault transparentDarkSurface compactAvailableMobile moveLocked={!!moveRestriction||(!!directoryReservation&&!linkedMoveEligible)} moveAnimation={moveRestriction?undefined:directoryReservation?moveLockAnimation:undefined} onRecordMove={()=>openRelocation(x.id)} />
+                <EquipmentRow key={x.id} item={x} showDefault transparentDarkSurface compactAvailableMobile moveLocked={!!moveRestriction||(!!directoryReservation&&!linkedMoveEligible)} moveAnimation={restrictionMoveAnimation||(moveRestriction?undefined:directoryReservation?moveLockAnimation:undefined)} onRecordMove={()=>openRelocation(x.id)} />
               ))
             )}
           </TabsContent>
@@ -4789,7 +4796,7 @@ function BookingApp() {
                   <EquipmentRow
                     key={x.id}
                     item={x}
-                    moveLocked={!!moveRestriction||(!!directoryReservation&&!linkedMoveEligible)} moveAnimation={moveRestriction?undefined:directoryReservation?moveLockAnimation:undefined} onRecordMove={()=>openRelocation(x.id)}
+                    moveLocked={!!moveRestriction||(!!directoryReservation&&!linkedMoveEligible)} moveAnimation={restrictionMoveAnimation||(moveRestriction?undefined:directoryReservation?moveLockAnimation:undefined)} onRecordMove={()=>openRelocation(x.id)}
                     showDefault
                     transparentDarkSurface
                     compactAvailableMobile
@@ -4841,6 +4848,7 @@ function HomeScreen({
   onEquipment,
   onReservations,
   onSupport,
+  onContactATS,
   onAvailability,
   next,
   conflict,
@@ -4851,6 +4859,7 @@ function HomeScreen({
   onEquipment: () => void;
   onReservations: (id?: string) => void;
   onSupport: () => void;
+  onContactATS: () => void;
   onAvailability: () => void;
   next?: Reservation;
   conflict: boolean;
@@ -5072,7 +5081,7 @@ function HomeScreen({
             <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-[#AAB3C7] sm:mt-3 sm:text-base sm:leading-7">
               Book your next session, manage reservations, or check equipment readiness.
             </p>
-            <div className="mt-4 space-y-3"><StudentAccessNotice compact onContact={onSupport} detailsOpen={restrictionDetailsOpen} onDetailsOpenChange={setRestrictionDetailsOpen}/><SessionInvitations/></div>
+            <div className="mt-4 space-y-3"><StudentAccessNotice compact onContact={onContactATS} detailsOpen={restrictionDetailsOpen} onDetailsOpenChange={setRestrictionDetailsOpen}/><SessionInvitations/></div>
             {next && <button type="button" onClick={()=>onReservations(next.id)} aria-label={`View ${reservationGroup(next)==="Active"?"current session":"next reservation"} details for ${next.room}`} className="practice-ready-home-next mt-5 grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-violet-200 bg-white/80 px-4 py-3 text-left hover:bg-violet-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500 dark:border-violet-500/40 dark:bg-[#1B2133] dark:hover:bg-[#211A38]"><span className="min-w-0"><span className="block text-xs font-semibold uppercase tracking-wide text-violet-700 dark:text-violet-300">{reservationGroup(next)==="Active" ? "Your current session" : "Your next reservation"}</span><span className="mt-1.5 block font-semibold">{next.room}</span><span className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm text-slate-500 dark:text-slate-300"><span>{reservationDate(next)}</span><span className="whitespace-nowrap">{<ReservationTime time={next.time} start={next.start} end={next.end}/>}</span></span></span><ChevronRight size={20} aria-hidden="true" className="shrink-0 text-violet-700 dark:text-violet-300"/></button>}
             <div className="practice-ready-home-cards mt-4 space-y-2.5 sm:mt-8 sm:space-y-4">
               <HomeCard
