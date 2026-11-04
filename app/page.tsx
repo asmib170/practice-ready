@@ -1,4 +1,6 @@
 "use client";
+import {appStorage} from "@/lib/preview-storage";
+
 import {StudentAccessNotice} from "@/components/student-access";
 import {SessionInvitations} from "@/components/session-participants";
 import {equipmentMoveIssue,accessIssue,currentStudent,belongsToStudent,canManageSession,ACCESS_EVENT} from "@/lib/student-access";
@@ -1990,7 +1992,7 @@ function ThemeToggle({ fixed = true, inline = false }: { fixed?: boolean; inline
   const [isThemeSpinning, setIsThemeSpinning] = useState(false);
 
   useEffect(() => {
-    const savedTheme = window.localStorage.getItem("practice-ready-theme");
+    const savedTheme = appStorage().getItem("practice-ready-theme");
     const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     const nextIsDark = savedTheme
       ? savedTheme === "dark"
@@ -2018,7 +2020,7 @@ function ThemeToggle({ fixed = true, inline = false }: { fixed?: boolean; inline
 
         window.requestAnimationFrame(() => {
           document.documentElement.style.colorScheme = nextIsDark ? "dark" : "light";
-          window.localStorage.setItem(
+          appStorage().setItem(
             "practice-ready-theme",
             nextIsDark ? "dark" : "light",
           );
@@ -2871,7 +2873,7 @@ function BookingApp() {
   const [bookingMoveIds, setBookingMoveIds] = useState<string[]>([]);
   useEffect(() => { setRelocations(loadRelocations());const refresh=()=>setRelocations(loadRelocations());const timer=setInterval(refresh,15000);window.addEventListener("storage",refresh);return()=>{clearInterval(timer);window.removeEventListener("storage",refresh);}; }, []);
   const [adminEquipment,setAdminEquipment]=useState<Record<string,Partial<Equipment>>>({});
-  useEffect(()=>{try{setAdminEquipment(JSON.parse(localStorage.getItem(ADMIN_EQUIPMENT_KEY)||"{}"));}catch{}},[]);
+  useEffect(()=>{try{setAdminEquipment(JSON.parse(appStorage().getItem(ADMIN_EQUIPMENT_KEY)||"{}"));}catch{}},[]);
   const allEquipment = useMemo(() => [...originalDirectoryEquipment,...Object.entries(adminEquipment).filter(([id,value])=>value.custom&&!originalDirectoryEquipment.some(i=>i.id===id)).map(([id,value])=>({...value,id} as Equipment))].map(base => {
     const item={...base,...adminEquipment[base.id]};
     const move = [...relocations].reverse().find(r => r.equipmentId === item.id);
@@ -4823,8 +4825,8 @@ function BookingApp() {
 const linked=record.reservationId?loadReservations().find(r=>r.id===record.reservationId):undefined;
 if(record.reservationId&&(!linked||linked.cancelled||!canRecordSessionMove(linked)||Date.parse(linked.end)<=Date.now()||Date.parse(record.expectedReturn)>Date.parse(linked.end)))throw new Error("Equipment moves are allowed only within 30 minutes before the session or during it, and must be returned by its end.");
 const updated=relocationForm.editRecord?existing.map(x=>x.id===record.id?{...x,note:record.note,expectedReturn:record.expectedReturn}:x):[...existing,record];
-localStorage.setItem(RELOCATION_KEY,JSON.stringify(updated));
-try {if(linked){const next=loadReservations().map(r=>r.id===linked.id?{...r,moveIds:Array.from(new Set([...(r.moveIds||[]),record.id]))}:r);storeReservations(next);setReservations(next);}}catch(error){localStorage.setItem(RELOCATION_KEY,JSON.stringify(existing));throw error;}
+appStorage().setItem(RELOCATION_KEY,JSON.stringify(updated));
+try {if(linked){const next=loadReservations().map(r=>r.id===linked.id?{...r,moveIds:Array.from(new Set([...(r.moveIds||[]),record.id]))}:r);storeReservations(next);setReservations(next);}}catch(error){appStorage().setItem(RELOCATION_KEY,JSON.stringify(existing));throw error;}
 setRelocations(updated);if(record.expectedReturn&&!relocationForm.editRecord&&!relocationForm.linkToBooking&&screen.startsWith("directory"))setDirectoryTab("unavailable");if(relocationForm.linkToBooking&&record.expectedReturn)setBookingMoveIds(ids=>[...ids,record.id]);if(directoryReservation&&record.expectedReturn&&!relocationForm.editRecord){setReservationDetail(directoryReservation);setDirectoryReservation(undefined);setHistory(h=>{const i=h.lastIndexOf("reservations");return i<0?h:h.slice(0,i);});setScreen("reservations");window.scrollTo(0,0);}setRelocationForm(null);}}/>)}</>;
 }
 

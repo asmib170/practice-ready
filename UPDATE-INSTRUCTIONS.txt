@@ -1,7 +1,6 @@
-Late equipment return policy
+Student restriction preview entry point
 
-Copy the cumulative source into your existing project.
-ATS Students: Review incident > Late equipment return > choose a saved late return. Record the student explanation and ATS reasoning; confirm or accept without warning.
-First 2 confirmed late returns issue warnings; third and later require a restriction period on new equipment moves only. Returns, existing-move edits and room bookings remain available unless another restriction applies.
-Review counts are separate and each move can be reviewed once. Legacy mover names require a unique registered-student match if no owner email is saved.
-Policy logic tests passed. Full app build and browser/device checks must be run in the complete project.
+Apply this cumulative source package.
+Sign into the student sample account > profile menu > Preview restrictions. Choose one of the three states. Exit preview returns to the student sample flow and discards preview records.
+The ATS launch control is removed. The shared student screens and access checks are unchanged. README is included.
+Run pnpm run build and verify the profile menu and preview on desktop/mobile in the complete project.

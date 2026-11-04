@@ -1,4 +1,6 @@
 "use client";
+import {beginRestrictionPreview,endRestrictionPreview,previewStudent,type RestrictionPreviewMode,appStorage} from "@/lib/preview-storage";
+
 
 import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { LoginAtmosphere, LoginEqualizer } from "@/components/login-atmosphere";
@@ -53,6 +55,14 @@ export default function SampleAccount({ children, controls, onLogout, adminView 
     return () => { cancelAnimationFrame(firstFrame); cancelAnimationFrame(secondFrame); };
   }, [enteringAdmin]);
   const [profile, setProfile] = useState<Profile>(sample);
+  const [restrictionChooser,setRestrictionChooser]=useState(false);
+  const [restrictionDemo,setRestrictionDemo]=useState<RestrictionPreviewMode|null>(null);
+  const [previewGeneration,setPreviewGeneration]=useState(0);
+  const previewProfile=useRef<Profile>(sample);
+  useEffect(()=>()=>endRestrictionPreview(),[]);
+  const exitRestrictionPreview=()=>{endRestrictionPreview();setRestrictionDemo(null);setProfile(previewProfile.current);setPreviewGeneration(n=>n+1);setPanel(null);window.dispatchEvent(new Event(ACCESS_EVENT));window.scrollTo(0,0);};
+  const launchRestrictionPreview=(mode:RestrictionPreviewMode)=>{previewProfile.current=profile;beginRestrictionPreview(mode);setRestrictionDemo(mode);setRestrictionChooser(false);setProfile(previewStudent);setPreviewGeneration(n=>n+1);window.scrollTo(0,0);};
+
   const [view, setView] = useState<"login" | "signup" | "forgot" | "sent">("login");
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
@@ -73,9 +83,9 @@ export default function SampleAccount({ children, controls, onLogout, adminView 
   useEffect(() => {
     try {
       migrateStudent();
-      const stored = JSON.parse(localStorage.getItem(key) || "null");
+      const stored = JSON.parse(appStorage().getItem(key) || "null");
       if (stored && typeof stored.name === "string") setProfile({ ...sample, name: stored.name, phone: typeof stored.phone === "string" ? stored.phone : "", email: typeof stored.email === "string" ? stored.email : sample.email });
-      const auth = JSON.parse(localStorage.getItem(credentialKey) || "null");
+      const auth = JSON.parse(appStorage().getItem(credentialKey) || "null");
       if (auth && typeof auth.salt === "string" && typeof auth.digest === "string") setCredential(auth);
       const fts=ftsMembers().find(t=>t.email===sessionStorage.getItem("practice-ready-fts-session-v1"));if(fts)setAdmin(fts);
       if (sessionStorage.getItem(sessionKey) === "sample") setProfile(sample);
@@ -97,13 +107,13 @@ export default function SampleAccount({ children, controls, onLogout, adminView 
       migrateStudent();
       const account=students().find(s=>s.email===email.trim().toLowerCase());
       if(account?.deletedAt){setError("This account was deleted by ATS. Contact ATS for assistance.");return;}
-      const storedProfile = account || JSON.parse(localStorage.getItem(key) || "null");
+      const storedProfile = account || JSON.parse(appStorage().getItem(key) || "null");
       const loginProfile = storedProfile && typeof storedProfile.name === "string" && typeof storedProfile.email === "string" ? {...sample, ...storedProfile} : profile;
       const loginCredential=account?.auth||credential;
       const correctPassword = loginCredential ? await passwordDigest(pass, loginCredential.salt) === loginCredential.digest : pass === password;
       if (email.trim().toLowerCase() !== loginProfile.email.toLowerCase() || !correctPassword) {setError("Email or password is incorrect."); return;}
-      localStorage.setItem(key,JSON.stringify({...loginProfile,auth:undefined}));
-      if(account?.auth){localStorage.setItem(credentialKey,JSON.stringify(account.auth));setCredential(account.auth);}
+      appStorage().setItem(key,JSON.stringify({...loginProfile,auth:undefined}));
+      if(account?.auth){appStorage().setItem(credentialKey,JSON.stringify(account.auth));setCredential(account.auth);}
       sessionStorage.setItem(sessionKey, "signed-in"); setProfile(loginProfile); setPass(""); setSignedIn(true);emitAccess();
     } catch {setError("Could not log in. Please allow browser storage and try again.");}
     finally {setBusy(false);}
@@ -126,12 +136,13 @@ export default function SampleAccount({ children, controls, onLogout, adminView 
     try {
       const salt = crypto.randomUUID(); const auth = {salt,digest:await passwordDigest(registration.password,salt)};
       rememberStudent({...next,auth,guidelinesAcceptance:{version:GUIDELINES_VERSION,acceptedAt:new Date().toISOString(),email:next.email}});
-      localStorage.setItem(credentialKey,JSON.stringify(auth)); localStorage.setItem(key,JSON.stringify({...next,guidelinesAcceptance:{version:GUIDELINES_VERSION,acceptedAt:new Date().toISOString(),email:next.email}})); sessionStorage.setItem(sessionKey,"signed-in");
+      appStorage().setItem(credentialKey,JSON.stringify(auth)); appStorage().setItem(key,JSON.stringify({...next,guidelinesAcceptance:{version:GUIDELINES_VERSION,acceptedAt:new Date().toISOString(),email:next.email}})); sessionStorage.setItem(sessionKey,"signed-in");
       setCredential(auth);setProfile(next);setDraft(next);setRegistration({name:"",phone:"",email:"",password:"",confirm:""});setShow(false);setShowConfirm(false);setSignedIn(true);setView("login");emitAccess();
     } catch {setError("Could not save your demo account. Please allow browser storage and try again.");}
     finally {setBusy(false);}
   }
   function logout() {
+    endRestrictionPreview();setRestrictionDemo(null);
     setAdmin(null);
     try { sessionStorage.removeItem("practice-ready-fts-session-v1");sessionStorage.removeItem(sessionKey); } catch {}
     setPanel(null); setSignedIn(false); setView("login"); setEmail(""); setPass(""); setError(""); onLogout?.();
@@ -143,6 +154,7 @@ export default function SampleAccount({ children, controls, onLogout, adminView 
       <DropdownMenuLabel className="px-3 py-3"><p className="truncate text-base font-semibold">{profile.name}</p><p className="truncate text-sm font-normal text-slate-500 dark:text-slate-300">{profile.email}</p></DropdownMenuLabel>
       <DropdownMenuSeparator />
       <DropdownMenuItem className="rounded-lg border border-transparent px-3 py-3 text-sm transition-all duration-150 focus:border-violet-300 focus:bg-violet-50/70 focus:text-violet-800 data-[highlighted]:border-violet-300 data-[highlighted]:bg-violet-50/70 data-[highlighted]:text-violet-800 dark:focus:border-violet-500/70 dark:focus:bg-[#211A38] dark:focus:text-violet-100 dark:data-[highlighted]:border-violet-500/70 dark:data-[highlighted]:bg-[#211A38] dark:data-[highlighted]:text-violet-100" onSelect={() => { setDraft(profile); setSaved(false); setError(""); setPanel("profile"); }}><UserRound size={18}/>Manage account</DropdownMenuItem>
+      {profile.email===sample.email&&restrictionDemo===null&&<DropdownMenuItem className="min-h-11 gap-2 rounded-lg px-3 py-3 text-sm focus:bg-violet-50 dark:focus:bg-[#211A38]" onSelect={()=>setRestrictionChooser(true)}><Eye size={18}/>Preview restrictions</DropdownMenuItem>}
       <DropdownMenuSeparator />
       <DropdownMenuItem className="rounded-lg border border-transparent px-3 py-3 text-sm transition-all duration-150 focus:border-violet-300 focus:bg-violet-50/70 focus:text-violet-800 data-[highlighted]:border-violet-300 data-[highlighted]:bg-violet-50/70 data-[highlighted]:text-violet-800 dark:focus:border-violet-500/70 dark:focus:bg-[#211A38] dark:focus:text-violet-100 dark:data-[highlighted]:border-violet-500/70 dark:data-[highlighted]:bg-[#211A38] dark:data-[highlighted]:text-violet-100 text-red-600 dark:text-red-400" onSelect={logout}><LogOut size={18}/>Log out</DropdownMenuItem>
     </DropdownMenuContent>
@@ -216,11 +228,12 @@ export default function SampleAccount({ children, controls, onLogout, adminView 
     </div>
   </main>;
 
-  return <AccountControlsContext.Provider value={toolbar}><span ref={pageTop} tabIndex={-1} className="block h-0 outline-none"/><style>{`@media(max-width:1023px){.account-global-controls{display:none;}}`}</style><div key={profile.email}>{children}</div><div className="account-global-controls fixed right-4 top-4 z-40 sm:right-8 sm:top-8">{toolbar}</div>
+  return <AccountControlsContext.Provider value={toolbar}><span ref={pageTop} tabIndex={-1} className="block h-0 outline-none"/><style>{`@media(max-width:1023px){.account-global-controls{display:none;}}`}</style>{restrictionDemo!==null&&<aside className="sticky top-0 z-[100] flex flex-wrap items-center justify-between gap-3 border-b border-violet-300 bg-violet-50 p-3 text-sm text-slate-900 dark:bg-[#211A38] dark:text-white" aria-label="Restriction preview"><p><strong>Student restriction preview</strong> · {restrictionDemo==="none"?"No restriction":restrictionDemo==="equipment"?"Equipment moves only":"Room bookings and equipment moves"}<span className="block text-xs">Sample records only. Changes are discarded on exit.</span></p><button type="button" className="min-h-11 rounded-xl border border-violet-300 px-4 font-semibold text-violet-700 dark:text-violet-200" onClick={exitRestrictionPreview}>Exit preview</button></aside>}<div key={`${profile.email}-${previewGeneration}`}>{children}</div><div className="account-global-controls fixed right-4 top-4 z-40 sm:right-8 sm:top-8">{toolbar}</div>
+    <Dialog open={restrictionChooser} onOpenChange={setRestrictionChooser}><DialogContent className="rounded-3xl bg-white dark:bg-[#1B2133]"><DialogHeader><DialogTitle>Preview restrictions</DialogTitle><DialogDescription>Explore the student experience with temporary sample records. Saved activity is unchanged.</DialogDescription></DialogHeader><div className="grid gap-3">{([{mode:"none",label:"No restriction"},{mode:"facilities",label:"Room bookings and equipment moves restricted"},{mode:"equipment",label:"Equipment moves restricted only"}] as const).map(option=><button key={option.mode} type="button" className="min-h-11 rounded-xl border border-violet-300 p-3 text-left font-semibold text-violet-700 hover:bg-violet-50 dark:text-violet-200 dark:hover:bg-[#211A38]" onClick={()=>launchRestrictionPreview(option.mode)}>{option.label}</button>)}</div></DialogContent></Dialog>
     <Dialog open={panel !== null} onOpenChange={open => {if (!open) {setPanel(null);setError("");}}}>
       <DialogContent className="max-h-[85dvh] overflow-y-auto rounded-3xl bg-white text-slate-900 dark:bg-[#1B2133] dark:text-white">
         <DialogHeader><DialogTitle>Manage account</DialogTitle><DialogDescription>Update your name and phone number. Your university email identifies your account.</DialogDescription></DialogHeader>
-        {<form className="space-y-4" onSubmit={e => {e.preventDefault();const name=draft.name.trim();if (!name) {setError("Enter your full name.");return;} if (!validPhone(draft.phone.trim())) {setError("Enter a valid phone number with 10–15 digits.");return;} const next={name,phone:draft.phone.trim(),email:draft.email.trim().toLowerCase()};setProfile(next);setDraft(next);try {localStorage.setItem(key,JSON.stringify({...JSON.parse(localStorage.getItem(key)||"{}"),...next}));rememberStudent({...next});} catch {}setError("");setSaved(true);setPanel(null);}}>
+        {<form className="space-y-4" onSubmit={e => {e.preventDefault();const name=draft.name.trim();if (!name) {setError("Enter your full name.");return;} if (!validPhone(draft.phone.trim())) {setError("Enter a valid phone number with 10–15 digits.");return;} const next={name,phone:draft.phone.trim(),email:draft.email.trim().toLowerCase()};setProfile(next);setDraft(next);try {appStorage().setItem(key,JSON.stringify({...JSON.parse(appStorage().getItem(key)||"{}"),...next}));rememberStudent({...next});} catch {}setError("");setSaved(true);setPanel(null);}}>
           <div className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-2">
           <label htmlFor="profile-name" className="block text-sm font-semibold">Name<input id="profile-name" className={field} required maxLength={80} value={draft.name} onChange={e => {setDraft({...draft,name:e.target.value});setSaved(false);}}/></label>
           <label htmlFor="profile-phone" className="block text-sm font-semibold">Phone number<input id="profile-phone" className={field} required type="tel" autoComplete="tel" maxLength={30} placeholder="Enter your phone number" value={draft.phone} onChange={e => {setDraft({...draft,phone:e.target.value});setSaved(false);}}/></label>

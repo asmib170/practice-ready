@@ -1,4 +1,6 @@
 "use client";
+import {appStorage} from "@/lib/preview-storage";
+
 import AdminDateFilter from "@/components/admin-date-filter";
 import AdminSelect from "@/components/admin-select";
 import AdminMobileFilters from "@/components/admin-mobile-filters";
@@ -20,7 +22,7 @@ export type Reservation = {ownerEmail?:string;ownerName?:string;participants?:Pa
 const key = "practice-ready-reservations-v1";
 export function dateKey(d: Date) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; }
 export function reservationGroup(r: Reservation, now = Date.now()) { return r.cancelled || Date.parse(r.end)<=now ? "History" : Date.parse(r.start)<=now ? "Active" : "Upcoming"; }
-export function loadReservations(): Reservation[] { try { migrateCalendarDayStorage();const value=JSON.parse(localStorage.getItem(key)||"[]");return Array.isArray(value)?value.filter(r=>typeof r.id==="string"&&typeof r.room==="string"&&Array.isArray(r.slots)&&typeof r.time==="string"&&typeof r.operationalDate==="string"&&Number.isFinite(Date.parse(r.start))&&Number.isFinite(Date.parse(r.end))):[]; } catch{return [];} }
+export function loadReservations(): Reservation[] { try { migrateCalendarDayStorage();const value=JSON.parse(appStorage().getItem(key)||"[]");return Array.isArray(value)?value.filter(r=>typeof r.id==="string"&&typeof r.room==="string"&&Array.isArray(r.slots)&&typeof r.time==="string"&&typeof r.operationalDate==="string"&&Number.isFinite(Date.parse(r.start))&&Number.isFinite(Date.parse(r.end))):[]; } catch{return [];} }
 // View-only examples: never persisted or used for booking availability.
 export function sampleReservations(now = Date.now()): Reservation[] {
  const make = (id: string, room: string, start: Date, cancelled = false): Reservation => {
@@ -32,7 +34,7 @@ export function sampleReservations(now = Date.now()): Reservation[] {
  const past = (days: number) => { const d = new Date(now); d.setDate(d.getDate() - days); d.setHours(16, 0, 0, 0); return d; };
  return [make("SAMPLE-COMPLETED", "MPR 5", past(1)), make("SAMPLE-CANCELLED", "MPR 2", past(3), true)];
 }
-export function storeReservations(value: Reservation[]) { localStorage.setItem(key,JSON.stringify(value)); }
+export function storeReservations(value: Reservation[]) { appStorage().setItem(key,JSON.stringify(value)); }
 export function reservationBlockedEnd(r:Reservation){return r.end;}
 export function earlyEndRelease(r:Reservation,now=Date.now()){return Math.min(Date.parse(r.end),now);}
 export function endActiveReservation(r:Reservation,now=Date.now()):Reservation|null {
