@@ -1,6 +1,7 @@
-Student restriction preview entry point
+Compact empty late-return review
 
-Apply this cumulative source package.
-Sign into the student sample account > profile menu > Preview restrictions. Choose one of the three states. Exit preview returns to the student sample flow and discards preview records.
-The ATS launch control is removed. The shared student screens and access checks are unchanged. README is included.
-Run pnpm run build and verify the profile menu and preview on desktop/mobile in the complete project.
+Replace components/student-access.tsx and README.md.
+With no late returns awaiting review, the modal shrinks to its content, shows its explanation once and provides Close only. Category remains available. Existing full reviews keep their scrollable form and action footer.
+All previous cumulative changes are retained. Run pnpm run build and check desktop/mobile in the complete project.
+
+Restriction preview refinement: two restricted scenarios only, matching incident history, shared Home notice and locked booking card, accessible preview account controls.

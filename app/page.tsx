@@ -12,6 +12,7 @@ import {
   ArrowRight,
   CalendarDays,
   CalendarPlus,
+  LockKeyhole,
   TicketCheck,
   Check,
   ChevronDown,
@@ -3394,7 +3395,7 @@ function BookingApp() {
   const renderScreen = () => {
   if (screen === "home")
     return (
-      <> <div className="mx-auto max-w-[760px] space-y-3 px-5"><StudentAccessNotice/><SessionInvitations/></div><HomeScreen
+      <><HomeScreen
         onBook={() => {
           setDemoConflict(false);
           setConflictConsumed(false);
@@ -4851,6 +4852,17 @@ function HomeScreen({
   conflict: boolean;
   greeting: string;
 }) {
+  const noticeRef = useRef<HTMLDivElement>(null);
+  const [bookingIssue,setBookingIssue] = useState("");
+  useEffect(()=>{
+    const refresh=()=>setBookingIssue(accessIssue());
+    refresh();
+    window.addEventListener(ACCESS_EVENT,refresh);
+    window.addEventListener("storage",refresh);
+    const timer=window.setInterval(refresh,15000);
+    return ()=>{window.removeEventListener(ACCESS_EVENT,refresh);window.removeEventListener("storage",refresh);window.clearInterval(timer);};
+  },[]);
+  const showRestriction=()=>{noticeRef.current?.scrollIntoView({block:"center",behavior:"smooth"});noticeRef.current?.focus({preventScroll:true});};
   const bars = [28, 46, 64, 38, 74, 52, 34, 68, 44, 58, 30, 50];
   return (
     <main data-account-home className="relative min-h-[100dvh] w-full max-w-full overflow-x-clip bg-[#f7f8fc] dark:bg-[#171D2D] text-[#151a31] dark:text-[#F5F7FF]">
@@ -5056,14 +5068,15 @@ function HomeScreen({
             <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-[#AAB3C7] sm:mt-3 sm:text-base sm:leading-7">
               Book your next session, manage reservations, or check equipment readiness.
             </p>
+            <div ref={noticeRef} tabIndex={-1} className="mt-4 space-y-3 rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-violet-400"><StudentAccessNotice/><SessionInvitations/></div>
             {next && <button type="button" onClick={()=>onReservations(next.id)} aria-label={`View ${reservationGroup(next)==="Active"?"current session":"next reservation"} details for ${next.room}`} className="practice-ready-home-next mt-5 grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-violet-200 bg-white/80 px-4 py-3 text-left hover:bg-violet-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500 dark:border-violet-500/40 dark:bg-[#1B2133] dark:hover:bg-[#211A38]"><span className="min-w-0"><span className="block text-xs font-semibold uppercase tracking-wide text-violet-700 dark:text-violet-300">{reservationGroup(next)==="Active" ? "Your current session" : "Your next reservation"}</span><span className="mt-1.5 block font-semibold">{next.room}</span><span className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm text-slate-500 dark:text-slate-300"><span>{reservationDate(next)}</span><span className="whitespace-nowrap">{<ReservationTime time={next.time} start={next.start} end={next.end}/>}</span></span></span><ChevronRight size={20} aria-hidden="true" className="shrink-0 text-violet-700 dark:text-violet-300"/></button>}
             <div className="practice-ready-home-cards mt-4 space-y-2.5 sm:mt-8 sm:space-y-4">
               <HomeCard
                 dark
-                icon={<CalendarPlus />}
-                title="Book a Room"
-                text="Choose a time and reserve a room."
-                onClick={onBook}
+                icon={bookingIssue ? <LockKeyhole /> : <CalendarPlus />}
+                title={bookingIssue ? "Booking restricted" : "Book a Room"}
+                text={bookingIssue ? "View the reason and when access resumes." : "Choose a time and reserve a room."}
+                onClick={bookingIssue ? showRestriction : onBook}
               />
               <HomeCard icon={<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 9v12M15 9v12M5.5 13h1M11.5 17h1M17.5 13h1"/></svg>} title="Room availability" text="Compare room schedules." onClick={onAvailability} />
               <HomeCard icon={<TicketCheck />} title="My Reservations" text="View and manage your sessions." onClick={() => onReservations()} />
