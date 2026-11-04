@@ -407,3 +407,9 @@ Contact ATS in the Home restriction notice opens the ATS team Email/Call cards d
 The guideline revisit reminder appears only in signup step 3. Reports & Support and other guideline views show the version without that reminder.
 
 Account-restricted move buttons play the existing lock animation once per equipment visit, then stay static. Searching, filtering and scrolling do not replay it. Unlocking waits until restriction and session timing both permit a move. Reduced-motion users receive static state changes.
+
+Student restriction history formats each restriction as a separate Restriction applied entry with reason, labelled start/scheduled-end dates and lifted/expired status when applicable. Incident and restriction dividers use the dialog border colours in light and dark mode.
+
+- Home Room availability now says “View schedules only · Booking restricted” while room bookings are restricted. Normal and equipment-only restriction states keep “Compare room schedules.”
+
+- Restriction consequence wording now uses “This restriction will block…” for both immediate and scheduled starts.

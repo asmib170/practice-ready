@@ -5091,7 +5091,7 @@ function HomeScreen({
                 text={bookingIssue ? "View the reason and when access resumes." : "Choose a time and reserve a room."}
                 onClick={bookingIssue ? showRestriction : onBook}
               />
-              <HomeCard icon={<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 9v12M15 9v12M5.5 13h1M11.5 17h1M17.5 13h1"/></svg>} title="Room availability" text="Compare room schedules." onClick={onAvailability} />
+              <HomeCard icon={<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 9v12M15 9v12M5.5 13h1M11.5 17h1M17.5 13h1"/></svg>} title="Room availability" text={bookingIssue ? "View schedules only · Booking restricted" : "Compare room schedules."} onClick={onAvailability} />
               <HomeCard icon={<TicketCheck />} title="My Reservations" text="View and manage your sessions." onClick={() => onReservations()} />
               <HomeCard
                 icon={<Headphones />}
