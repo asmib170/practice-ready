@@ -41,3 +41,5 @@ Student restriction history formats each restriction as a separate Restriction a
 - Home Room availability now says “View schedules only · Booking restricted” while room bookings are restricted. Normal and equipment-only restriction states keep “Compare room schedules.”
 
 - Restriction consequence wording now uses “This restriction will block…” for both immediate and scheduled starts.
+
+- Restriction preview history now records “No explanation received” separately from ATS’s assessment. Student history shows recorded explanations, with a clear fallback when none is recorded.
