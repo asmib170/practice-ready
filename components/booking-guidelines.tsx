@@ -32,7 +32,7 @@ const sections = [
     "Check current location and working condition before practice. Reference photos may differ from the actual equipment.",
     "Record a move only after physically moving the equipment. Check the item, destination, purpose and return time.",
     "Linked-session moves open 30 minutes before your session and remain available during it. Return equipment by the session end or the form’s 3-hour limit, whichever is earlier.",
-    "For other moves, follow the form’s deadline. Return equipment to its default location by the recorded deadline, then record its return. Late returns stay marked in history.",
+    "For other moves, follow the form’s deadline. Return equipment to its default location by the recorded deadline, then record its return. Late returns stay marked in history and await ATS review. The first two confirmed late returns receive warnings; the third and later require an ATS-set restriction on new equipment moves. Returns and room bookings remain available. Late-return counts are separate from no-shows and damage.",
     "After an ATS reschedule, review linked moves, destinations and return times. A reservation change does not physically move equipment."
   ]},
   {title:"Handle equipment with care",items:[

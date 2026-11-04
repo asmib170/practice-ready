@@ -75,7 +75,7 @@ The prototype also includes an expanded illustrative equipment inventory across 
 
 ## Reservation Filters and Card Layout
 
-My Reservations includes a **Session type** filter across Upcoming, Active and History: All sessions, Individual practice and Joint practice. Sessions with retained participant invitations count as joint practice, including pending invitations and historical responses. Removing every participant invitation leaves no joint-practice record for this filter.
+My Reservations includes a **Session type** filter in History only: All sessions, Individual practice and Joint practice. Sessions with retained participant invitations count as joint practice, including pending invitations and historical responses. Removing every participant invitation leaves no joint-practice record for this filter. Upcoming and Active show their reservation or empty state directly, without filters, result counts or Clear filters.
 
 History also provides Date, Room and Status filters. On laptop, its four filters share one row, with a compact Clear filters action beside the result count. Mobile retains the collapsible Filters panel. Clear filters is disabled when no filters are applied; empty filtered results explain how to recover.
 
@@ -128,7 +128,7 @@ The Audio Technical Support interface includes:
 - Recording equipment movements for a student’s linked reservation or another purpose, and recording returns.
 - Separate attribution for the original mover and the ATS member who recorded a return.
 - Report updates and history. Resolved reports are read-only; in-progress reports allow a further update through an explicit action.
-- Action-led recent updates with relevant record details, the ATS member, and a timestamp. Identifiers remain available in detail views. Updates open their linked record directly, skipping the intermediate update-summary popup; an unavailable record retains its update summary as a fallback. Closing record details returns to Overview at the same scroll position.
+- Action-led recent updates with relevant record details, the ATS member, and a timestamp. Identifiers remain available in detail views. Updates open their linked record directly, skipping the intermediate update-summary popup; an unavailable record retains its update summary as a fallback. Closing record details returns to Overview at the same scroll position. In All ATS updates, mobile card chevrons are vertically centred at the right edge; laptop placement is unchanged.
 - Updated mobile form text sizing to avoid input-focus zoom on supported iPhone browsers; physical-device verification remains necessary.
 - Responsive navigation: a sidebar on desktop and a section selector in the page heading on mobile.
 - Shared Back navigation restores the previous section, relevant filters and scroll position, including routes opened from Overview.
@@ -139,17 +139,24 @@ The Audio Technical Support interface includes:
 
 Equipment movement cards emphasise return deadlines, use the correct overdue/late-return status, and keep status beside the equipment name. Student equipment moves retain their separate three-hour return limit. Ending or cancelling a reservation does not automatically record a physical equipment return.
 
+## ATS Search and Filters
+
+- **Reservations:** List and Calendar search use “Search by student name, email, reservation ID or room.” List filters are labelled **Room** and **Date** and remain available in Upcoming, Active and History because ATS manages multiple students. Clear filters resets room/date only, preserves search text and any exact student identity scope, and is disabled when neither dropdown is selected.
+- **Equipment:** Search matches equipment name, ID, default location and current location. The **Current location** dropdown selects the exact current location; the condition dropdown remains available. Clear filters resets those dropdowns only and is disabled when neither is selected. Search text and the archived-equipment checkbox selection are preserved.
+- **Equipment moves:** Search reads “Search equipment, ID, person or location” and matches equipment name/ID, the original mover, and From/To locations. The exact-location dropdown is labelled **Current location** in Current and **Returned to** in History.
+- **Reports & Support:** Search reads “Search reports by title, ID or reporter” and also matches report message text. Report type and report location remain separate dropdown filters. Clear filters is disabled until either dropdown is selected and preserves the separate search text.
+
 ## Student Access and Misconduct Reviews
 
-ATS can review two categories independently: **no-shows** and **unreported equipment damage**. Each category has its own confirmed-incident count.
+ATS can review three categories independently: **no-shows**, **unreported equipment damage** and **late equipment returns**. Each category has its own confirmed-incident count; counts are not combined.
 
-- **Review incident** records a category-specific reference: **Reservation ID** for a no-show, or **Equipment ID and incident date** for unreported damage. It also records what happened, the student’s explanation and ATS reasoning. When no response has been received, ATS records its contact attempt and the absence of a response.
+- **Review incident** records a category-specific reference: **Reservation ID** for a no-show, **Equipment ID and incident date** for unreported damage, or a specific saved **equipment move reference** for a late return. It also records what happened, the student’s explanation and ATS reasoning. When no response has been received, ATS records its contact attempt and the absence of a response.
 - ATS must explicitly confirm an incident or accept the student’s explanation. An accepted explanation does not add a warning.
 - The first two confirmed incidents in a category receive warnings. The third and later confirmed incidents require a restriction period set by ATS. Clear consequence headings, such as **Third confirmed no-show**, explain the result before saving. Promptly reported accidental damage is distinct from failing to report damage.
 - Restrictions default to **Start immediately**: the start timestamp is set when the decision is saved, so time spent completing the form does not invalidate the start. **Start later** reveals a future start date and time. An end date and time is required in either mode.
 - Restriction controls use an app-styled calendar and separate hour, minute and AM/PM selectors. Invalid periods show inline messages, including **Choose a future start time** and **End must be after the start**. Date validity is refreshed while the form is open and checked again when saving.
 - **Save decision** remains disabled until a decision and all required text fields are complete (at least five characters after trimming surrounding whitespace), with a valid period whenever a restriction is required.
-- During an active restriction, the prototype blocks new reservations and equipment moves. Students can still report problems and return outstanding equipment. Restrictions expire at their end time; ATS can also lift one with a reason.
+- An active facility restriction for no-shows or unreported damage blocks new reservations and equipment moves. A late-return restriction blocks **new equipment moves only**, including ATS recording a new student move on their behalf; room bookings, outstanding-move edits and returns remain available unless another restriction applies. Students can still report problems. Restrictions expire at their end time; ATS can lift one with a reason. Lifting one restriction does not remove any others.
 - Incident reviews open in a scrollable modal with a fixed header and action footer. Text boxes begin at three lines and grow for longer entries. Date and time controls share a row on laptop and stack on mobile; scheduled start and end use separate rows. Clear feedback beside Save decision identifies missing fields or invalid dates. The form displays the decision’s consequence before saving and requests confirmation before discarding an unsaved review.
 - **Lift restriction** opens a compact popup showing the active restriction’s reason and readable end date/time. ATS must complete **Reason for lifting restriction** before the violet confirmation button enables. The action rechecks that a restriction remains active; closing restores the prior page scroll and focus. Unsaved input requires discard confirmation.
 - Student cards show two per row on laptop and one per row on mobile. Mobile actions use the shorter **Reservations** and **Equipment moves** labels. Expanded incident history shows the **three newest incidents**, newest first; larger histories offer **View all incidents (N)** in a separate scrollable popup. Entries have subtle dividers, labelled references, what happened, student explanation, ATS reasoning and a **Reviewed by** footer without seconds. Delete account remains in the three-dot menu.
@@ -157,6 +164,12 @@ ATS can review two categories independently: **no-shows** and **unreported equip
 - Opening reservations from a student card displays the student’s name in search while retaining an exact email-based identity filter, so matching names do not mix records.
 
 These controls operate on local demo records. They require authenticated, server-enforced permissions and shared storage before use as real disciplinary or account-management controls.
+
+## Late Equipment Return Policy
+
+Late student equipment returns are derived from saved movement/return records and shown as awaiting ATS review in Students. Review incident → Late equipment return selects the specific move, deadline and recorded return time. ATS records the student explanation and either confirms the incident or accepts the explanation without a warning. Each move can be reviewed once. Legacy records without an email are attributed only when the mover name uniquely matches a registered student. ATS-owned moves do not count.
+
+Confirmed late returns have a separate count: first warning, second/final warning, then a required restriction period and ATS reason on the third and later. The new restriction scope blocks new student equipment moves (including ATS recording on their behalf), while room bookings, outstanding-move edits and returns remain available. Older facility restrictions retain their existing scope. Restrictions expire automatically and ATS can lift them with a reason. Student access notices show warnings and restriction history. This remains a local-browser prototype, not cross-device enforcement.
 
 ## ATS Member Accounts and Account Details
 
@@ -176,7 +189,7 @@ Manage account and Add ATS member require at least one **Area of responsibility*
 
 Existing members have no assigned area until they edit their account; their responsibilities are not inferred. Saved profile selections and newly added members appear in Contact ATS within the same browser environment. Members without a selected area retain the ATS team member fallback.
 
-Contact cards place the name on the left and year on the right on laptop when space permits. Mobile places the year beneath the name. Responsibility areas appear below, with each phrase kept together when wrapping. Email and Call remain side by side at the bottom-left, aligned across each card row.
+Contact cards place the name on the left and year on the right on laptop when space permits. Mobile places the year beneath the name. Responsibility areas appear below with middle-dot separators, with each phrase kept together when wrapping. Email and Call remain side by side at the bottom-left, aligned across each card row.
 
 After a successful Manage account save, the popup closes automatically. Validation or storage errors keep it open and display the error so the member can correct it.
 
@@ -335,13 +348,13 @@ Apply the latest source updates to this project before building. Keep its existi
 
 Practice Ready is a functional interactive prototype developed for HCI/UI-UX evaluation and formal usability testing.
 
-The current version includes the booking and equipment-readiness paths, a rolling one-hour student start window, a three-hour reservation limit with overnight selection, university-email domain validation, signup agreement and shared booking/equipment guidelines, student session management, equipment movement/return records, reports, a practice journal, ATS member creation and editable contact profiles, reservation and equipment-move history filters, student access reviews, immediate/scheduled restrictions and a lift-restriction popup, compact incident histories, account deletion, joint-practice invitations, and the seven-room day calendar with date limits and a calendar-only fullscreen view. It supports desktop/mobile layouts, direct room-to-slot navigation with automatic initial slot positioning, light/dark themes, semantic equipment search, audio feedback and a deterministic Booking Conflict Demo.
+The current version includes the booking and equipment-readiness paths, a rolling one-hour student start window, a three-hour reservation limit with overnight selection, university-email domain validation, signup agreement and shared booking/equipment guidelines, student session management, equipment movement/return records, reports, a practice journal, ATS member creation and editable contact profiles, reservation and equipment-move history filters, student access reviews with separate late-return warnings and equipment-only restrictions, immediate/scheduled restrictions and a lift-restriction popup, compact incident histories, account deletion, joint-practice invitations, and the seven-room day calendar with date limits and a calendar-only fullscreen view. It supports desktop/mobile layouts, direct room-to-slot navigation with automatic initial slot positioning, light/dark themes, semantic equipment search, audio feedback and a deterministic Booking Conflict Demo.
 
-Development checks have covered TypeScript syntax and types, production building, booking-window boundaries, midnight/year rollover, reservation overlap and sample records. Screenshot reviews informed the layout refinements. Recent incident validation checks covered incomplete fields, accepted explanations, warning-only decisions, immediate starts, scheduled starts, past starts and invalid end times. Recent checks covered direct update-to-record routing, history filtering and date-grid generation, ATS profile updates, incident-form feedback, and source/archive integrity. The latest ATS form layouts, matching control heights and shortened year placeholder received source/archive checks. These packages were not verified with a fresh full-project build or a complete desktop/mobile browser test in this workspace; run the build and verify the flows after applying them. These checks do not replace a full end-to-end usability study of the expanded app or prove production readiness.
+Development checks have covered TypeScript syntax and types, production building, booking-window boundaries, midnight/year rollover, reservation overlap and sample records. Screenshot reviews informed the layout refinements. Recent incident validation checks covered incomplete fields, accepted explanations, warning-only decisions, immediate starts, scheduled starts, past starts and invalid end times. Recent checks covered direct update-to-record routing, history filtering and date-grid generation, ATS profile updates, incident-form feedback, and source/archive integrity. The latest ATS form layouts, matching control heights and shortened year placeholder received source/archive checks. Late-return policy tests covered detection, first/second warnings, third-incident restriction requirements, duplicate prevention, accepted explanations, separate counts, booking access, lifting, expiry, scheduled scope and legacy facility restrictions. The latest search/filter wording and reset changes received scoped source/archive checks. These packages were not verified with a fresh full-project build or a complete desktop/mobile browser test in this workspace; run the build and verify the flows after applying them. These checks do not replace a full end-to-end usability study of the expanded app or prove production readiness.
 
 The earlier research included three user interviews, a ten-participant card sort, a two-person V1 tree-test pilot and five V2 participants completing seven tasks each. The reported 35 direct successes belong to the V2 information-architecture test, not to the later expanded app.
 
 Equipment, room availability, scheduling information, equipment IDs, quantities, locations and condition states used in the prototype are illustrative prototype data and should not be treated as an authoritative live inventory or booking system for the True School of Music.
 
 
-Last documented update: **3 November 2026**.
+Last documented update: **4 November 2026**.
