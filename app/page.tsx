@@ -2091,6 +2091,7 @@ function Shell({
   headerScrollHintAside,
   mobileOnlyTitleAside = false,
   stickyHeader = true,
+  mobileStaticHeader = false,
   headerRef,
   compactActionBarPadding = false,
   measureActionBarPadding = false,
@@ -2110,6 +2111,7 @@ function Shell({
   headerScrollHintAside?: React.ReactNode;
   mobileOnlyTitleAside?: boolean;
   stickyHeader?: boolean;
+  mobileStaticHeader?: boolean;
   headerRef?: React.RefObject<HTMLElement | null>;
   compactActionBarPadding?: boolean;
   measureActionBarPadding?: boolean;
@@ -2294,7 +2296,7 @@ function Shell({
         </svg>
       </div>
       <div className={`relative z-10 mx-auto w-full min-w-0 ${title==="Room availability"?"max-w-[1440px]":"max-w-[760px]"} overflow-x-clip bg-transparent sm:bg-[#f8f9fd] dark:bg-transparent sm:dark:bg-[#151A2B] shadow-[0_0_60px_rgba(21,26,49,.08)] ${lockMobileViewport ? "h-full min-h-0 overflow-y-hidden sm:min-h-screen sm:h-auto sm:overflow-y-visible" : measureActionBarPadding ? "" : fitVisibleViewport ? "min-h-[100dvh]" : "min-h-screen"}`}>
-        <header ref={headerRef} className={`${stickyHeader ? "sticky top-0 z-20" : "relative z-10"} border-b border-slate-200/80 dark:border-[#30384D]/80 bg-[#f8f9fd]/96 dark:bg-[#151A2B]/96 sm:bg-[#f8f9fd]/98 sm:dark:bg-[#151A2B]/98 px-5 ${compactMobileHeader ? "pb-2 pt-2 sm:pb-3 sm:pt-3" : "pb-3 pt-3"} sm:px-8`}>
+        <header ref={headerRef} className={`${stickyHeader ? mobileStaticHeader ? "relative z-10 sm:sticky sm:top-0 sm:z-20" : "sticky top-0 z-20" : "relative z-10"} border-b border-slate-200/80 dark:border-[#30384D]/80 bg-[#f8f9fd]/96 dark:bg-[#151A2B]/96 sm:bg-[#f8f9fd]/98 sm:dark:bg-[#151A2B]/98 px-5 ${compactMobileHeader ? "pb-2 pt-2 sm:pb-3 sm:pt-3" : "pb-3 pt-3"} sm:px-8`}>
           <div className={`${compactMobileHeader ? "mb-1.5 sm:mb-2.5" : "mb-2.5"} flex items-center ${title==="Room availability"?"justify-start":"justify-between"} gap-2`}>
             {back ? (
               <button
@@ -4449,6 +4451,7 @@ function BookingApp() {
     const scrollHint = "";
     return (
       <Shell
+        mobileStaticHeader
         title="Equipment directory"
         subtitle="Check locations and working conditions."
         scrollHint=""
@@ -4522,7 +4525,7 @@ function BookingApp() {
               </div>
             </form>
             {!searched && (
-              <div className="flex min-h-[270px] flex-col items-center justify-center px-6 pb-4 text-center sm:min-h-[420px] sm:pb-0">
+              <div className="flex flex-col items-center justify-center px-6 py-8 text-center sm:min-h-[420px] sm:py-0">
                 <div className="grid h-16 w-16 place-items-center rounded-full bg-violet-50 dark:bg-[#211A38] text-violet-500 dark:text-violet-300">
                   <Search size={30} strokeWidth={1.8} />
                 </div>
@@ -4679,6 +4682,7 @@ function BookingApp() {
     return (
       <Shell
         compactMobileHeader
+        mobileStaticHeader
         title={`${location} equipment`}
         subtitle="Review current locations and working conditions."
         scrollHint=""
@@ -5091,7 +5095,7 @@ function HomeScreen({
                 text={bookingIssue ? "View the reason and when access resumes." : "Choose a time and reserve a room."}
                 onClick={bookingIssue ? showRestriction : onBook}
               />
-              <HomeCard icon={<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 9v12M15 9v12M5.5 13h1M11.5 17h1M17.5 13h1"/></svg>} title="Room availability" text={bookingIssue ? "View schedules only · Booking restricted" : "Compare room schedules."} onClick={onAvailability} />
+              <HomeCard icon={<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 9v12M15 9v12M5.5 13h1M11.5 17h1M17.5 13h1"/></svg>} title="Room availability" text={bookingIssue ? <><span className="lg:hidden">View schedules only</span><span className="hidden lg:inline">View schedules only · Booking restricted</span></> : "Compare room schedules."} onClick={onAvailability} />
               <HomeCard icon={<TicketCheck />} title="My Reservations" text="View and manage your sessions." onClick={() => onReservations()} />
               <HomeCard
                 icon={<Headphones />}
@@ -5120,7 +5124,7 @@ function HomeCard({
   dark?: boolean;
   icon: React.ReactNode;
   title: string;
-  text: string;
+  text: React.ReactNode;
   onClick: () => void;
   className?: string;
 }) {

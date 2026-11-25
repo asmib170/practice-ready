@@ -415,3 +415,11 @@ Student restriction history formats each restriction as a separate Restriction a
 - Restriction consequence wording now uses “This restriction will block…” for both immediate and scheduled starts.
 
 - Restriction preview history now records “No explanation received” separately from ATS’s assessment. Student history shows recorded explanations, with a clear fallback when none is recorded.
+
+- Mobile restriction previews use a compact banner with “Restriction preview”, an adjacent Exit preview button, and “Sample data · Discarded on exit”. The restriction scope stays in the Home notice. Restricted Room availability uses “View schedules only” on mobile; desktop copy and card sizing stay unchanged.
+
+- Restriction details hide the descriptive subtitle visually on mobile while retaining its screen-reader description. Incident labels share the row height so all three counts align even when a label wraps. Desktop subtitle, scrolling content and fixed Close button are preserved.
+
+- On mobile and desktop, booking-restricted calendars replace booking instructions with “View room schedules” and a clear browsing-only explanation above date controls. The repeated message below the legend is removed. Normal booking instructions, ATS calendars, date/room browsing, fullscreen and slot restrictions remain unchanged.
+
+- Mobile equipment directory and location-result headers scroll with the page, including My equipment moves. The initial search guidance uses compact vertical padding. Desktop sticky headers and empty-state spacing, search controls and browsing tabs are preserved.
